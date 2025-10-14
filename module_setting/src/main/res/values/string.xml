@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setting_cache_has_been_cleared">The cache has been cleared.</string>
+    <string name="setting_settings">Settings</string>
+    <string name="setting_user_agreement">User Agreement</string>
+    <string name="setting_privacy_policy">Privacy Policy</string>
+    <string name="setting_about_us">About Us</string>
+    <string name="setting_clear_cache">Clear Cache</string>
+    <string name="setting_version">Version</string>
+    <string name="setting_login_out">Login Out</string>
+</resources>

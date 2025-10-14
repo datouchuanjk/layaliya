@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agent_agency">Agency</string>
+    <string name="agent_proxy_name">Proxy Name</string>
+    <string name="agent_payment_method">Payment Method</string>
+    <string name="agent_code">Code</string>
+    <string name="agent_payment_information">Payment Information</string>
+    <string name="agent_cancel">Cancel</string>
+    <string name="agent_confirm">Confirm</string>
+    <string name="agent_uid">UID</string>
+    <string name="agent_name">Name</string>
+    <string name="agent_cycle">Cycle</string>
+    <string name="agent_idol_income">Idol Income</string>
+    <string name="agent_proxy_commission_ratio">Proxy commission ratio</string>
+    <string name="agent_proxy_commission">Proxy commission</string>
+    <string name="agent_gross_salary">Gross Salary</string>
+    <string name="agent_please_input">Please input</string>
+    <string name="agent_invitations">Invitations</string>
+    <string name="agent_time">Time</string>
+    <string name="agent_status">Status</string>
+    <string-array name="agent_tabs">
+        <item>Basic information</item>
+        <item>Idol List</item>
+        <item>Bill</item>
+    </string-array>
+    <string name="agent_remaining_coins">Remaining coins</string>
+    <string name="agent_total_coins">Total coins</string>
+    <string name="agent_account_status">Account status</string>
+    <string name="mine_admin">Admin</string>
+    <string name="mine_bd">BD</string>
+    <string name="mine_cycle">Cycle</string>
+    <string name="mine_please_input">please input</string>
+    <string name="mine_invitation">Invitation</string>
+    <string name="mine_total_coins">Total coins</string>
+    <string name="mine_uid">UID</string>
+    <string name="mine_agent_nickname">Agent Nickname</string>
+    <string name="mine_bound_idol">Bound Idol</string>
+    <string name="mine_agent_revenue">Agent Revenue</string>
+    <string name="mine_details_of_coins">Details of coins</string>
+    <string name="mine_coin_merchant"> Coin Merchant</string>
+    <string name="mine_remaining_currency"> Remaining Currency</string>
+    <string name="mine_diamond_details"> Diamond Details</string>
+    <string name="mine_recharge">Recharge</string>
+    <string name="mine_cancel">Cancel</string>
+    <string name="mine_confirm">Confirm</string>
+    <string name="mine_confirm_successful">Confirm Successful"</string>
+    <string name="mine_please_enter_the_uid">Please enter the UID</string>
+    <string name="mine_query">Query</string>
+    <string name="mine_avatar_and_nickname">Avatar and Nickname</string>
+    <string name="mine_gift_diamonds">Gift Diamonds</string>
+    <string name="mine_please_enter_the_number">Please enter the Number</string>
+</resources>

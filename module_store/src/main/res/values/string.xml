@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="store_store">Store</string>
+    <string name="store_buy">Buy</string>
+    <string name="store_buy_now">Buy Now</string>
+    <string name="store_buy_successful">buy successful</string>
+</resources>

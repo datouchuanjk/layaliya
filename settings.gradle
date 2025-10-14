@@ -1,0 +1,42 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://jitpack.io' }  // 添加这行
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://jitpack.io' }  // 添加这行
+    }
+}
+
+rootProject.name = "Layaliya"
+include ':app'
+include ':module_basic'
+include ':module_login'
+include ':module_room'
+include ':module_chatroom'
+include ':module_chat'
+include ':module_community'
+include ':module_mine'
+include ':module_noble'
+include ':module_agent'
+include ':module_gift'
+include ':module_comment'
+include ':module_wallet'
+include ':module_charm'
+include ':module_wealth'
+include ':module_store'
+include ':module_setting'
+include ':module_bag'
+include ':helper_im'
+include ':helper_develop'
+include ':module_emoji'
+
+

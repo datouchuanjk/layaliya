@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="noble_tabs">
+        <item>Baron</item>
+        <item>Viscount</item>
+        <item>Count</item>
+        <item>Marquis</item>
+        <item>Duke</item>
+        <item>King</item>
+    </string-array>
+
+
+    <string name="nobel_record_successful">Record successful</string>
+    <string name="nobel_receive_failed"> u are not noble cannot receive</string>
+    <string name="noble_give_successful">Give successful</string>
+    <string name="noble_give">Give</string>
+    <string name="noble_buy">Buy</string>
+    <string name="noble_buy_successful">Buy successful</string>
+    <string name="noble_uid">UID:</string>
+    <string name="noble_please_enter">Please enter</string>
+    <string name="noble_search">Search</string>
+    <string name="noble_name">Name:</string>
+    <string name="noble_cancel">Cancel</string>
+    <string name="noble_confirm">Confirm</string>
+    <string name="noble_explain">Explain</string>
+    <string name="noble_explain_info">1.After activating the noble,the validity period is calculated in 30-day cycles, starting from the second day of activating. \n2.Activate/renew nobles will receive return coins.</string>
+    <string name="noble_explain_info1">Level 1–4 return</string>
+    <string name="noble_explain_info2">Purchasing nobility（100% rebate）</string>
+    <string-array name="vip_explain_days">
+        <item>Start day</item>
+        <item>7 days</item>
+        <item>14 day</item>
+        <item>21 day</item>
+        <item>28 day</item>
+    </string-array>
+    <string-array name="vip_explain_days_return1">
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+    </string-array>
+    <string-array name="vip_explain_days_return2">
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+        <item>Return 60%</item>
+    </string-array>
+    <string name="noble_historical_records">Historical records</string>
+    <string name="noble_no_records_for_the_time_being">No record for the time being</string>
+    <string name="noble_claim">Claim</string>
+    <string-array name="vip_historical_records_tabs">
+        <item>Date</item>
+        <item>Behavior</item>
+        <item>Object</item>
+        <item>Noble rank</item>
+    </string-array>
+</resources>

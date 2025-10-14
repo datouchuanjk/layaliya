@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gift_to">To</string>
+    <string name="gift_send">Send</string>
+    <string name="gift_send_successful">Send_successful</string>
+</resources>

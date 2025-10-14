@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="charm_charm_level">Charm Level</string>
+    <string name="charm_level_rules">Level Rules</string>
+    <string name="charm_level_rules_detail">Levels are based on historical recharge or consumption, taking the maximum value of recharge or consumption.group red packets.</string>
+</resources>

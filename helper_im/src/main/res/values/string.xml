@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="im_image_message_display">[image]</string>
+    <string name="im_gift_message_display">[gift]</string>
+    <string name="im_gift_message_invitation">[invitation]</string>
+    <string name="im_unknown_message_display">[unknown]</string>
+</resources>

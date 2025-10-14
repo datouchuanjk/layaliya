@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mine_followers">Following</string>
+    <string name="mine_fans">Fans</string>
+    <string name="mine_rooms">Rooms</string>
+    <string name="mine_wallet">Wallet</string>
+    <string name="mine_view_more">View More</string>
+    <string name="mine_store">Store</string>
+
+
+
+    <string-array name="mine_actions">
+        <item>Store</item>
+        <item>My decoration</item>
+        <item>Noble</item>
+        <item>Agency</item>
+        <item>Admin</item>
+        <item>BD</item>
+        <item>Coin Merchant</item>
+    </string-array>
+    <string name="mine_charm_level">Charm Level</string>
+    <string name="mine_wealth_level">Wealth level</string>
+    <string name="mine_settings">Settings</string>
+    <string name="mine_hidden_identity">Hidden identity</string>
+    <string-array name="mine_person_center_tabs">
+        <item>Community</item>
+    </string-array>
+    <string name="mine_profile">Profile</string>
+    <string name="mine_avatar">Avatar</string>
+    <string name="mine_nickname">Nickname</string>
+    <string name="mine_introduce">Introduce</string>
+    <string name="mine_please_input">please input</string>
+    <string name="mine_birthday">Birthday</string>
+    <string name="mine_sex">Sex</string>
+    <string name="mine_sex_man">man</string>
+    <string name="mine_sex_woman">woman</string>
+    <string name="mine_sex_unknow">unknow</string>
+    <string name="mine_language">Language</string>
+    <string name="mine_country">Country</string>
+    <string name="mine_edit">edit</string>
+    <string name="mine_edit_successful">edit successful</string>
+
+
+    <string name="mine_uid">UID</string>
+
+
+    <string name="mine_please_enter_the_uid">Please enter the UID</string>
+
+    <string name="mine_cancel">Cancel</string>
+    <string name="mine_confirm">Confirm</string>
+    <string name="mine_confirm_successful">Confirm Successful</string>
+    <string name="mine_message">message</string>
+
+
+</resources>

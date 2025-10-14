@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="comment_comments">Comments</string>
+    <string name="comment_please_input_comment">Please input</string>
+    <string name="comment_post_successful">post_successful</string>
+    <string name="comment_reply">Reply</string>
+    <string name="comment_send">Send</string>
+</resources>

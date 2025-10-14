@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="community">Community</string>
+    <string name="community_post_update">Post update</string>
+    <string name="community_post">Post</string>
+    <string name="community_share_your_good_mood">Share your good mood~</string>
+    <string name="comment_please_input_comment">Please input</string>
+    <string name="community_post_successful">post_successful</string>
+</resources>

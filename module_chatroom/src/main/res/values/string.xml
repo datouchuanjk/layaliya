@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <string-array name="room_chat_message_tab">
+        <item>All</item>
+        <item>Chat</item>
+        <item>Me</item>
+    </string-array>
+    <string name="room_send_a_message">Send a message~</string>
+    <string-array name="room_more_action">
+        <item>Text-ban List</item>
+        <item>Admin</item>
+        <item>Edit</item>
+        <item>Kick-out List</item>
+    </string-array>
+    <string-array name="room_warning_action">
+        <item>Minimize</item>
+        <item>Exit</item>
+    </string-array>
+    <string name="room_cancel" translatable="false">Cancel</string>
+    <string name="room_submit" translatable="false">Submit</string>
+    <string name="room_relieve" translatable="false">Relieve</string>
+    <string name="room_out" translatable="false">Out</string>
+    <string-array name="room_silence_title">
+        <item>UID</item>
+        <item>Name</item>
+        <item>Add time</item>
+        <item>Operation</item>
+    </string-array>
+    <string-array name="room_admin_title">
+        <item>UID</item>
+        <item>Time</item>
+        <item>Expiration</item>
+        <item>Operator</item>
+        <item>Operation</item>
+    </string-array>
+
+    <string name="room_follow">Follow</string>
+    <string name="room_unfollow">Unfollow</string>
+    <string name="room_mention">Mention</string>
+    <string name="room_send_gifts">Send Gifts</string>
+    <string name="room_mute">Mute</string>
+    <string name="room_silence">Text Mute</string>
+    <string name="room_unsilence">Allow Text</string>
+    <string name="room_add_admin">Add admin</string>
+    <string name="room_un_admin">Del admin</string>
+    <string name="room_kick_out">Kick Out</string>
+    <string name="room_close_successful">Close successful</string>
+    <string name="room_search">Search</string>
+    <string name="room_uid">UID</string>
+    <string name="room_search_hint">please input</string>
+
+    <string name="room_time">Time</string>
+    <string name="room_confirm" translatable="false">Confirm</string>
+    <string name="room_report_type" >Report type</string>
+    <string name="room_please_enter_the_reason_for_reporting" >Please enter the reason for reporting</string>
+    <string name="room_upload_photos" >Upload photos</string>
+    <string name="room_report_successful" >Report Successful</string>
+    <string name="room_not_empty_seat" >Not empty seat</string>
+    <string name="room_up_seat" >Up seat</string>
+    <string name="room_down_seat" >Down seat</string>
+    <string name="room_must_up_seat_before_you_open_or_close" >Must up seat before you open or close</string>
+    <string name="room_set_as_admin">You have been set as an administrator</string>
+    <string name="room_removed_from_admin">Your administrator privileges have been removed</string>
+    <string name="room_banned_message">You have been muted</string>
+    <string name="room_unbanned_message">You have been unmuted</string>
+    <string name="room_kicked_from_room">You have been kicked out of the room</string>
+    <string name="room_no_body_nickname">Hidden identity</string>
+    <string name="room_you_have_been_muted">you have been muted</string>
+    <string name="room_you_have_been_unmuted">you have been unmuted</string>
+    <string name="room_no_record_for_the_time_being">No record for the time being</string>
+
+</resources>

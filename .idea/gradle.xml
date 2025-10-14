@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT">
+            <builds>
+              <build path="$PROJECT_DIR$/buildSrc" name="buildSrc">
+                <projects>
+                  <project path="$PROJECT_DIR$/buildSrc" />
+                </projects>
+              </build>
+            </builds>
+          </compositeBuild>
+        </compositeConfiguration>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/helper_develop" />
+            <option value="$PROJECT_DIR$/helper_im" />
+            <option value="$PROJECT_DIR$/module_agent" />
+            <option value="$PROJECT_DIR$/module_bag" />
+            <option value="$PROJECT_DIR$/module_basic" />
+            <option value="$PROJECT_DIR$/module_charm" />
+            <option value="$PROJECT_DIR$/module_chat" />
+            <option value="$PROJECT_DIR$/module_chatroom" />
+            <option value="$PROJECT_DIR$/module_comment" />
+            <option value="$PROJECT_DIR$/module_community" />
+            <option value="$PROJECT_DIR$/module_emoji" />
+            <option value="$PROJECT_DIR$/module_gift" />
+            <option value="$PROJECT_DIR$/module_login" />
+            <option value="$PROJECT_DIR$/module_mine" />
+            <option value="$PROJECT_DIR$/module_noble" />
+            <option value="$PROJECT_DIR$/module_room" />
+            <option value="$PROJECT_DIR$/module_setting" />
+            <option value="$PROJECT_DIR$/module_store" />
+            <option value="$PROJECT_DIR$/module_wallet" />
+            <option value="$PROJECT_DIR$/module_wealth" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

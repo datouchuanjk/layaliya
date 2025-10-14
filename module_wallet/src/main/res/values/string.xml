@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallet_wallet"> Wallet</string>
+    <string-array name="wallet_tabs">
+        <item>Diamond</item>
+        <item>Coins</item>
+    </string-array>
+    <string name="wallet_balance">Balance</string>
+    <string name="wallet_confirm_recharge">Confirm Recharge</string>
+</resources>

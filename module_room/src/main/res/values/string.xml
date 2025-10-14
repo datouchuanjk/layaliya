@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="room_chatroom_create">Chatroom Create</string>
+    <string name="room_chatroom_settings">Chatroom Settings</string>
+    <string name="room_cover">Cover</string>
+    <string name="room_name">Name</string>
+    <string name="room_please_enter_the_name">Please enter the name</string>
+    <string name="room_announcement" translatable="false">Announcement</string>
+    <string name="room_enter_the_announcement">Please enter the announcement</string>
+    <string name="room_country_or_region">Country/Region</string>
+    <string name="room_language">Language</string>
+    <string name="room_room_type">Room type</string>
+    <string name="room_number_of_mic">Number of Mic</string>
+    <string name="room_save">Save</string>
+    <string-array name="room_my_tabs">
+        <item>My </item>
+        <item>Manage  </item>
+        <item>Follow  </item>
+    </string-array>
+    <string name="room_hide">Hide</string>
+    <string name="room_show">Show</string>
+    <string-array name="room_tabs">
+        <item>Follow</item>
+        <item>Party</item>
+    </string-array>
+</resources>

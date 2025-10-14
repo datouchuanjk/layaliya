@@ -1,0 +1,11 @@
+package com.module.community.api.data.request
+
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
+import com.module.basic.api.data.request.BaseRequest
+
+@Keep
+internal data class CommunityLikeRequest(
+    @SerializedName("zone_id")
+    val zoneId: String
+) : BaseRequest()
