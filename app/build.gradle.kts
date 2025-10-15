@@ -15,7 +15,7 @@ android {
         minSdk = MIN_SDK
         ndk {
             //设置支持的 SO 库架构
-            abiFilters.addAll(listOf("armeabi-v7a", "x86", "arm64-v8a", "x86"))
+            abiFilters.addAll(listOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64"))
         }
     }
 
