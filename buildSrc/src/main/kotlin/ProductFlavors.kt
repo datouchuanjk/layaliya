@@ -13,15 +13,15 @@ sealed class ProductFlavors {
         override val name: String = "Online",
         override val signingConfigs: SigningConfigs = SigningConfigs.Online(),
         override val applicationId: String = "com.layaliya.chat",
-        override val versionCode: Int = 1,
-        override val versionName: String = "1.0"
+        override val versionCode: Int = 2,
+        override val versionName: String = "1.0.1"
     ) : ProductFlavors()
 
     class Offline(
         override val name: String = "Offline",
         override val signingConfigs: SigningConfigs = SigningConfigs.Offline(),
         override val applicationId: String = "com.test.lychat",
-        override val versionCode: Int = 1,
-        override val versionName: String = "1.0"
+        override val versionCode: Int = 2,
+        override val versionName: String = "1.0.1"
     ) : ProductFlavors()
 }
