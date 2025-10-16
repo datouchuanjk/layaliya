@@ -7,4 +7,5 @@
     </string-array>
     <string name="wallet_balance">Balance</string>
     <string name="wallet_confirm_recharge">Confirm Recharge</string>
+    <string name="wallet_buy_successful">Buy successful</string>
 </resources>

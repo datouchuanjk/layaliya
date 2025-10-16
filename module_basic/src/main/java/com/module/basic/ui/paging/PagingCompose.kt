@@ -1,11 +1,14 @@
 package com.module.basic.ui.paging
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -23,24 +26,39 @@ import com.helper.develop.paging.LoadState
 import com.module.basic.R
 import com.module.basic.util.onClick
 
+
 @Composable
-internal fun LazyItemScope.DefaultLoadingCompose() {
-    Row(
-        modifier = Modifier
+internal fun Any.DefaultLoadingCompose() {
+    val modifier = if(this is LazyItemScope){
+        Modifier
             .fillParentMaxWidth()
             .wrapContentSize()
+    }else{
+        Modifier
+            .fillMaxWidth()
+            .wrapContentSize()
+    }
+    Row(
+        modifier = modifier
     ) {
         CircularProgressIndicator(modifier = Modifier.size(15.dp), strokeWidth = 3.dp, color = Color(0xff333333))
     }
 }
 
 @Composable
-internal fun LazyItemScope.DefaultNotLoadingCompose(loadState: LoadState) {
+internal fun Any.DefaultNotLoadingCompose(loadState: LoadState) {
+    val modifier = if(this is LazyItemScope){
+        Modifier
+            .fillParentMaxWidth()
+            .wrapContentSize()
+    }else{
+        Modifier
+            .fillMaxWidth()
+            .wrapContentSize()
+    }
     if (loadState.endOfPaginationReached) {
         Row(
-            modifier = Modifier
-                .fillParentMaxWidth()
-                .wrapContentSize()
+            modifier = modifier
         ) {
             Text(text = "no more", fontSize = 12.sp, color = Color(0xff333333))
         }
@@ -48,11 +66,18 @@ internal fun LazyItemScope.DefaultNotLoadingCompose(loadState: LoadState) {
 }
 
 @Composable
-internal fun LazyItemScope.DefaultLoadErrorCompose(retry: () -> Unit) {
-    Row(
-        modifier = Modifier
+internal fun Any.DefaultLoadErrorCompose(retry: () -> Unit) {
+    val modifier = if(this is LazyItemScope){
+        Modifier
             .fillParentMaxWidth()
             .wrapContentSize()
+    }else{
+        Modifier
+            .fillMaxWidth()
+            .wrapContentSize()
+    }
+    Row(
+        modifier =modifier
     ) {
         Icon(
             painter = painterResource(R.drawable.paging_ic_refresh),
@@ -64,9 +89,19 @@ internal fun LazyItemScope.DefaultLoadErrorCompose(retry: () -> Unit) {
 }
 
 @Composable
-internal fun LazyItemScope.DefaultEmptyCompose() {
+internal fun Any.DefaultEmptyCompose() {
+    val modifier = if(this is LazyItemScope){
+        Modifier
+            .fillParentMaxWidth()
+            .wrapContentSize()
+    }else{
+        Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .wrapContentSize()
+    }
     Column(
-        modifier = Modifier.fillParentMaxSize(),
+        modifier =modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

@@ -65,7 +65,7 @@ internal class PagingImpl<T, V>(
                         _loadMoreState = LoadState.NotLoading(_nextKey == null)
                     }
                     _list.clear()
-                    _list.addAll(result.data)
+                    _list.addAll(result.data.orEmpty())
                 } catch (e: Exception) {
                     e.printStackTrace()
                     _refreshState = LoadState.Error(e)
@@ -93,7 +93,7 @@ internal class PagingImpl<T, V>(
                     }
                     _nextKey = result.nextKey
                     _loadMoreState = LoadState.NotLoading(_nextKey == null)
-                    _list.addAll(result.data)
+                    _list.addAll(result.data.orEmpty())
                 } catch (e: Exception) {
                     e.printStackTrace()
                     _loadMoreState = LoadState.Error(e)

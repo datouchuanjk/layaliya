@@ -67,7 +67,7 @@ internal class MyRoomViewModel(
                 apiRequest {
                     api.hideRoom().checkAndGet()
                 }.apiResponse {
-                    pagingData.map {
+                    pagingData.handle {
                         findIndex { it.uid == response.uid }?.let { index ->
                             this[index] = response.copy(isOpen = 0)
                         }
@@ -77,7 +77,7 @@ internal class MyRoomViewModel(
                 apiRequest {
                     api.showRoom().checkAndGet()
                 }.apiResponse {
-                    pagingData.map {
+                    pagingData.handle {
                         findIndex { it.uid == response.uid }?.let { index ->
                             this[index] = response.copy(isOpen = 1)
                         }

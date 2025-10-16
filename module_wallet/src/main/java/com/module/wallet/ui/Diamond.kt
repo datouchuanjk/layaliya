@@ -1,5 +1,6 @@
 package com.module.wallet.ui
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,10 +36,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.helper.develop.Background
-import com.module.agent.R
+import com.module.wallet.R
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWidth
+import com.module.basic.ui.paging.items
+import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.util.*
 import com.module.basic.viewmodel.*
 import com.module.wallet.viewmodel.*
@@ -109,7 +113,7 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                                     start.linkTo(icon.end, 12.dp)
                                 })
                             Text(
-                                text = "UID:${ viewModel.userInfo?.uuid.orEmpty()}",
+                                text = "UID:${viewModel.userInfo?.uuid.orEmpty()}",
                                 fontSize = 16.sp,
                                 color = Color(0xffe6e6e6),
                                 modifier = Modifier.constrainAs(uid) {
@@ -122,7 +126,11 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                                     top.linkTo(icon.bottom, 20.dp)
                                     start.linkTo(icon.start)
                                 }) {
-                                Text(text =  viewModel.userInfo?.diamond.orEmpty(), fontSize = 28.sp, color = Color.White)
+                                Text(
+                                    text = viewModel.userInfo?.diamond.orEmpty(),
+                                    fontSize = 28.sp,
+                                    color = Color.White
+                                )
                                 SpacerWidth(8.dp)
                                 AppImage(R.drawable.wallet_ic_coin)
                             }
@@ -140,11 +148,11 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                     }
                 }
             }
-            val count = 7
-            items(count = count) {
-                val isSelected = it == 0
-                val isTop = it == 0
-                Box {
+            val pagingData = viewModel.pagingData
+            itemsIndexed(pagingData = pagingData, key = {
+                it.id.toString()
+            }) { index, it ->
+                Box(modifier = Modifier) {
                     Column(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier
@@ -153,25 +161,31 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                             .aspectRatio(107f / 76)
                             .border(
                                 2.dp,
-                                color = if (isSelected) Color(0xffff4070) else Color(0xffE6E6E6),
+                                color = if (it.isSelected) Color(0xffff4070) else Color(0xffE6E6E6),
                                 shape = RoundedCornerShape(12.dp)
-                            ),
+                            ).onClick {
+                                viewModel.selected(it)
+                            },
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             AppImage(R.drawable.wallet_ic_coin)
                             SpacerWidth(4.dp)
                             Text(
-                                "1980",
+                                it.num.toString(),
                                 fontSize = 20.sp,
                                 color = Color.Black,
                                 fontWeight = FontWeight.Black
                             )
                         }
                         SpacerHeight(4.dp)
-                        Text(text = "0.99", fontSize = 16.sp, color = Color(0xff999999))
+                        Text(
+                            text = it.price.toString(),
+                            fontSize = 16.sp,
+                            color = Color(0xff999999)
+                        )
                     }
-                    if (isTop) {
+                    if (it.isTop) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
@@ -185,10 +199,10 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                                     )
                                 )
                         ) {
-                            Text(text = "10%", fontSize = 12.sp, color = Color.White)
+                            Text(text = "${it.topValue}%", fontSize = 12.sp, color = Color.White)
                         }
                     }
-                    if (isSelected) {
+                    if (it.isSelected) {
                         AppImage(
                             R.drawable.wallet_ic_my_checked,
                             modifier = Modifier.align(alignment = Alignment.BottomEnd)
@@ -197,6 +211,7 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                 }
             }
         }
+        val localActivity = LocalActivity.current
         Text(
             text = stringResource(R.string.wallet_confirm_recharge),
             fontSize = 20.sp,
@@ -205,9 +220,12 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                 .fillMaxWidth()
                 .padding(15.dp)
                 .appBrushBackground(
-                   shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp)
                 )
-                .padding(vertical = 10.dp)
+                .onClick {
+                    localActivity?:return@onClick
+                    viewModel.buy(localActivity)
+                }. padding (vertical = 10.dp)
                 .wrapContentSize()
         )
     }

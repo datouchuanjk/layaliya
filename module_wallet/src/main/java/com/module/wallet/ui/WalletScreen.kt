@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.module.agent.R
+import com.module.wallet.R
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppTitleBar
 import com.module.basic.util.*

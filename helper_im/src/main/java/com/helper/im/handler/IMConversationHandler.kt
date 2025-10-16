@@ -45,7 +45,7 @@ import kotlin.coroutines.resume
         logIM("onConversationCreated conversation=${conversation}")
         conversation ?: return
         IMHelper.userHandler.refreshUserInfos(conversation.conversationId.toTargetId())
-        pagingData.map {
+        pagingData.handle {
             add(0, conversation.transform())
         }
 
@@ -55,7 +55,7 @@ import kotlin.coroutines.resume
         logIM("onConversationDeleted conversationIds->${conversationIds}")
         conversationIds ?: return
         if (conversationIds.isEmpty()) return
-        pagingData.map {
+        pagingData.handle {
             removeAll {
                 it.conversationId in conversationIds
             }
@@ -66,7 +66,7 @@ import kotlin.coroutines.resume
         logIM("onConversationChanged conversationList->${conversationList}")
         conversationList ?: return
         if (conversationList.isEmpty()) return
-        pagingData.map {
+        pagingData.handle {
             removeAll {
                 it.conversationId in conversationList.map { it.conversationId }
             }
@@ -132,7 +132,7 @@ import kotlin.coroutines.resume
     init {
         launch {
             IMHelper.userHandler.userProfileChangedFlow.collect { users ->
-                pagingData.map {
+                pagingData.handle {
                     users.forEach { user ->
                         this.forEachIndexed { index, item ->
                             if (user.accountId == item.targetId) {

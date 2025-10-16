@@ -57,7 +57,7 @@ internal class CommentViewModel(
                                     ).checkAndGet()
                 }
             }.apiResponse(null) {
-                pagingData.map {
+                pagingData.handle {
                     set(
                         index,
                         item.copy(
@@ -110,7 +110,7 @@ internal class CommentViewModel(
                 _input = ""
                 _postCommentSuccessfulFlow.emit(_commentCount)
                 result?.let {
-                    pagingData.map {
+                    pagingData.handle {
                         if (_commentResponse == null) {
                             add(0, result)
                         } else {

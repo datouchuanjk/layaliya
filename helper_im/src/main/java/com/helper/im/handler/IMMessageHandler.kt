@@ -14,9 +14,7 @@ import com.helper.im.util.logIM
 import com.helper.im.transform
 import com.netease.nimlib.sdk.v2.message.V2NIMClearHistoryNotification
 import com.netease.nimlib.sdk.v2.message.V2NIMMessage
-import com.netease.nimlib.sdk.v2.message.V2NIMMessageAttachmentCreator
 import com.netease.nimlib.sdk.v2.message.V2NIMMessageCreator
-import com.netease.nimlib.sdk.v2.message.V2NIMMessageCustomAttachmentParser
 import com.netease.nimlib.sdk.v2.message.V2NIMMessageDeletedNotification
 import com.netease.nimlib.sdk.v2.message.V2NIMMessageListener
 import com.netease.nimlib.sdk.v2.message.V2NIMMessagePinNotification
@@ -25,14 +23,11 @@ import com.netease.nimlib.sdk.v2.message.V2NIMMessageRevokeNotification
 import com.netease.nimlib.sdk.v2.message.V2NIMMessageService
 import com.netease.nimlib.sdk.v2.message.V2NIMP2PMessageReadReceipt
 import com.netease.nimlib.sdk.v2.message.V2NIMTeamMessageReadReceipt
-import com.netease.nimlib.sdk.v2.message.attachment.*
 import com.netease.nimlib.sdk.v2.message.enums.V2NIMMessageQueryDirection
 import com.netease.nimlib.sdk.v2.message.option.V2NIMMessageListOption
-import com.netease.nimlib.sdk.v2.message.params.*
 import com.netease.nimlib.sdk.v2.utils.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import okhttp3.internal.*
 import org.json.JSONObject
 import java.io.File
 import kotlin.collections.filter
@@ -77,7 +72,7 @@ class IMMessageHandler internal constructor(
         launch {
             _receiveMessagesFlow.emit(Unit)
             IMHelper.conversationHandler.clearUnreadCountById(conversationId)
-            pagingData.map {
+            pagingData.handle {
                 addAll(
                     0,
                     messages.filter { it.conversationId == conversationId }.map { it.transform() })
@@ -94,7 +89,7 @@ class IMMessageHandler internal constructor(
         logIM("onReceiveP2PMessageReadReceipts readReceipts->${readReceipts}")
         readReceipts ?: return
         if (readReceipts.isEmpty()) return
-        pagingData.map {
+        pagingData.handle {
             readReceipts
                 .filter { it.conversationId == conversationId }
                 .forEach { readReceipt ->
@@ -174,7 +169,7 @@ class IMMessageHandler internal constructor(
         logIM("onSendMessage message->${message}")
         if (message == null) return
         if (message.conversationId != conversationId) return
-        pagingData.map {
+        pagingData.handle {
             val index = findIndex { it.messageId == message.messageId }
             if (index == null) {
                 add(0, message.transform())
@@ -233,7 +228,7 @@ class IMMessageHandler internal constructor(
     init {
         launch {
             IMHelper.userHandler.userProfileChangedFlow.collect { users ->
-                pagingData.map {
+                pagingData.handle {
                     users.forEach { user ->
                         this.forEachIndexed { index, item ->
                             if (user.accountId == item.senderId) {

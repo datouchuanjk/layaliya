@@ -8,8 +8,7 @@ import com.module.basic.ui.BaseApplication
 
 open class BaseRequest(
     @SerializedName("device_id")
-//    val deviceId: String = AppGlobal.deviceId,
-    val deviceId: String = "abcdefsadsasdsddg",
+    val deviceId: String = AppGlobal.deviceId,
     val version: Long = BaseApplication.INSTANCE.versionCode,
     val system: Int = 1,
     @SerializedName("system_version")

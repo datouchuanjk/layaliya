@@ -597,7 +597,7 @@ internal class ChatRoomViewModel(
                 api.unAdmin(ChatroomUserRequest(uid = uid, roomId = roomId))
                     .checkAndGet()!!
                 refreshCurrentUserInfo()
-                adminList.map { removeIf { it.uid.toString() == uid } }
+                adminList.handle { removeIf { it.uid.toString() == uid } }
             }.apiResponse()
         }
     }
@@ -640,7 +640,7 @@ internal class ChatRoomViewModel(
                 refreshMikeInfos()
                 chatroomHandler.kickout(imId)
             }.apiResponse {
-                kickoutList.map { removeIf { it.uid.toString() == uid } }
+                kickoutList.handle { removeIf { it.uid.toString() == uid } }
                 _kickoutUserFlow.emit(Unit)
             }
         }
@@ -670,7 +670,7 @@ internal class ChatRoomViewModel(
                     ChatroomUserRequest(uid = uid, roomId = roomId)
                 ).checkAndGet()
                 refreshCurrentUserInfo()
-                muteList.map { removeIf { it.uid.toString() == uid } }
+                muteList.handle { removeIf { it.uid.toString() == uid } }
             }.apiResponse()
         }
     }

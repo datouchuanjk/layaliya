@@ -48,7 +48,7 @@ internal class CommunityViewModel(
                     ).checkAndGet()
                 }
             }.apiResponse(null) {
-                pagingData.map {
+                pagingData.handle {
                     set(
                         index,
                         item.copy(
@@ -71,7 +71,7 @@ internal class CommunityViewModel(
                     api.followUser(UidRequest(uid = item.uid.toString())).checkAndGet()
                 }
             }.apiResponse(null) {
-                pagingData.map {
+                pagingData.handle {
                     set(
                         index,
                         item.copy(
@@ -84,7 +84,7 @@ internal class CommunityViewModel(
     }
 
     fun uploadCommentNum(communityResponse: CommunityResponse, count: Int) {
-        pagingData.map {
+        pagingData.handle {
             findIndex { it.id == communityResponse.id }?.let { index ->
                 this[index] = communityResponse.copy(
                     commentNum = communityResponse.commentNum + count

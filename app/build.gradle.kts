@@ -83,7 +83,6 @@ dependencies {
     implementation(project(":module_setting"))
     implementation(project(":module_bag"))
     implementation(project(":helper_im"))
-    implementation("com.android.billingclient:billing:6.1.0")
 }
 
 tasks.register("buildOnline") {

@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.google.ksp)
 }
 android {
-    namespace = "com.module.agent"
+    namespace = "com.module.wallet"
     compileSdk = COMPILE_SDK
     defaultConfig {
         minSdk = MIN_SDK
@@ -26,4 +26,6 @@ android {
 
 dependencies {
     implementation(project(":module_basic"))
+    implementation("com.android.billingclient:billing:6.1.0")
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
 }

@@ -49,7 +49,7 @@ internal class FollowersOrFansViewModel(
                 apiRequest {
                     api.unfollowUser(UidRequest(uid = response.uid.toString())).checkAndGet()
                 }.apiResponse {
-                    pagingDate.map {
+                    pagingDate.handle {
                         findIndex { it.uid == response.uid }?.let { index ->
                             if (response.status == 1) {
                                 removeAt(index)
@@ -63,7 +63,7 @@ internal class FollowersOrFansViewModel(
                 apiRequest {
                     api.followUser(UidRequest(uid = response.uid.toString())).checkAndGet()
                 }.apiResponse {
-                    pagingDate.map {
+                    pagingDate.handle {
                         findIndex { it.uid == response.uid }?.let { index ->
                             this[index] = response.copy(status = 2)
                         }

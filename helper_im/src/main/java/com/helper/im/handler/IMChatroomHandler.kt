@@ -61,7 +61,7 @@ class IMChatroomHandler(
     init {
         launch {
             IMHelper.userHandler.userProfileChangedFlow.collect { users ->
-                allPagingData.map {
+                allPagingData.handle {
                     users.forEach { user ->
                         this.forEachIndexed { index, item ->
                             if (user.accountId == item.senderId) {
@@ -273,7 +273,7 @@ class IMChatroomHandler(
                     Log.e("1234","我收到了礼物 自定义消息收到 发送给房间")
                     val gift = data.getString("gift")
                     _receiveGiftFlow.emit(gift)
-                    allPagingData.map {
+                    allPagingData.handle {
                         add(0, message.transform(IMChatroomMessageBody(code = code, data = gift)))
                     }
                 }
@@ -302,7 +302,7 @@ class IMChatroomHandler(
                     val notice = data.getString("notice")
                     _userJoinFlow.emit(notice)
                     //同时也加入消息体
-                    allPagingData.map {
+                    allPagingData.handle {
                         add(0, message.transform(IMChatroomMessageBody(code = code, data = notice)))
                     }
                 }
@@ -328,7 +328,7 @@ class IMChatroomHandler(
     }
 
     private fun handleTextMessage(message: V2NIMChatroomMessage) {
-        allPagingData.map {
+        allPagingData.handle {
             add(0, message.transform())
         }
     }

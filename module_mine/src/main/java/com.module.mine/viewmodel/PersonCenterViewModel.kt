@@ -16,7 +16,6 @@ import com.module.mine.api.data.request.PersonDynamicRequest
 import com.module.mine.api.data.response.PersonDynamicResponse
 import com.module.mine.api.data.response.PersonResponse
 import com.module.mine.api.service.MineApiService
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 internal class PersonCenterViewModel(
@@ -77,7 +76,7 @@ internal class PersonCenterViewModel(
                                     ).checkAndGet()
                 }
             }.apiResponse(null) {
-                pagingData.map {
+                pagingData.handle {
                     set(
                         index,
                         item.copy(
@@ -91,7 +90,7 @@ internal class PersonCenterViewModel(
     }
 
     fun uploadCommentNum(response: PersonDynamicResponse, count: Int) {
-        pagingData.map {
+        pagingData.handle {
             findIndex { it.id == response.id }?.let { index ->
                 this[index] = response.copy(
                     commentNum = response.commentNum + count

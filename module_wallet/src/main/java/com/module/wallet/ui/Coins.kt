@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.helper.develop.Background
-import com.module.agent.R
+import com.module.wallet.R
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerWidth
 import com.module.basic.util.todoImageUrl

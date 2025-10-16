@@ -10,7 +10,6 @@ class PagingData<T> internal constructor(
     private val appendStateBlock: () -> LoadState,
     private val isFirstRefreshBlock: () -> Boolean
 ) {
-
     val refreshState get() = refreshStateBlock()
     val appendState get() = appendStateBlock()
     val isFirstRefresh get() = isFirstRefreshBlock()
@@ -34,18 +33,26 @@ class PagingData<T> internal constructor(
     fun peek(index: Int): T {
         return list[index]
     }
-    fun filter(predicate: (T) -> Boolean): PagingData<T>{
-        return  PagingData(
+
+    fun filter(predicate: (T) -> Boolean): PagingData<T> {
+        return PagingData(
             list = list.filter(predicate).toMutableList(),
-            onRefresh=onRefresh,
-            onRetry=onRetry,
-            onHint=onHint,
-            refreshStateBlock=refreshStateBlock,
-            appendStateBlock=appendStateBlock,
-            isFirstRefreshBlock=isFirstRefreshBlock,
+            onRefresh = onRefresh,
+            onRetry = onRetry,
+            onHint = onHint,
+            refreshStateBlock = refreshStateBlock,
+            appendStateBlock = appendStateBlock,
+            isFirstRefreshBlock = isFirstRefreshBlock,
         )
     }
-    fun map(block: MutableList<T>.() -> Unit) {
+
+    fun handle(block: MutableList<T>.() -> Unit) {
         block(list)
+    }
+
+
+
+    fun find(predicate: (T) -> Boolean): T? {
+        return list.find(predicate)
     }
 }
