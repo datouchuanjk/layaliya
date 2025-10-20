@@ -91,13 +91,12 @@ class DiamondViewModel(
             apiRequest {
                 api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken))
                     .checkAndGet()!!.googleProductId!!
+                payHelper.consumePurchase(purchaseToken)
             }.apiResponse {
-                payHelper.consumePurchase(purchaseToken) {
-                    if (it) {
-                        application.toast(R.string.wallet_buy_successful)
-                    } else {
-                        application.toast(R.string.wallet_buy_successful)
-                    }
+                if (it) {
+                    application.toast(R.string.wallet_buy_successful)
+                } else {
+                    application.toast(R.string.wallet_buy_successful)
                 }
             }
         }
