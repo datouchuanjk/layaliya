@@ -157,10 +157,10 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                             fontSize = 14.sp
                         )
                         Row(modifier = Modifier.constrainAs(userinfo) {
-                            top.linkTo(name.bottom, 5.dp)
+                            top.linkTo(name.bottom, 0.dp)
                             start.linkTo(name.start)
                         }) {
-                            Text(text = "China", fontSize = 16.sp, color = Color(0xff999999))
+//                            Text(text = "China", fontSize = 16.sp, color = Color(0xff999999))
                         }
                         Text(
                             text = item.content.orEmpty(),
