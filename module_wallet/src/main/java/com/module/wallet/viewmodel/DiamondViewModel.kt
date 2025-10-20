@@ -14,6 +14,7 @@ import com.module.wallet.api.data.request.VerifyRequest
 import com.module.wallet.api.data.response.DiamondListResponse
 import com.module.wallet.api.service.WalletApiService
 import com.module.wallet.util.PayHelper
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class DiamondViewModel(
@@ -49,23 +50,55 @@ class DiamondViewModel(
             apiRequest {
                 api.buy(BuyRequest(id.toString())).checkAndGet()
             }.apiResponse { result ->
-                PayHelper.pay(activity, result?.googleProductId.toString()) { token ->
-                    verify(
-                        orderNum = result?.orderNum.toString(),
-                        purchaseToken = token.toString(),
-                    )
+                PayHelper.pay(activity, result?.googleProductId.toString()) { successful, token ->
+                    if (successful) {
+                        verify(
+                            this,
+                            orderNum = result?.orderNum.toString(),
+                            purchaseToken = token,
+                        )
+                    } else {
+                        when (token) {
+                            PayHelper.PAY_CONNECT_FAILED -> {
+                                application.toast(R.string.wallet_pay_connect_failed)
+                            }
+
+                            PayHelper.PAY_EMPTY_PRODUCT_FAILED -> {
+                                application.toast(R.string.wallet_pay_no_product_failed)
+                            }
+
+                            PayHelper.PAY_QUERY_FAILED -> {
+                                application.toast(R.string.wallet_pay_query_failed)
+                            }
+
+                            PayHelper.PAY_LAUNCH_FAILED -> {
+                                application.toast(R.string.wallet_pay_launch_failed)
+                            }
+
+                            PayHelper.PAY_CANCEL_FAILED -> {
+                                application.toast(R.string.wallet_pay_cancel)
+                            }
+                        }
+                    }
+
                 }
             }
         }
     }
 
-    private fun verify(orderNum: String, purchaseToken: String) {
+    private fun verify(payHelper: PayHelper, orderNum: String, purchaseToken: String) {
         viewModelScope.launch {
             apiRequest {
                 api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken))
                     .checkAndGet()!!.googleProductId!!
             }.apiResponse {
-                application.toast(R.string.wallet_buy_successful)
+                payHelper.consumePurchase(purchaseToken) {
+                    if (it) {
+                        application.toast(R.string.wallet_buy_successful)
+                    } else {
+                        application.toast(R.string.wallet_buy_successful)
+                    }
+                }
             }
         }
     }

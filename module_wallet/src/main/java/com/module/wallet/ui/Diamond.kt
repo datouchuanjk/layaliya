@@ -21,7 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -163,7 +163,8 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                                 2.dp,
                                 color = if (it.isSelected) Color(0xffff4070) else Color(0xffE6E6E6),
                                 shape = RoundedCornerShape(12.dp)
-                            ).onClick {
+                            )
+                            .onClick {
                                 viewModel.selected(it)
                             },
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -222,10 +223,11 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                 .appBrushBackground(
                     shape = RoundedCornerShape(24.dp)
                 )
-                .onClick {
-                    localActivity?:return@onClick
+                .onClick() {
+                    localActivity ?: return@onClick
                     viewModel.buy(localActivity)
-                }. padding (vertical = 10.dp)
+                }
+                .padding(vertical = 10.dp)
                 .wrapContentSize()
         )
     }

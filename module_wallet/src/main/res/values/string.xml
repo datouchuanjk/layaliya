@@ -10,5 +10,7 @@
     <string name="wallet_buy_successful">Buy successful</string>
     <string name="wallet_pay_connect_failed">Connect Failed</string>
     <string name="wallet_pay_query_failed">Query Failed</string>
-    <string name="wallet_pay_buy_failed">Buy Failed</string>
+    <string name="wallet_pay_launch_failed">Launch Failed</string>
+    <string name="wallet_pay_no_product_failed">No Product Failed</string>
+    <string name="wallet_pay_cancel">Buy Cancel</string>
 </resources>

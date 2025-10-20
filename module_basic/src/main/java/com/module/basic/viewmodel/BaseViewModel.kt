@@ -27,6 +27,9 @@ abstract class BaseViewModel : ViewModel() {
     private var _loading by mutableStateOf(false)
     internal val loading get() = _loading
 
+    protected fun  handleLoading(isLoading:Boolean){
+        _loading  = isLoading
+    }
     fun <T> apiRequest(
         request: suspend () -> T,
     ) = flow {
