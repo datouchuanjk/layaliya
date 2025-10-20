@@ -17,31 +17,36 @@ class PayHelper(private val context: Context) : PurchasesUpdatedListener {
     private lateinit var billingClient: BillingClient
 
     init {
-        Log.e("1234","这PayHelper")
+        Log.e("1234", "这PayHelper")
         initializeBilling()
     }
+
     private var isConnection = false
-    private  fun initializeBilling(count: Int = 1) {
-        Log.e("1234","这是第${count}次")
+    private fun initializeBilling(count: Int = 1) {
+        Log.e("1234", "这是第${count}次")
         billingClient = BillingClient.newBuilder(context)
             .setListener(this)
             .enablePendingPurchases()
             .build()
-            billingClient.startConnection(object : BillingClientStateListener {
-                override fun onBillingSetupFinished(billingResult: BillingResult) {
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                        Log.e("1234","这是第${count}次 成功了")
-                    }else{
-                        Log.e("1234","这是第${count}次 失败了 ${billingResult.responseCode}")
-                    }
-                }
-
-                override fun onBillingServiceDisconnected() {
-                    Log.e("1234","这是第${count}次 失败了")
-                    initializeBilling()
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    isConnection = true
+                    Log.e("1234", "这是第${count}次 成功了")
+                } else {
+                    isConnection = false
+                    Log.e("1234", "这是第${count}次 失败了 ${billingResult.debugMessage}")
+                    initializeBilling(count + 1)
                 }
             }
-            )
+
+            override fun onBillingServiceDisconnected() {
+                isConnection = false
+                Log.e("1234", "这是第${count}次 失败了")
+                initializeBilling(count + 1)
+            }
+        }
+        )
     }
 
     private var _result: ((String?) -> Unit)? = null
@@ -51,6 +56,7 @@ class PayHelper(private val context: Context) : PurchasesUpdatedListener {
                 .show()
             return
         }
+        Log.e("1234", "开始支付产品id= $productId")
         _result = onResult
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(
@@ -61,8 +67,10 @@ class PayHelper(private val context: Context) : PurchasesUpdatedListener {
                         .build()
                 )
             ).build()
+        Log.e("1234", "构建产品支付参数完成")
         billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Log.e("1234", "很明显 产品查询成功了")
                 if (productDetailsList.isEmpty()) {
                     Toast.makeText(activity, "product is null", Toast.LENGTH_SHORT)
                         .show()
@@ -78,6 +86,17 @@ class PayHelper(private val context: Context) : PurchasesUpdatedListener {
                     )
                     .build()
                 billingClient.launchBillingFlow(activity, billingFlowParams)
+            } else {
+                Log.e(
+                    "1234",
+                    "很明显 产品查询失败了 ${billingResult.debugMessage} ${billingResult.responseCode}"
+                )
+                Toast.makeText(
+                    activity,
+                    "很明显，我炸了 debugMessage=${billingResult.debugMessage} responseCode=${billingResult.responseCode}",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
             }
         }
     }
@@ -95,7 +114,7 @@ class PayHelper(private val context: Context) : PurchasesUpdatedListener {
 
                     billingClient.acknowledgePurchase(params) { billingResult ->
                         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                            _result?.invoke( purchase.purchaseToken)
+                            _result?.invoke(purchase.purchaseToken)
                         } else {
                             _result?.invoke(
                                 null

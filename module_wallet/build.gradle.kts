@@ -26,6 +26,6 @@ android {
 
 dependencies {
     implementation(project(":module_basic"))
-    implementation("com.android.billingclient:billing:6.1.0")
-    implementation("com.android.billingclient:billing-ktx:6.1.0")
+    implementation("com.android.billingclient:billing:7.0.0")
+    implementation("com.android.billingclient:billing-ktx:7.0.0")
 }
