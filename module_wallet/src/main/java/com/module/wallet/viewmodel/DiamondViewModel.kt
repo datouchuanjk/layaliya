@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 
 class DiamondViewModel(
     private val api: WalletApiService,
-    private val pay: PayHelper,
     private val application: Application,
 ) : BaseViewModel() {
 
@@ -50,7 +49,7 @@ class DiamondViewModel(
             apiRequest {
                 api.buy(BuyRequest(id.toString())).checkAndGet()
             }.apiResponse { result ->
-                pay.pay(activity, result?.googleProductId.toString()) { token ->
+                PayHelper.pay(activity, result?.googleProductId.toString()) { token ->
                     verify(
                         orderNum = result?.orderNum.toString(),
                         purchaseToken = token.toString(),
@@ -60,7 +59,7 @@ class DiamondViewModel(
         }
     }
 
-    fun verify(orderNum: String, purchaseToken: String) {
+    private fun verify(orderNum: String, purchaseToken: String) {
         viewModelScope.launch {
             apiRequest {
                 api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken))

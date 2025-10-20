@@ -8,4 +8,7 @@
     <string name="wallet_balance">Balance</string>
     <string name="wallet_confirm_recharge">Confirm Recharge</string>
     <string name="wallet_buy_successful">Buy successful</string>
+    <string name="wallet_pay_connect_failed">Connect Failed</string>
+    <string name="wallet_pay_query_failed">Query Failed</string>
+    <string name="wallet_pay_buy_failed">Buy Failed</string>
 </resources>

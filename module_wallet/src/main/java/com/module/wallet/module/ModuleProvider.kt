@@ -1,9 +1,6 @@
 package com.module.wallet.module
 
 import com.module.wallet.api.service.WalletApiService
-import com.module.wallet.ui.*
-import com.module.wallet.ui.Diamond
-import com.module.wallet.util.PayHelper
 import com.module.wallet.viewmodel.*
 import org.koin.androidx.viewmodel.dsl.*
 import org.koin.dsl.module
@@ -19,10 +16,6 @@ val walletModule = module {
     }
 
     viewModel {
-        DiamondViewModel(get(),get(),get())
-    }
-
-    single {
-        PayHelper(get())
+        DiamondViewModel(get(),get())
     }
 }

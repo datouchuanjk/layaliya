@@ -48,6 +48,7 @@ android {
         compose = true
         buildConfig = true
     }
+
     flavorDimensions += listOf("default")
     productFlavors {
         ProductFlavors.all.forEach {

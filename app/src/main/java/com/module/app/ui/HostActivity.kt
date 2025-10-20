@@ -50,7 +50,6 @@ import com.module.room.ui.roomCreateCheckDialog
 import com.module.setting.ui.*
 import com.module.store.ui.*
 import com.module.wallet.ui.walletScreen
-import com.module.wallet.util.PayHelper
 import com.module.wealth.ui.*
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
@@ -66,7 +65,6 @@ class HostActivity : ComponentActivity() {
         enableEdgeToEdge()
         initNotification()
         IMHelper.initV2(application)
-        get<PayHelper>()
         lifecycleScope.launch {
             IMHelper.giftMessageHandler.receiveMessagesFlow.collect {
                 val localNav = _navController ?: return@collect
@@ -167,6 +165,7 @@ class HostActivity : ComponentActivity() {
      * 处理通知栏渠道与权限
      */
     private fun initNotification() {
+        return
         createNotificationChannel(AppConstant.CHANNEL_ID)
         registerForActivityResult(
             CustomActivityResultContracts.RequestNotificationPermission()
