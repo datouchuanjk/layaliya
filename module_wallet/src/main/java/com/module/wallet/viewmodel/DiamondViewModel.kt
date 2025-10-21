@@ -151,4 +151,10 @@ class DiamondViewModel(
             }
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        _payHelper?.end()
+        _payHelper =null
+    }
 }
