@@ -27,7 +27,7 @@ class DiamondViewModel(
 ) : BaseViewModel() {
 
     val userInfo get() = AppGlobal.userResponse
-
+    private var _payHelper: PayHelper? = null
     fun selected(response: DiamondListResponse) {
         pagingData.handle {
             forEachIndexed { index, item ->
@@ -58,7 +58,7 @@ class DiamondViewModel(
                     "PayHelper",
                     "跳去支付之前 先确定我这次购买的订单号是多少 ${result.orderNum}"
                 )
-                PayHelper.pay(
+                _payHelper = PayHelper.pay(
                     activity,
                     result.googleProductId.toString()
                 ) { token ->
@@ -108,5 +108,10 @@ class DiamondViewModel(
                 )
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _payHelper?.close()
     }
 }

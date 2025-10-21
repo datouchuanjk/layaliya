@@ -19,9 +19,8 @@ class PayHelper private constructor(
             context: Activity,
             productId: String,
             onResult: (String) -> Unit
-        ) {
-            PayHelper(context, productId, onResult).pay()
-        }
+        ) = PayHelper(context, productId, onResult).apply { pay() }
+
     }
 
 
@@ -150,7 +149,7 @@ class PayHelper private constructor(
         }
     }
 
-    private fun close() {
+     fun close() {
         isClose = true
         if (billingClient.isReady) {
             billingClient.endConnection()

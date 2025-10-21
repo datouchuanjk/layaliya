@@ -47,7 +47,7 @@ internal class ProfileEditViewModel(
     private var _introduce by mutableStateOf(userInfo?.nickname)
     val introduce get() = _introduce
     fun introduce(introduce: String) {
-        _introduce = _introduce
+        _introduce = introduce
     }
 
     private var _nickname by mutableStateOf(userInfo?.nickname)
