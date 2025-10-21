@@ -16,6 +16,6 @@ val walletModule = module {
     }
 
     viewModel {
-        DiamondViewModel(get(),get())
+        DiamondViewModel(get(),get(),get())
     }
 }

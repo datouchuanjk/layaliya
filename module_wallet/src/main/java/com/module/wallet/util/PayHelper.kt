@@ -1,6 +1,7 @@
 package com.module.wallet.util
 
 import android.app.Activity
+import android.util.Log
 import com.android.billingclient.api.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
@@ -142,6 +143,7 @@ class PayHelper private constructor(
 
       return suspendCancellableCoroutine { b->
           billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+              Log.e("PayHelper", "billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？")
               b.resume(billingResult.responseCode == BillingClient.BillingResponseCode.OK)
           }
       }
