@@ -117,8 +117,7 @@ class DiamondViewModel(
                 "开始调用验证接口 orderNum =$orderNum token=$purchaseToken"
             )
             apiRequest {
-                api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken))
-                    .checkAndGet()!!.googleProductId!!
+                api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken)).checkAndGet()
                 Log.e(
                     "PayHelper",
                     "验证接口调用成功  开始调用用户信息接口刷新砖石 现在的数量为${userInfo?.diamond}"

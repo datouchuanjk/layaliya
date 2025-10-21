@@ -27,5 +27,5 @@ interface WalletApiService {
      * 验证商品
      */
     @POST("recharge-order/verify-google-payment")
-    suspend fun verify(@Body request: VerifyRequest): BaseResponse<BuyResponse>
+    suspend fun verify(@Body request: VerifyRequest): BaseResponse<Unit>
 }
