@@ -9,7 +9,7 @@ import kotlin.coroutines.*
 class PayHelper private constructor(
     private val context: Activity,
     private val productId: String,
-    private val onResult: PayHelper.(Boolean, String) -> Unit
+    private val onResult: (Boolean, String) -> Unit
 ) : PurchasesUpdatedListener {
 
     companion object {
@@ -21,9 +21,11 @@ class PayHelper private constructor(
         suspend fun pay(
             context: Activity,
             productId: String,
-            onResult: PayHelper.(Boolean, String) -> Unit
-        ) {
-            PayHelper(context, productId, onResult).pay()
+            onResult: (Boolean, String) -> Unit
+        ): PayHelper {
+            return PayHelper(context, productId, onResult).apply {
+                pay()
+            }
         }
     }
 
@@ -123,7 +125,7 @@ class PayHelper private constructor(
 
                     billingClient.acknowledgePurchase(params) { billingResult ->
                         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                            onResult.invoke(this, true, purchase.purchaseToken)
+                            onResult.invoke( true, purchase.purchaseToken)
                         } else {
                             onResult(false, PAY_CANCEL_FAILED)
                         }
@@ -147,7 +149,9 @@ class PayHelper private constructor(
         }
     }
 
-    fun end(){
-        billingClient.endConnection()
+    fun end() {
+        if (billingClient.isReady) {
+            billingClient.endConnection()
+        }
     }
 }

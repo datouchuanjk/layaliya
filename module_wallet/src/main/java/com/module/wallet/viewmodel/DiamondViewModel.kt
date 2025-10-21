@@ -28,6 +28,7 @@ class DiamondViewModel(
 
     val userInfo get() = AppGlobal.userResponse
 
+    private var _payHelper: PayHelper? = null
 
     fun selected(response: DiamondListResponse) {
         pagingData.handle {
@@ -57,19 +58,31 @@ class DiamondViewModel(
                     Log.e("PayHelper", "订单号是多少  ${orderNum.toString()}")
                 } //创建订单接口
             }.apiResponse { result ->
-                Log.e("PayHelper", "跳去支付之前 先确定我这次购买的订单号是多少 ${result?.orderNum}")
-                PayHelper.pay(activity, result?.googleProductId.toString()) { successful, token ->
-                    Log.e("PayHelper", "支付完成 我回来了 这里我先输出 我购买接口 返回给我的订单号 ${result?.orderNum}")
+                Log.e(
+                    "PayHelper",
+                    "跳去支付之前 先确定我这次购买的订单号是多少 ${result.orderNum}"
+                )
+                _payHelper = PayHelper.pay(
+                    activity,
+                    result.googleProductId.toString()
+                ) { successful, token ->
+                    Log.e(
+                        "PayHelper",
+                        "支付完成 我回来了 这里我先输出 我购买接口 返回给我的订单号 ${result.orderNum}"
+                    )
                     if (successful) {
                         Log.e("PayHelper", "支付成功 开始调用验证接口")
                         verify(
-                            this,
-                            orderNum = result?.orderNum.toString(),
+                            orderNum = result.orderNum.toString(),
                             purchaseToken = token,
                         )
                     } else {
-                        end()
-                        Log.e("PayHelper", "支付失败 这个时候应该有toast 假如我是成功的 那么orderNum=${result?.orderNum} token= 没有token 只有错误码")
+                        _payHelper?.end()
+                        _payHelper = null
+                        Log.e(
+                            "PayHelper",
+                            "支付失败 这个时候应该有toast 假如我是成功的 那么orderNum=${result.orderNum} token= 没有token 只有错误码"
+                        )
                         when (token) {
                             PayHelper.PAY_CONNECT_FAILED -> {
                                 application.toast(R.string.wallet_pay_connect_failed)
@@ -97,7 +110,7 @@ class DiamondViewModel(
         }
     }
 
-    private fun verify(payHelper: PayHelper, orderNum: String, purchaseToken: String) {
+    private fun verify(orderNum: String, purchaseToken: String) {
         viewModelScope.launch {
             Log.e(
                 "PayHelper",
@@ -128,8 +141,9 @@ class DiamondViewModel(
                     "PayHelper",
                     "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken} "
                 )
-                payHelper.consumePurchase(purchaseToken)
-                payHelper.end()
+                _payHelper?.consumePurchase(purchaseToken)
+                _payHelper?.end()
+                _payHelper = null
                 Log.e(
                     "PayHelper",
                     "异步调用消费接口，断开了链接 不会出现多次请求 "
