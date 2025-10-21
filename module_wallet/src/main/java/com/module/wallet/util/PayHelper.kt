@@ -3,29 +3,24 @@ package com.module.wallet.util
 import android.app.Activity
 import android.util.Log
 import com.android.billingclient.api.*
+import com.helper.develop.util.toast
+import com.module.wallet.R
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
 class PayHelper private constructor(
     private val context: Activity,
     private val productId: String,
-    private val onResult: (Boolean, String) -> Unit
+    private val onResult: (String) -> Unit
 ) : PurchasesUpdatedListener {
 
     companion object {
-        const val PAY_CONNECT_FAILED = "PAY_CONNECT_FAILED"
-        const val PAY_EMPTY_PRODUCT_FAILED = "PAY_EMPTY_PRODUCT_FAILED"
-        const val PAY_QUERY_FAILED = "PAY_QUERY_FAILED"
-        const val PAY_LAUNCH_FAILED = "PAY_LAUNCH_FAILED"
-        const val PAY_CANCEL_FAILED = "PAY_CANCEL_FAILED"
         suspend fun pay(
             context: Activity,
             productId: String,
-            onResult: (Boolean, String) -> Unit
-        ): PayHelper {
-            return PayHelper(context, productId, onResult).apply {
-                pay()
-            }
+            onResult: (String) -> Unit
+        ) {
+            PayHelper(context, productId, onResult).pay()
         }
     }
 
@@ -46,19 +41,29 @@ class PayHelper private constructor(
             billingClient.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
                     if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                        if (b.isCompleted) {
+                            return
+                        }
                         b.resume(true)
                     } else {
+                        if (b.isCompleted) {
+                            return
+                        }
                         b.resume(false)
                     }
                 }
 
                 override fun onBillingServiceDisconnected() {
+                    if (b.isCompleted) {
+                        return
+                    }
                     b.resume(false)
                 }
             })
         }
     }
 
+    private var isClose: Boolean = false
 
     private suspend fun pay() {
         var isConnection = false
@@ -68,7 +73,8 @@ class PayHelper private constructor(
             connectCount++
         }
         if (!isConnection) {
-            onResult(false, PAY_CONNECT_FAILED)
+            context.toast(R.string.wallet_pay_connect_failed)
+            close()
             return
         }
         val params = QueryProductDetailsParams.newBuilder()
@@ -89,12 +95,9 @@ class PayHelper private constructor(
                 }
             }
         }
-        if (productDetailsList == null) {
-            onResult(false, PAY_QUERY_FAILED)
-            return
-        }
-        if (productDetailsList.isEmpty()) {
-            onResult(false, PAY_EMPTY_PRODUCT_FAILED)
+        if (productDetailsList.isNullOrEmpty()) {
+            context.toast(R.string.wallet_pay_query_failed)
+            close()
             return
         }
         val billingFlowParams = BillingFlowParams.newBuilder()
@@ -108,7 +111,9 @@ class PayHelper private constructor(
             .build()
         val result = billingClient.launchBillingFlow(context, billingFlowParams)
         if (result.responseCode != BillingClient.BillingResponseCode.OK) {
-            onResult(false, PAY_LAUNCH_FAILED)
+            context.toast(R.string.wallet_pay_launch_failed)
+            close()
+            return
         }
     }
 
@@ -116,6 +121,10 @@ class PayHelper private constructor(
         billingResult: BillingResult,
         purchases: List<Purchase?>?
     ) {
+        if (isClose) {
+            return
+        }
+        isClose = true
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             for (purchase in purchases) {
                 if (purchase!!.purchaseState == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged) {
@@ -124,37 +133,26 @@ class PayHelper private constructor(
                         .build()
 
                     billingClient.acknowledgePurchase(params) { billingResult ->
+                        close()
                         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                            onResult.invoke( true, purchase.purchaseToken)
+                            onResult.invoke(purchase.purchaseToken)
                         } else {
-                            onResult(false, PAY_CANCEL_FAILED)
+                            context.toast(R.string.wallet_pay_cancel)
                         }
                     }
                 }
             }
         } else {
-            onResult(false, PAY_CANCEL_FAILED)
+            context.toast(R.string.wallet_pay_cancel)
+            if (billingClient.isReady) {
+                billingClient.endConnection()
+            }
         }
     }
 
-    fun consumePurchase(token: String) {
-        val consumeParams = ConsumeParams.newBuilder()
-            .setPurchaseToken(token)
-            .build()
-        billingClient.consumeAsync(consumeParams) { billingResult, _ ->
-            Log.e(
-                "PayHelper",
-                " 消费接口token =${token} 调用 结果 ->billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？"
-            )
-        }
-    }
-
-    fun end() {
+    private fun close() {
+        isClose = true
         if (billingClient.isReady) {
-            Log.e(
-                "PayHelper",
-                " 已经成功清理连接"
-            )
             billingClient.endConnection()
         }
     }

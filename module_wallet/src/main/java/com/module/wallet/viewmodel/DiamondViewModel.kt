@@ -28,8 +28,6 @@ class DiamondViewModel(
 
     val userInfo get() = AppGlobal.userResponse
 
-    private var _payHelper: PayHelper? = null
-
     fun selected(response: DiamondListResponse) {
         pagingData.handle {
             forEachIndexed { index, item ->
@@ -54,57 +52,20 @@ class DiamondViewModel(
         val id = pagingData.find { it.isSelected }?.id ?: return
         viewModelScope.launch {
             apiRequest {
-                api.buy(BuyRequest(id.toString())).checkAndGet()!!.apply {
-                    Log.e("PayHelper", "订单号是多少  ${orderNum.toString()}")
-                } //创建订单接口
+                api.buy(BuyRequest(id.toString())).checkAndGet()!!
             }.apiResponse { result ->
                 Log.e(
                     "PayHelper",
                     "跳去支付之前 先确定我这次购买的订单号是多少 ${result.orderNum}"
                 )
-                _payHelper = PayHelper.pay(
+                PayHelper.pay(
                     activity,
                     result.googleProductId.toString()
-                ) { successful, token ->
-                    Log.e(
-                        "PayHelper",
-                        "支付完成 我回来了 这里我先输出 我购买接口 返回给我的订单号 ${result.orderNum}"
+                ) { token ->
+                    verify(
+                        orderNum = result.orderNum.toString(),
+                        purchaseToken = token,
                     )
-                    if (successful) {
-                        Log.e("PayHelper", "支付成功 开始调用验证接口")
-                        verify(
-                            orderNum = result.orderNum.toString(),
-                            purchaseToken = token,
-                        )
-                    } else {
-                        _payHelper?.end()
-                        _payHelper = null
-                        Log.e(
-                            "PayHelper",
-                            "支付失败 这个时候应该有toast 假如我是成功的 那么orderNum=${result.orderNum} token= 没有token 只有错误码"
-                        )
-                        when (token) {
-                            PayHelper.PAY_CONNECT_FAILED -> {
-                                application.toast(R.string.wallet_pay_connect_failed)
-                            }
-
-                            PayHelper.PAY_EMPTY_PRODUCT_FAILED -> {
-                                application.toast(R.string.wallet_pay_no_product_failed)
-                            }
-
-                            PayHelper.PAY_QUERY_FAILED -> {
-                                application.toast(R.string.wallet_pay_query_failed)
-                            }
-
-                            PayHelper.PAY_LAUNCH_FAILED -> {
-                                application.toast(R.string.wallet_pay_launch_failed)
-                            }
-
-                            PayHelper.PAY_CANCEL_FAILED -> {
-                                application.toast(R.string.wallet_pay_cancel)
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -117,7 +78,8 @@ class DiamondViewModel(
                 "开始调用验证接口 orderNum =$orderNum token=$purchaseToken"
             )
             apiRequest {
-                api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken)).checkAndGet()
+                api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken))
+                    .checkAndGet()
                 Log.e(
                     "PayHelper",
                     "验证接口调用成功  开始调用用户信息接口刷新砖石 现在的数量为${userInfo?.diamond}"
@@ -130,8 +92,6 @@ class DiamondViewModel(
                     "验证接口或者是用户信息接口报错 msg =  ${a.message}"
                 )
                 b()
-                _payHelper?.end()
-                _payHelper = null
             }) {
                 Log.e(
                     "PayHelper",
@@ -142,20 +102,11 @@ class DiamondViewModel(
                     "PayHelper",
                     "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken} "
                 )
-                _payHelper?.consumePurchase(purchaseToken)
-                _payHelper?.end()
-                _payHelper = null
                 Log.e(
                     "PayHelper",
                     "异步调用消费接口，断开了链接 不会出现多次请求 "
                 )
             }
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        _payHelper?.end()
-        _payHelper =null
     }
 }
