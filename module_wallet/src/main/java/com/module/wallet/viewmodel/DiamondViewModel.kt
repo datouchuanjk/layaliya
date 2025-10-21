@@ -57,7 +57,7 @@ class DiamondViewModel(
                 PayHelper.pay(activity, result?.googleProductId.toString()) { successful, token ->
                     Log.e("PayHelper", "支付完成 我回来了")
                     if (successful) {
-                        Log.e("PayHelper", "支付成功  开始调用验证接口")
+                        Log.e("PayHelper", "支付成功 开始调用验证接口")
                         verify(
                             this,
                             orderNum = result?.orderNum.toString(),
@@ -94,32 +94,36 @@ class DiamondViewModel(
 
     private fun verify(payHelper: PayHelper, orderNum: String, purchaseToken: String) {
         viewModelScope.launch {
+            Log.e(
+                "PayHelper",
+                "开始调用验证接口 orderNum =$orderNum token=$purchaseToken"
+            )
             apiRequest {
                 api.verify(VerifyRequest(orderNum = orderNum, purchaseToken = purchaseToken))
                     .checkAndGet()!!.googleProductId!!
-                Log.e("PayHelper", "验证接口调用成功  开始调用谷歌消耗api")
-                if (payHelper.consumePurchase(purchaseToken)) {
-                    Log.e("PayHelper", "最后一部  开始调用用户信息接口 刷新用户信息")
-                    AppGlobal.userResponse(basicApi.user().checkAndGet())
-                } else {
-                    Log.e("PayHelper", "谷歌消耗接口报错了？")
-                }
+                Log.e(
+                    "PayHelper",
+                    "验证接口调用成功  开始调用用户信息接口刷新砖石 现在的数量为${userInfo?.diamond}"
+                )
+                AppGlobal.userResponse(basicApi.user().checkAndGet())
+                Log.e("PayHelper", "验证接口调用成功  砖石数量为${userInfo?.diamond}")
             }.apiResponse(catch = { a, b ->
-                if (a is ApiException) {
-                    Log.e(
-                        "PayHelper",
-                        "验证接口or用户信息接口报错了？ 错误信息是 ${a.code} + ${a.message}"
-                    )
-                } else {
-                    Log.e("PayHelper", "谷歌消耗api报错了？ 错误信息是 ${a.message}")
-                }
+                Log.e(
+                    "PayHelper",
+                    "验证接口或者是用户信息接口报错 msg =  ${a.message}"
+                )
                 b()
             }) {
-                Log.e("PayHelper", "谷歌消耗api 调用 ${it} 这个时候应该弹出toast")
-
+                Log.e(
+                    "PayHelper",
+                    "出现toast 购买成功"
+                )
                 application.toast(R.string.wallet_buy_successful)
-
-
+                Log.e(
+                    "PayHelper",
+                    "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken}"
+                )
+                payHelper.consumePurchase(purchaseToken)
             }
         }
     }

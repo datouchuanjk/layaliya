@@ -136,16 +136,14 @@ class PayHelper private constructor(
         }
     }
 
-      suspend fun consumePurchase(token: String) :Boolean{
+       fun consumePurchase(token: String){
         val consumeParams = ConsumeParams.newBuilder()
             .setPurchaseToken(token)
             .build()
 
-      return suspendCancellableCoroutine { b->
+
           billingClient.consumeAsync(consumeParams) { billingResult, _ ->
-              Log.e("PayHelper", "billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？")
-              b.resume(billingResult.responseCode == BillingClient.BillingResponseCode.OK)
-          }
+              Log.e("PayHelper", " 消费接口 调用 结果 ->billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？")
       }
     }
 }
