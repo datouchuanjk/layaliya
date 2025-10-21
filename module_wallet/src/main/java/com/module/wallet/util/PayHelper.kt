@@ -143,7 +143,7 @@ class PayHelper private constructor(
 
 
           billingClient.consumeAsync(consumeParams) { billingResult, _ ->
-              Log.e("PayHelper", " 消费接口 调用 结果 ->billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？")
+              Log.e("PayHelper", " 消费接口token =${token} 调用 结果 ->billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？")
       }
     }
 }
