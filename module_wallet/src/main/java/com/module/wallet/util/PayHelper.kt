@@ -151,6 +151,10 @@ class PayHelper private constructor(
 
     fun end() {
         if (billingClient.isReady) {
+            Log.e(
+                "PayHelper",
+                " 已经成功清理连接"
+            )
             billingClient.endConnection()
         }
     }
