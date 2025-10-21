@@ -131,6 +131,8 @@ class DiamondViewModel(
                     "验证接口或者是用户信息接口报错 msg =  ${a.message}"
                 )
                 b()
+                _payHelper?.end()
+                _payHelper = null
             }) {
                 Log.e(
                     "PayHelper",
