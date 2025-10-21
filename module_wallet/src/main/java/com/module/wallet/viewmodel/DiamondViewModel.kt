@@ -49,10 +49,13 @@ class DiamondViewModel(
     }.pagingData
 
     fun buy(activity: Activity) {
+        Log.e("PayHelper", "我点击了购买 开始创建订单")
         val id = pagingData.find { it.isSelected }?.id ?: return
         viewModelScope.launch {
             apiRequest {
-                api.buy(BuyRequest(id.toString())).checkAndGet() //创建订单接口
+                api.buy(BuyRequest(id.toString())).checkAndGet()!!.apply {
+                    Log.e("PayHelper", "订单号是多少  ${orderNum.toString()}")
+                } //创建订单接口
             }.apiResponse { result ->
                 Log.e("PayHelper", "跳去支付之前 先确定我这次购买的订单号是多少 ${result?.orderNum}")
                 PayHelper.pay(activity, result?.googleProductId.toString()) { successful, token ->
