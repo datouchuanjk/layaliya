@@ -25,5 +25,5 @@ data class DiamondListResponse(
     val displayNum get() = (num ?: 0) + (sendNum ?: 0)
     val isTop get() = topValue>100
 
-    val topValue get() = displayNum.toFloat() / (num ?: 0)*100
+    val topValue get() = (displayNum.toFloat() / (num ?: 0)*100).toInt()
 }

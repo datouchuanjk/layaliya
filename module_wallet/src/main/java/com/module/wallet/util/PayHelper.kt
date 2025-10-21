@@ -10,8 +10,7 @@ class PayHelper private constructor(
     private val context: Activity,
     private val productId: String,
     private val onResult: PayHelper.(Boolean, String) -> Unit
-) :
-    PurchasesUpdatedListener {
+) : PurchasesUpdatedListener {
 
     companion object {
         const val PAY_CONNECT_FAILED = "PAY_CONNECT_FAILED"
@@ -124,7 +123,7 @@ class PayHelper private constructor(
 
                     billingClient.acknowledgePurchase(params) { billingResult ->
                         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                            onResult.invoke(this,true, purchase.purchaseToken)
+                            onResult.invoke(this, true, purchase.purchaseToken)
                         } else {
                             onResult(false, PAY_CANCEL_FAILED)
                         }
@@ -136,14 +135,19 @@ class PayHelper private constructor(
         }
     }
 
-       fun consumePurchase(token: String){
+    fun consumePurchase(token: String) {
         val consumeParams = ConsumeParams.newBuilder()
             .setPurchaseToken(token)
             .build()
+        billingClient.consumeAsync(consumeParams) { billingResult, _ ->
+            Log.e(
+                "PayHelper",
+                " 消费接口token =${token} 调用 结果 ->billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？"
+            )
+        }
+    }
 
-
-          billingClient.consumeAsync(consumeParams) { billingResult, _ ->
-              Log.e("PayHelper", " 消费接口token =${token} 调用 结果 ->billingResult ${billingResult.responseCode} ${billingResult.debugMessage}？")
-      }
+    fun end(){
+        billingClient.endConnection()
     }
 }

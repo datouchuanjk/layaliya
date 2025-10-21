@@ -64,7 +64,8 @@ class DiamondViewModel(
                             purchaseToken = token,
                         )
                     } else {
-                        Log.e("PayHelper", "支付失败 这个时候应该有toast")
+                        end()
+                        Log.e("PayHelper", "支付失败 这个时候应该有toast 假如我是成功的 那么orderNum=${result?.orderNum} token= 没有token 只有错误码")
                         when (token) {
                             PayHelper.PAY_CONNECT_FAILED -> {
                                 application.toast(R.string.wallet_pay_connect_failed)
@@ -121,9 +122,14 @@ class DiamondViewModel(
                 application.toast(R.string.wallet_buy_successful)
                 Log.e(
                     "PayHelper",
-                    "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken}"
+                    "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken} "
                 )
                 payHelper.consumePurchase(purchaseToken)
+                payHelper.end()
+                Log.e(
+                    "PayHelper",
+                    "异步调用消费接口，断开了链接 不会出现多次请求 "
+                )
             }
         }
     }

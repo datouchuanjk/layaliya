@@ -173,7 +173,7 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                             AppImage(R.drawable.wallet_ic_coin)
                             SpacerWidth(4.dp)
                             Text(
-                                it.num.toString(),
+                                it.displayNum.toString(),
                                 fontSize = 20.sp,
                                 color = Color.Black,
                                 fontWeight = FontWeight.Black
