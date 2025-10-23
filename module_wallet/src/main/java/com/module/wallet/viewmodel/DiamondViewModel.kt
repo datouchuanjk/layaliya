@@ -3,7 +3,9 @@ package com.module.wallet.viewmodel
 import android.app.Activity
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.savedstate.savedState
 import com.helper.develop.paging.LoadResult
 import com.helper.develop.paging.buildPaging
 import com.helper.develop.util.toast
@@ -24,8 +26,11 @@ class DiamondViewModel(
     private val api: WalletApiService,
     private val basicApi: BasicApiService,
     private val application: Application,
+    private val savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
+
+    val fromGame = savedStateHandle.get<Boolean>("fromGame")
     val userInfo get() = AppGlobal.userResponse
     private var _payHelper: PayHelper? = null
     fun selected(response: DiamondListResponse) {
@@ -71,6 +76,8 @@ class DiamondViewModel(
         }
     }
 
+    private val _buySuccessful = MutableSharedFlow<Unit>()
+     val buySuccessful = _buySuccessful.asSharedFlow()
     private fun verify(orderNum: String, purchaseToken: String) {
         viewModelScope.launch {
             Log.e(
@@ -98,6 +105,7 @@ class DiamondViewModel(
                     "出现toast 购买成功"
                 )
                 application.toast(R.string.wallet_buy_successful)
+                _buySuccessful.emit(Unit)
                 Log.e(
                     "PayHelper",
                     "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken} "

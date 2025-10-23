@@ -80,9 +80,24 @@ object AppRoutes {
             type = NavType.IntType
             defaultValue = 0
         }.build()
-    val Wallet = NavRouter.Builder("Wallet").build()
+    val Wallet = NavRouter.Builder("Wallet")
+        .argument("fromGame") {
+            type = NavType.BoolType
+            defaultValue = false
+        }
+        .build()
     val Admin = NavRouter.Builder("Admin").build()
     val BD = NavRouter.Builder("BD").build()
+    val Game = NavRouter.Builder("Game")
+        .argument("withChildScreen") {
+            type = NavType.BoolType
+           defaultValue = true
+        }
+        .argument("roomId") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .build()
     val Emoji = NavRouter.Builder("Emoji")
         .argument("x") {
             type = NavType.FloatType
@@ -114,13 +129,13 @@ object AppRoutes {
         }
         .build()
 
-    val GiftPlay= NavRouter.Builder("GiftPlay")
+    val GiftPlay = NavRouter.Builder("GiftPlay")
         .argument("json") {
             type = NavType.StringType
             defaultValue = ""
         }
         .build()
-    val NoblePlay= NavRouter.Builder("NoblePlay")
+    val NoblePlay = NavRouter.Builder("NoblePlay")
         .argument("json") {
             type = NavType.StringType
             defaultValue = ""

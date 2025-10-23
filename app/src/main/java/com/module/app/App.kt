@@ -13,6 +13,7 @@ import com.module.room.module.roomModule
 import com.module.login.module.loginModule
 import com.module.comment.module.commentModule
 import com.module.emoji.module.emojiModule
+import com.module.game.module.gameModule
 import com.module.gift.module.giftModule
 import com.module.mine.module.mineModule
 import com.module.noble.module.nobleModule
@@ -56,7 +57,8 @@ class App : BaseApplication() {
                 storeModule,
                 settingModule,
                 bagModule,
-                chatroomModule
+                chatroomModule,
+                gameModule
             )
         }
     }

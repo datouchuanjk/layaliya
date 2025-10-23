@@ -7,9 +7,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.lifecycle.*
 import androidx.navigation.NavHostController
@@ -44,6 +47,7 @@ import com.module.noble.ui.nobleScreen
 import com.module.chatroom.ui.chatroomReportDialog
 import com.module.chatroom.ui.chatroomUserListDialog
 import com.module.emoji.ui.emojiDialog
+import com.module.game.ui.gameScreen
 import com.module.gift.ui.*
 import com.module.noble.ui.noblePlayDialog
 import com.module.room.ui.roomCreateCheckDialog
@@ -97,6 +101,9 @@ class HostActivity : ComponentActivity() {
                 }) {
                     _navController = navController
                     NavHost(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding(),
                         navController = navController,
                         startDestination = AppRoutes.Launcher.static
                     ) {
@@ -133,6 +140,7 @@ class HostActivity : ComponentActivity() {
                         chatroomEnterCheckDialog()
                         giftPlayDialog()
                         noblePlayDialog()
+                        gameScreen()
                     }
                 }
             }

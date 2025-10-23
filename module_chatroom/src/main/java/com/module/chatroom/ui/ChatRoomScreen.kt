@@ -190,26 +190,39 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 }
                 SpacerHeight(10.dp)
                 val stateHolder = rememberSaveableStateHolder()
-                when (index) {
-                    0 -> stateHolder.SaveableStateProvider("all") {
-                        ChatroomTextMessage(
-                            viewModel,
-                            viewModel.pagingData
-                        )
-                    }
+                Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f).fillMaxWidth()) {
+                    when (index) {
+                        0 -> stateHolder.SaveableStateProvider("all") {
+                            ChatroomTextMessage(
+                                viewModel,
+                                viewModel.pagingData
+                            )
+                        }
 
-                    1 -> stateHolder.SaveableStateProvider("chat") {
-                        ChatroomTextMessage(
-                            viewModel,
-                            viewModel.pagingData
-                        )
-                    }
+                        1 -> stateHolder.SaveableStateProvider("chat") {
+                            ChatroomTextMessage(
+                                viewModel,
+                                viewModel.pagingData
+                            )
+                        }
 
-                    2 -> stateHolder.SaveableStateProvider("me") {
-                        ChatroomTextMessage(
-                            viewModel,
-                            viewModel.pagingData.filter { it.isSelf || it.receiverId == AppGlobal.userResponse?.imAccount }
-                        )
+                        2 -> stateHolder.SaveableStateProvider("me") {
+                            ChatroomTextMessage(
+                                viewModel,
+                                viewModel.pagingData.filter { it.isSelf || it.receiverId == AppGlobal.userResponse?.imAccount }
+                            )
+                        }
+                    }
+                    Box {
+                        AppImage(model = R.drawable.room_ic_game) {
+                            localNav.navigate(
+                                AppRoutes.Game.dynamic(
+                                    "withChildScreen" to false,
+                                    "roomId" to viewModel.roomId
+                                )
+                            )
+                        }
+                        Text("Game Bar", fontSize = 10.sp, color = Color.White, modifier = Modifier.align(alignment = Alignment.BottomCenter).padding(bottom = 6.dp))
                     }
                 }
                 ChatAction(viewModel = viewModel)

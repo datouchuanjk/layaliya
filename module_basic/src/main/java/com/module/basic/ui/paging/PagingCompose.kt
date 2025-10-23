@@ -92,7 +92,7 @@ internal fun Any.DefaultLoadErrorCompose(retry: () -> Unit) {
 internal fun Any.DefaultEmptyCompose() {
     val modifier = if(this is LazyItemScope){
         Modifier
-            .fillParentMaxWidth()
+            .fillParentMaxSize()
             .wrapContentSize()
     }else{
         Modifier

@@ -36,11 +36,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.helper.develop.Background
+import com.helper.develop.nav.LocalNavController
+import com.helper.develop.nav.setResult
 import com.module.wallet.R
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWidth
-import com.module.basic.ui.paging.items
 import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.util.*
 import com.module.basic.viewmodel.*
@@ -48,6 +49,12 @@ import com.module.wallet.viewmodel.*
 
 @Composable
 internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
+    val localNav = LocalNavController.current
+    LaunchedEffect(viewModel) {
+        viewModel.buySuccessful.collect {
+            localNav.setResult(true)
+        }
+    }
     Column(modifier = Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             modifier = Modifier

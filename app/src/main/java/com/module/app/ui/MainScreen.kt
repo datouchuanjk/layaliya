@@ -19,16 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraphBuilder
@@ -38,7 +31,6 @@ import com.helper.im.IMHelper
 import com.module.app.R
 import com.module.basic.route.AppRoutes
 import com.module.basic.util.onClick
-import com.module.basic.viewmodel.*
 import com.module.chat.ui.Home2
 import com.module.community.ui.Home3
 import com.module.mine.ui.Home4
@@ -68,7 +60,6 @@ fun MainScreen() {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .navigationBarsPadding()
                     .height(50.dp)
                     .background(color = Color(0xff333333))
                     .padding(vertical = 9.dp)

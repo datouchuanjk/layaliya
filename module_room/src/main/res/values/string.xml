@@ -22,5 +22,6 @@
     <string-array name="room_tabs">
         <item>Follow</item>
         <item>Party</item>
+        <item>Game</item>
     </string-array>
 </resources>

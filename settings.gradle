@@ -38,5 +38,6 @@ include ':module_bag'
 include ':helper_im'
 include ':helper_develop'
 include ':module_emoji'
+include ':module_game'
 
 

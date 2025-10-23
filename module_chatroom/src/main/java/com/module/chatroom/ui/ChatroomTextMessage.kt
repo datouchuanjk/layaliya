@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,7 +36,7 @@ import com.module.chatroom.viewmodel.ChatRoomViewModel
 import org.json.JSONObject
 
 @Composable
-internal fun ColumnScope.ChatroomTextMessage(
+internal fun RowScope.ChatroomTextMessage(
     viewModel: ChatRoomViewModel,
     pagingData: PagingData<IMChatroomMessage>?
 ) {
@@ -51,7 +53,7 @@ internal fun ColumnScope.ChatroomTextMessage(
         reverseLayout = true,
         contentPadding = PaddingValues(vertical = 15.dp),
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxHeight()
             .weight(1f),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {

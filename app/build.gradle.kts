@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":module_room"))
     implementation(project(":module_mine"))
     implementation(project(":module_chat"))
+    implementation(project(":module_game"))
     implementation(project(":module_chatroom"))
     implementation(project(":module_community"))
     implementation(project(":module_login"))

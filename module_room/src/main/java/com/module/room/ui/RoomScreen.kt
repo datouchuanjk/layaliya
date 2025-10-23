@@ -38,6 +38,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.rememberAsyncImagePainter
 import com.helper.develop.nav.LocalNavController
+import com.module.basic.provider.GameScreenProvider
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppTabRow
 import com.module.basic.ui.paging.AppPagingRefresh
@@ -49,6 +50,7 @@ import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.basic.util.todoImageUrl
 import com.module.room.R
 import com.module.room.viewmodel.RoomViewModel
+import org.koin.androidx.compose.get
 import org.koin.core.parameter.*
 
 @Composable
@@ -96,6 +98,10 @@ internal fun RoomScreen() {
                             parametersOf(1)
                         }),
                     )
+                }
+
+                2 -> stateHolder.SaveableStateProvider("game") {
+                    get<GameScreenProvider>().GameScreen()
                 }
             }
         }
