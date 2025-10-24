@@ -31,6 +31,7 @@ import com.module.agent.ui.coinMerchantScreen
 import com.module.bag.ui.*
 import com.module.basic.constant.AppConstant
 import com.module.basic.route.AppRoutes
+import com.module.basic.ui.base.webViewScreen
 import com.module.basic.util.LocalKeyboardHeight
 import com.module.charm.ui.*
 import com.module.chat.ui.chatScreen
@@ -141,6 +142,7 @@ class HostActivity : ComponentActivity() {
                         giftPlayDialog()
                         noblePlayDialog()
                         gameScreen()
+                        webViewScreen()
                     }
                 }
             }

@@ -14,6 +14,7 @@ object IMHelper : CoroutineScope by MainScope() {
 
     internal lateinit var context: Application
 
+   internal val isDebug =true
     fun initV2(context: Application) {
         logIM("init context=$context")
         IMHelper.context = context

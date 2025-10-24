@@ -55,6 +55,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.helper.develop.Background
 import com.helper.develop.banner.Banner
 import com.helper.develop.nav.LocalNavController
+import com.helper.develop.util.padToMultiple
 import com.helper.develop.util.toast
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppImage
@@ -156,32 +157,43 @@ internal fun NobleScreen(viewModel: NobleViewModel = apiHandlerViewModel()) {
                     .padding(horizontal = 15.dp),
                 painter = rememberAsyncImagePainter(viewModel.selectedNobleResponse?.bg)
             ) {
-                FlowRow (
-                    modifier = Modifier.fillMaxSize().padding(   horizontal = 24.dp, vertical = 24.dp).verticalScroll(rememberScrollState()),
-                     maxItemsInEachRow = 3,
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 10.dp, vertical = 24.dp)
+                        .verticalScroll(rememberScrollState()),
+                    maxItemsInEachRow = 3,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    viewModel.selectedNobelPowerDataList.forEach { item ->
-                        Column (horizontalAlignment = Alignment.CenterHorizontally){
+                    viewModel.selectedNobelPowerDataList.padToMultiple(3).forEach { item ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(1 / 3f)
+                        ) {
+                            if (item != null) {
                                 AppImage(
-                                    model = item?.icon,
+                                    model = item.icon,
                                     modifier = Modifier
                                         .size(60.dp)
-                                        .paint(painter =  rememberAsyncImagePainter(viewModel.selectedNobleResponse?.powerBg), contentScale = ContentScale.Crop)
+                                        .paint(
+                                            painter = rememberAsyncImagePainter(viewModel.selectedNobleResponse?.powerBg),
+                                            contentScale = ContentScale.Crop
+                                        )
                                         .wrapContentSize()
                                         .size(30.dp),
                                 )
-                            SpacerHeight(4.dp)
-                            Text(
-                                minLines = 2,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                text = item?.name.orEmpty(),
-                                fontSize = 12.sp,
-                                color = Color.White,
-                                textAlign = TextAlign.Center
-                            )
+                                SpacerHeight(4.dp)
+                                Text(
+                                    minLines = 2,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    text = item.name.orEmpty(),
+                                    fontSize = 12.sp,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
                 }
@@ -269,15 +281,13 @@ private fun BottomButton(viewModel: NobleViewModel) {
                     .padding(horizontal = 16.dp)
                     .wrapContentHeight()
             )
-            val localNav = LocalNavController.current
             Text(
                 stringResource(R.string.noble_buy), fontSize = 12.sp, color = Color(0xff333333),
                 modifier = Modifier
                     .fillMaxHeight()
                     .padding(horizontal = 12.dp)
                     .onClick {
-                        //                        viewModel.buy()
-                        localNav.navigate(AppRoutes.NobleHistory.dynamic("name" to viewModel.selectedNobleResponse?.name.orEmpty()))
+                        viewModel.buy()
                     }
                     .wrapContentHeight()
             )
@@ -320,7 +330,7 @@ private fun VipBanner(
                     style = TextStyle(
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
-                        brush =item.textColor
+                        brush = item.textColor
                     )
                 )
                 Text(

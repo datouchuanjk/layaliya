@@ -12,7 +12,7 @@ val agentModule = module {
         get<Retrofit>().create(AgentApiService::class.java)
     }
     viewModel {
-        BasicInformationViewModel(get())
+        BasicInformationViewModel(get(),get(),get())
     }
     viewModel {
         IdolListViewModel(get())
@@ -28,7 +28,7 @@ val agentModule = module {
         BDViewModel(get())
     }
     viewModel {
-        CoinMerchantViewModel(get())
+        CoinMerchantViewModel(get(),get())
     }
     viewModel {
         CoinDetailViewModel(get())

@@ -4,7 +4,7 @@ import android.os.Build
 import com.google.gson.annotations.SerializedName
 import com.helper.develop.util.versionCode
 import com.module.basic.sp.AppGlobal
-import com.module.basic.ui.BaseApplication
+import com.module.basic.ui.base.BaseApplication
 
 open class BaseRequest(
     @SerializedName("device_id")

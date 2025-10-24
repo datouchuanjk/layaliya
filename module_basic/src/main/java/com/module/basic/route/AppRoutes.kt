@@ -15,7 +15,16 @@ object AppRoutes {
             type = NavType.IntType
             defaultValue = 0
         }.build()
-    val MyRoom = NavRouter.Builder("myRoom").build()
+    val MyRoom = NavRouter.Builder("MyRoom").build()
+    val WebView = NavRouter.Builder("WebView")
+        .argument("title") {
+            type = NavType.StringType
+            defaultValue = ""
+        }
+        .argument("url") {
+            type = NavType.StringType
+            defaultValue = ""
+        }.build()
     val ChatroomEnterCheck = NavRouter.Builder("ChatroomEnterCheck")
         .argument("roomId") {
             type = NavType.StringType
@@ -63,7 +72,12 @@ object AppRoutes {
     val CharmLevel = NavRouter.Builder("CharmLevel").build()
     val WealthLevel = NavRouter.Builder("WealthLevel").build()
     val Noble = NavRouter.Builder("Noble").build()
-    val NobleHistory = NavRouter.Builder("NobleHistory").build()
+    val NobleHistory = NavRouter.Builder("NobleHistory")
+        .argument("name") {
+            type = NavType.StringType
+            defaultValue = ""
+        }
+        .build()
     val Agent = NavRouter.Builder("Agent").build()
     val PostCommunity = NavRouter.Builder("PostCommunity").build()
     val ChatroomUserList = NavRouter.Builder("ChatroomUserList")

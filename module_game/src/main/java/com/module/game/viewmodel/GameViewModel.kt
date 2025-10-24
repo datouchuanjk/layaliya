@@ -14,6 +14,6 @@ internal class GameViewModel(
     val roomId = saveHandler.get<String?>("roomId")
 
     //是否作为子界面嵌套 如果是 那么不能退出界面
-    val withChildScreen = saveHandler.get<Boolean>("withChildScreen")
+    val withChildScreen = saveHandler.get<Boolean>("withChildScreen")?:false
     val token = share.getToken()
 }

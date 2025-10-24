@@ -9,16 +9,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +44,7 @@ import com.module.basic.util.*
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.community.viewmodel.CommunityViewModel
 import  com.module.community.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun Home3() {
@@ -48,6 +54,8 @@ fun Home3() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel()) {
+    val state = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,14 +71,21 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                         color = Color(0xffFF4070)
                     )
                 )
-            },actions={
+            }, actions = {
                 AppImage(
                     R.drawable.community_ic_take_pic,
                     modifier = Modifier
                         .padding(horizontal = 15.dp)
                         .size(25.dp)
                 ) {
-                    localNav.navigate(AppRoutes.PostCommunity.static)
+                    localNav.navigateForResult<Boolean>(AppRoutes.PostCommunity.static) {
+                        if (it == true) {
+                            pagingData.refresh()
+                            scope.launch {
+                                state.animateScrollToItem(0)
+                            }
+                        }
+                    }
                 }
             }
         )
@@ -95,6 +110,7 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                 .weight(1f),
         ) {
             LazyColumn(
+                state = state,
                 modifier = Modifier
                     .fillMaxSize()
             ) {
@@ -127,35 +143,57 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                 top.linkTo(icon.top)
                                 start.linkTo(icon.end, 12.dp)
                             })
-                        Text(
-                            text = "...",
-                            modifier = Modifier
-                                .constrainAs(more) {
-                                    top.linkTo(icon.top)
-                                    end.linkTo(parent.end, 15.dp)
-                                },
-                            color = Color(0xff333333),
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = if (item.isFollow == 1) "+" else "-",
+//                        Text(
+//                            text = "...",
+//                            modifier = Modifier
+//                                .constrainAs(more) {
+//                                    top.linkTo(icon.top)
+//                                    end.linkTo(parent.end, 15.dp)
+//                                },
+//                            color = Color(0xff333333),
+//                            fontSize = 14.sp
+//                        )
+
+                        Box(
                             modifier = Modifier
                                 .constrainAs(add) {
                                     top.linkTo(icon.top)
-                                    end.linkTo(more.start, 12.dp)
+                                    end.linkTo(parent.end, 12.dp)
                                 }
-                                .border(
-                                    width = 1.dp,
-                                    color = Color(0xffFF4070),
-                                    shape = RoundedCornerShape(20.dp)
+                                .width(32.dp)
+                                .height(24.dp)
+                                .appBrushBackground(
+                                    shape = RoundedCornerShape(12.dp)
                                 )
                                 .onClick {
-                                    viewModel.like(index, item)
+                                    viewModel.follow(index, item)
                                 }
-                                .padding(vertical = 6.dp, horizontal = 12.dp),
-                            color = Color(0xffFF4071),
-                            fontSize = 14.sp
-                        )
+                                .wrapContentSize()
+                        ) {
+                            AppImage(
+                                if (item.isFollow == 1) R.drawable.community_ic_unfollow else R.drawable.community_ic_follow
+                            )
+                        }
+
+//                        Text(
+//                            text = if (item.isFollow == 1) "+" else "-",
+//                            modifier = Modifier
+//                                .constrainAs(add) {
+//                                    top.linkTo(icon.top)
+//                                    end.linkTo(more.start, 12.dp)
+//                                }
+//                                .border(
+//                                    width = 1.dp,
+//                                    color = Color(0xffFF4070),
+//                                    shape = RoundedCornerShape(20.dp)
+//                                )
+//                                .onClick {
+//                                    viewModel.follow(index, item)
+//                                }
+//                                .padding(vertical = 5.dp, horizontal = 12.dp),
+//                            color = Color(0xffFF4071),
+//                            fontSize = 18.sp
+//                        )
                         Row(modifier = Modifier.constrainAs(userinfo) {
                             top.linkTo(name.bottom, 0.dp)
                             start.linkTo(name.start)

@@ -23,7 +23,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +54,7 @@ import androidx.navigation.NavHostController
 import com.helper.develop.nav.LocalNavController
 import com.module.basic.api.data.response.UserResponse
 import com.module.basic.route.AppRoutes
+import com.module.basic.sp.AppGlobal
 import com.module.basic.sp.getHiddenIdentity
 import com.module.basic.sp.putHiddenIdentity
 import com.module.basic.ui.AppMoreIcon
@@ -60,6 +63,7 @@ import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWeight
 import com.module.basic.ui.SpacerWidth
+import com.module.basic.ui.paging.AppPagingRefresh
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.basic.util.onClick
 import com.module.mine.R
@@ -72,65 +76,51 @@ fun Home4() {
     MineScreen()
 }
 
-private class MineAction(
+internal class MineAction(
     val name: String,
     val icon: Int,
     val onClick: ((NavHostController) -> Unit)? = null
 )
 
-private val mineActionIcons = listOf(
-    R.drawable.mine_ic_action_store to { nav: NavHostController ->
-        nav.navigate(AppRoutes.Store.static)
-    },
-    R.drawable.mine_ic_action_my_decoration to { nav: NavHostController ->
-        nav.navigate(AppRoutes.Bag.static)
-    },
-    R.drawable.mine_ic_action_noble to { nav: NavHostController ->
-        nav.navigate(AppRoutes.Noble.static)
-    },
-    R.drawable.mine_ic_action_agency to { nav: NavHostController ->
-        nav.navigate(AppRoutes.Agent.static)
-    },
-    R.drawable.mine_ic_action_admin to { nav: NavHostController ->
-        nav.navigate(AppRoutes.Admin.dynamic("isAdmin" to true))
-    },
-    R.drawable.mine_ic_action_bd to { nav: NavHostController ->
-        nav.navigate(AppRoutes.BD.dynamic("isAdmin" to false))
-    },
-    R.drawable.mine_ic_action_bd to { nav: NavHostController ->
-        nav.navigate(AppRoutes.CoinMerchant.static)
-    },
 
-)
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MineScreen(viewModel: MineViewModel = apiHandlerViewModel()) {
-    Column(
+    PullToRefreshBox(
         modifier = Modifier
-            .fillMaxSize()
-            .paint(
-                painter = painterResource(R.drawable.mine_bg),
-                contentScale = ContentScale.FillBounds
-            )
-            .statusBarsPadding()
-            .padding(bottom = 12.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        UserInfo(viewModel.userInfo)
-        MyWallet()
-        Actions()
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp)
-                .padding(top = 12.dp)
-        ) {
-            CharmLevel(viewModel.userInfo)
-            SpacerWidth(13.dp)
-            WealthLevel(viewModel.userInfo)
+            .fillMaxSize(),
+        isRefreshing = viewModel.isRefresh,
+        onRefresh = {
+            viewModel.refresh()
         }
-        HiddenIdentity()
-        Setting()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .paint(
+                    painter = painterResource(R.drawable.mine_bg),
+                    contentScale = ContentScale.FillBounds
+                )
+                .statusBarsPadding()
+                .padding(bottom = 12.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            UserInfo(viewModel.userInfo)
+            MyWallet()
+            Actions()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .padding(top = 12.dp)
+            ) {
+                CharmLevel(viewModel.userInfo)
+                SpacerWidth(13.dp)
+                WealthLevel(viewModel.userInfo)
+            }
+            HiddenIdentity()
+            Setting()
+        }
     }
 }
 
@@ -264,10 +254,10 @@ private fun MyWallet() {
             .padding(top = 12.dp)
             .background(color = Color.White, shape = RoundedCornerShape(16.dp))
             .onClick {
-                localNav.navigate(AppRoutes.Wallet.static)
+                localNav.navigate(AppRoutes.Wallet.dynamic())
             }
             .padding(8.dp)
-    ){
+    ) {
         SpacerWidth(15.dp)
         AppImage(model = R.drawable.mine_ic_wallet)
         SpacerWidth(5.dp)
@@ -291,19 +281,78 @@ private fun MyWallet() {
 }
 
 @Composable
+internal fun createActions() : List<MineAction>{
+    val isBd = AppGlobal.userResponse?.isBd == 1
+    val isBBusiness = AppGlobal.userResponse?.isBBusiness == 1
+    val isAgent = AppGlobal.userResponse?.isAgent == 1
+    val isSuper = AppGlobal.userResponse?.isSuper == 1
+    val list = mutableListOf(
+        MineAction(
+            stringResource(R.string.mine_actions_store),
+            R.drawable.mine_ic_action_store
+        ) { nav: NavHostController ->
+            nav.navigate(AppRoutes.Store.static)
+        },
+        MineAction(
+            stringResource(R.string.mine_actions_decoration),
+            R.drawable.mine_ic_action_my_decoration
+        ) { nav: NavHostController ->
+            nav.navigate(AppRoutes.Bag.static)
+        },
+        MineAction(
+            stringResource(R.string.mine_actions_noble),
+            R.drawable.mine_ic_action_noble
+        ) { nav: NavHostController ->
+            nav.navigate(AppRoutes.Noble.static)
+        },
+    )
+
+    if (isAgent) {
+        list.add(
+            MineAction(
+                stringResource(R.string.mine_actions_agency),
+                R.drawable.mine_ic_action_agency
+            ) { nav: NavHostController ->
+                nav.navigate(AppRoutes.Agent.static)
+            })
+    }
+    if (isSuper) {
+        list.add(
+            MineAction(
+                stringResource(R.string.mine_actions_admin),
+                R.drawable.mine_ic_action_admin
+            ) { nav: NavHostController ->
+                nav.navigate(AppRoutes.Admin.static)
+            }
+        )
+    }
+    if (isBd) {
+        list.add(
+            MineAction(
+                stringResource(R.string.mine_actions_bd),
+                R.drawable.mine_ic_action_bd
+            ) { nav: NavHostController ->
+                nav.navigate(AppRoutes.BD.static)
+            }
+        )
+    }
+    if (isBBusiness) {
+        list.add(
+            MineAction(
+                stringResource(R.string.mine_actions_coin_merchant),
+                R.drawable.mine_ic_action_bd
+            ) { nav: NavHostController ->
+                nav.navigate(AppRoutes.CoinMerchant.static)
+            }
+        )
+    }
+    return list
+}
+
+@Composable
 private fun Actions() {
     val localNav = LocalNavController.current
-    val actions = stringArrayResource(R.array.mine_actions)
-    val mineActions = remember {
-        actions.mapIndexed { index, item ->
-            val icon = mineActionIcons[index]
-            MineAction(
-                name = item,
-                icon = icon.first,
-                onClick = icon.second
-            )
-        }
-    }
+    val mineActions = createActions()
     FlowRow(
         maxItemsInEachRow = 4,
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -314,31 +363,31 @@ private fun Actions() {
             .background(color = Color.White, shape = RoundedCornerShape(16.dp))
             .padding(vertical = 12.dp)
     ) {
-        repeat(8) { index->
-            val it =  mineActions.getOrNull(index)
-            if(it==null){
+        repeat(8) { index ->
+            val it = mineActions.getOrNull(index)
+            if (it == null) {
                 Box(modifier = Modifier.weight(1f))
-            }else{
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .onClick {
-                        it.onClick?.invoke(localNav)
-                    },
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AppImage(
+            } else {
+                Column(
                     modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape),
-                    model = it.icon,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null
-                )
-                SpacerHeight(6.dp)
-                Text(text = it.name, fontSize = 12.sp, color = Color.Black)
+                        .weight(1f)
+                        .onClick {
+                            it.onClick?.invoke(localNav)
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AppImage(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape),
+                        model = it.icon,
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null
+                    )
+                    SpacerHeight(6.dp)
+                    Text(text = it.name, fontSize = 12.sp, color = Color.Black)
+                }
             }
-        }
         }
     }
 }

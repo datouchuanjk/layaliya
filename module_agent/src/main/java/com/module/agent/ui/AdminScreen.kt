@@ -62,7 +62,9 @@ internal fun AdminScreen(viewModel: AdminViewModel = apiHandlerViewModel()) {
                 .padding(it)
         ) {
             SpacerHeight(16.dp)
-            WeekDatePicker()
+            WeekDatePicker { startTime, endTime ->
+                viewModel.refreshByTime(startTime, endTime)
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -78,7 +80,7 @@ internal fun AdminScreen(viewModel: AdminViewModel = apiHandlerViewModel()) {
 }
 
 @Composable
-private fun Top(){
+private fun Top() {
     Row(
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -140,7 +142,7 @@ private fun List(viewModel: AdminViewModel) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        itemsIndexed(pagingData = pagingData, key = {it.uid.toString()}) { index,item->
+        itemsIndexed(pagingData = pagingData, key = { it.uid.toString() }) { index, item ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -151,7 +153,8 @@ private fun List(viewModel: AdminViewModel) {
                             bottomEnd = 8.dp,
                             bottomStart = 8.dp
                         ) else RectangleShape
-                    ).padding(vertical = 12.dp)
+                    )
+                    .padding(vertical = 12.dp)
             ) {
                 Text(
                     textAlign = TextAlign.Center,

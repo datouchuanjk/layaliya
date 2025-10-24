@@ -2,6 +2,7 @@
 <resources>
     <string name="login_google">Google</string>
     <string name="login_facebook">Facebook</string>
+    <string name="login_guest">Guest</string>
     <string-array name="login_agree">
         <item>Please read and agree to</item>
         <item>User Agreement</item>

@@ -49,7 +49,7 @@ data class UserResponse(
     val wealthLevel: Int?,
     val language: String?,
     @SerializedName("is_b_business")
-    val isBBusiness: String?,
+    val isBBusiness: Int?,
     @SerializedName("im_account")
     val imAccount: String?,
     @SerializedName("im_token")

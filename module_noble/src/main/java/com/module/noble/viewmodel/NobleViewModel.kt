@@ -1,12 +1,10 @@
 package com.module.noble.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.module.basic.viewmodel.BaseViewModel
 import com.module.noble.api.data.request.BuyNobleRequest
 import com.module.noble.api.data.request.GiveNobleRequest

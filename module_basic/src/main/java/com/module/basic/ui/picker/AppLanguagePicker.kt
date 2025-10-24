@@ -1,4 +1,4 @@
-package com.module.basic.ui
+package com.module.basic.ui.picker
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,13 +21,13 @@ import com.module.basic.sp.AppGlobal
 import com.module.basic.util.onClick
 
 @Composable
-fun AppSilencePicker(
+fun AppLanguagePicker(
     modifier: Modifier = Modifier,
-    onSelected: (ConfigResponse.MuteType) -> Unit
+    onSelected: (ConfigResponse.Language) -> Unit
 ) {
     Column(modifier = modifier) {
         val data = remember {
-            AppGlobal.configResponse?.muteType.orEmpty()
+            AppGlobal.configResponse?.language.orEmpty()
         }
         val state = rememberLazyListState()
         Icon(
@@ -47,7 +47,7 @@ fun AppSilencePicker(
                 state = state,
             ) {
                 Text(
-                    text = data[it].content,
+                    text = data[it].name,
                     fontSize = 16.sp,
                     color = Color(0xff333333)
                 )

@@ -34,6 +34,7 @@ import com.helper.develop.util.toast
 import com.module.basic.route.*
 import com.module.basic.sp.AppGlobal
 import com.module.basic.ui.*
+import com.module.basic.ui.picker.AppSilencePicker
 import com.module.basic.util.*
 import com.module.basic.viewmodel.*
 import com.module.chatroom.R
@@ -642,7 +643,7 @@ private fun RowScope.Input(
                 viewModel.input(it)
             },
             decorationBox = {
-                if (viewModel.input.isEmpty()) {
+                if (viewModel.input.isEmpty()&&viewModel.toNickname.trim().isEmpty()) {
                     Text(
                         stringResource(R.string.room_send_a_message),
                         style = TextStyle(fontSize = 12.sp, color = Color.White)

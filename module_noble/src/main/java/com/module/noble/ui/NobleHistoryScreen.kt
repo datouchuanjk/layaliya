@@ -50,7 +50,7 @@ import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.noble.R
 import com.module.noble.viewmodel.NobleHistoryViewModel
 
-fun NavGraphBuilder.nobleHistoryScreen() = composable(route = AppRoutes.NobleHistory.static) {
+fun NavGraphBuilder.nobleHistoryScreen() = composable(route = AppRoutes.NobleHistory.static, arguments = AppRoutes.NobleHistory.arguments) {
     NobleHistoryScreen()
 }
 
@@ -74,6 +74,7 @@ internal fun NobleHistoryScreen(viewModel: NobleHistoryViewModel = apiHandlerVie
         containerColor = Color.Transparent,
         topBar = {
             AppTitleBar(
+                backIconTint = Color.White,
                 textStyle = TextStyle(
                     fontSize = 20.sp,
                     color = Color.White

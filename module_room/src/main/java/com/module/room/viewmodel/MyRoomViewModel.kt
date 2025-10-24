@@ -31,13 +31,13 @@ internal class MyRoomViewModel(
     val pagingData = buildOffsetPaging(viewModelScope) {
         when (type) {
             0 -> {
-                AppGlobal.userResponse?.roomInfo.run {
-                    if (this != null && it.key == 1) {
+                AppGlobal.userResponse?.roomInfo?.run {
+                    if (it.key == 1 && this.id != null && this.id!! > 0) {
                         listOf(this)
                     } else {
                         listOf()
                     }
-                }
+                }.orEmpty()
             }
 
             1 -> {

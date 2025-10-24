@@ -20,6 +20,7 @@ data class IMChatroomMessage(
     val senderId: String = v2NIMChatroomMessage.senderId,
     val isSelf: Boolean = v2NIMChatroomMessage.isSelf,
     val receiverId: String? = v2NIMChatroomMessage.serverExtension,
+    val receiverName : String? =  IMHelper.userHandler.getLocalUserInfo(receiverId)?.name,
     val createTime: Long = v2NIMChatroomMessage.createTime,
     val body: IMChatroomMessageBody?
 )

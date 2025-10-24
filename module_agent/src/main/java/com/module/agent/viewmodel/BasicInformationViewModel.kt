@@ -1,15 +1,21 @@
 package com.module.agent.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import com.helper.develop.util.filterDigit
+import com.helper.develop.util.toast
+import com.module.agent.R
 import com.module.agent.api.data.request.AgentInviteRequest
 import com.module.agent.api.data.response.AgentInfoResponse
 import com.module.agent.api.service.AgentApiService
 import com.module.basic.api.data.request.PagingRequest
 import com.module.basic.api.data.request.UidRequest
+import com.module.basic.api.data.response.SearchUserResponse
 import com.module.basic.api.data.response.UserResponse
+import com.module.basic.api.service.BasicApiService
 import com.module.basic.util.buildOffsetPaging
 import com.module.basic.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +23,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 internal class BasicInformationViewModel(
-    private val api: AgentApiService
+    private val api: AgentApiService,
+    private val basicApi: BasicApiService,
+    private val application: Application,
 ) : BaseViewModel() {
 
 
@@ -46,10 +54,10 @@ internal class BasicInformationViewModel(
     private var _inviteUid by mutableStateOf("")
     val inviteUid get() = _inviteUid
     fun inviteUid(value: String) {
-        _inviteUid = value
+        _inviteUid = value.filterDigit()
     }
 
-    private var _inviteUserResponse by mutableStateOf<UserResponse?>(null)
+    private var _inviteUserResponse by mutableStateOf<SearchUserResponse?>(null)
     val inviteUserResponse get() = _inviteUserResponse
     fun clearInviteUserResponse() {
         _inviteUserResponse = null
@@ -61,8 +69,12 @@ internal class BasicInformationViewModel(
         }
         viewModelScope.launch {
             apiRequest {
-                api.findUserByUid(UidRequest(inviteUid)).checkAndGet()!!
+                basicApi.searchUser(UidRequest(inviteUid)).checkAndGet()
             }.apiResponse {
+                if (it == null||it.id==null) {
+                    application.toast(R.string.agent_not_find_user)
+                    return@apiResponse
+                }
                 _inviteUserResponse = it
             }
         }

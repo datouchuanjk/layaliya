@@ -11,6 +11,7 @@
 
 
     <string name="nobel_record_successful">Record successful</string>
+    <string name="nobel_not_find_user">Not find user</string>
     <string name="nobel_receive_failed"> u are not noble cannot receive</string>
     <string name="noble_give_successful">Give successful</string>
     <string name="noble_give">Give</string>

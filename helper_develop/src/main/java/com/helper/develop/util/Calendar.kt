@@ -2,6 +2,14 @@ package com.helper.develop.util
 
 import java.util.Calendar
 
+val Calendar.YMD: String
+    get() = buildString {
+        append(year.toString().padStart(4, '0'))
+        append("-")
+        append((month+1).toString().padStart(2, '0'))
+        append("-")
+        append(dayOfMonth.toString().padStart(2, '0'))
+    }
 var Calendar.year: Int
     get() = get(Calendar.YEAR)
     set(value) {

@@ -38,9 +38,10 @@ import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppTitleBar
 import com.module.basic.util.*
 
-fun NavGraphBuilder.walletScreen() = composable(route = AppRoutes.Wallet.static) {
-    WalletScreen()
-}
+fun NavGraphBuilder.walletScreen() =
+    composable(route = AppRoutes.Wallet.static, arguments = AppRoutes.Wallet.arguments) {
+        WalletScreen()
+    }
 
 @Composable
 internal fun WalletScreen() {
@@ -51,7 +52,7 @@ internal fun WalletScreen() {
                 showLine = false
             )
         }
-    ) { innerPadding->
+    ) { innerPadding ->
         var index by rememberSaveable {
             mutableIntStateOf(0)
         }

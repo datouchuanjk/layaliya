@@ -25,7 +25,6 @@ import com.helper.develop.Background
 import com.module.wallet.R
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerWidth
-import com.module.basic.util.todoImageUrl
 import com.module.basic.viewmodel.*
 import com.module.wallet.viewmodel.*
 
@@ -62,7 +61,7 @@ internal fun Coins(viewModel: CoinsViewModel = apiHandlerViewModel()) {
             ) {
                 val (icon, name, uid, coin, msg) = createRefs()
                 AppImage(
-                    model = todoImageUrl(), modifier = Modifier
+                    model =  viewModel.userInfo?.avatar, modifier = Modifier
                         .constrainAs(icon) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)

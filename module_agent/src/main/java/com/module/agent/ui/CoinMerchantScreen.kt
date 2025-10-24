@@ -126,14 +126,14 @@ private fun UserInfo(viewModel: CoinMerchantViewModel) {
                 top.linkTo(name.bottom, 3.dp)
                 start.linkTo(name.start, 0.dp)
             })
-        Text(
-            text = "这里需要一个时间，但是目前没有",
-            fontSize = 12.sp,
-            color = Color(0xff999999),
-            modifier = Modifier.constrainAs(createTime) {
-                top.linkTo(uid.bottom, 3.dp)
-                start.linkTo(uid.start, 0.dp)
-            })
+//        Text(
+//            text = "这里需要一个时间，但是目前没有",
+//            fontSize = 12.sp,
+//            color = Color(0xff999999),
+//            modifier = Modifier.constrainAs(createTime) {
+//                top.linkTo(uid.bottom, 3.dp)
+//                start.linkTo(uid.start, 0.dp)
+//            })
         Row(
             modifier = Modifier
                 .constrainAs(coin) {
@@ -145,8 +145,13 @@ private fun UserInfo(viewModel: CoinMerchantViewModel) {
                 .background(color = Color(0xfff5f5f5), shape = RoundedCornerShape(8.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
+            val localNav = LocalNavController.current
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .onClick {
+                        localNav.navigate(AppRoutes.CoinDetail.static)
+                    },
             ) {
                 Text(
                     text = stringResource(R.string.mine_remaining_currency),
@@ -162,11 +167,8 @@ private fun UserInfo(viewModel: CoinMerchantViewModel) {
                     )
                     AppImage(model = R.drawable.mine_ic_store_coin)
                 }
-                val localNav = LocalNavController.current
+
                 Text(
-                    modifier = Modifier.onClick{
-                        localNav.navigate(AppRoutes.CoinDetail.static)
-                    },
                     text = stringResource(R.string.mine_diamond_details),
                     fontSize = 10.sp,
                     color = Color(0xff999999)
@@ -177,7 +179,7 @@ private fun UserInfo(viewModel: CoinMerchantViewModel) {
                 modifier = Modifier
                     .align(alignment = Alignment.CenterVertically)
                     .appBrushBackground(
-                       shape = RoundedCornerShape(15.dp)
+                        shape = RoundedCornerShape(15.dp)
                     )
                     .padding(horizontal = 12.dp, vertical = 4.dp),
                 text = stringResource(R.string.mine_recharge),
@@ -292,11 +294,19 @@ private fun OtherUserInfoUID(viewModel: CoinMerchantViewModel) {
         Text(
             text = stringResource(R.string.mine_query),
             modifier = Modifier
-                .background(
-                    color = Color(0xff999999),
-                    shape = RoundedCornerShape(15.dp)
+                .then(
+                    if (viewModel.uid.isEmpty()) {
+                        Modifier.background(
+                            color = Color(0xff999999),
+                            shape = RoundedCornerShape(15.dp)
+                        )
+                    } else {
+                        Modifier.appBrushBackground(
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                    }
                 )
-                .onClick {
+                .onClick(viewModel.uid.isNotEmpty()){
                     viewModel.query()
                 }
                 .padding(horizontal = 12.dp, vertical = 4.dp),

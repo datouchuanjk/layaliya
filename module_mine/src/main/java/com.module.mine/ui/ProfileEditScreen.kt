@@ -2,7 +2,6 @@ package com.module.mine.ui
 
 import android.view.*
 import androidx.activity.compose.*
-import androidx.activity.result.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -26,6 +25,10 @@ import com.helper.develop.util.*
 import com.module.basic.route.*
 import com.module.basic.sp.AppGlobal
 import com.module.basic.ui.*
+import com.module.basic.ui.picker.AppCountryPicker
+import com.module.basic.ui.picker.AppDatePicker
+import com.module.basic.ui.picker.AppLanguagePicker
+import com.module.basic.ui.picker.AppSexPicker
 import com.module.basic.util.*
 import com.module.basic.viewmodel.*
 import com.module.mine.R

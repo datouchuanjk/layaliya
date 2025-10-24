@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 
 val mineModule = module {
     viewModel {
-        MineViewModel()
+        MineViewModel(get())
     }
 
     viewModel {

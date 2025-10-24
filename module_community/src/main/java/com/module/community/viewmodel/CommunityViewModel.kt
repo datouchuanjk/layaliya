@@ -70,7 +70,7 @@ internal class CommunityViewModel(
                 } else {
                     api.followUser(UidRequest(uid = item.uid.toString())).checkAndGet()
                 }
-            }.apiResponse(null) {
+            }.apiResponse {
                 pagingData.handle {
                     set(
                         index,

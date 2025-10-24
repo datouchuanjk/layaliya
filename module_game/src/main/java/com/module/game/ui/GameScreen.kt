@@ -7,6 +7,7 @@ import android.view.*
 import android.webkit.*
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ fun NavGraphBuilder.gameScreen() = composable(
 @Composable
 internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
     val localNav = LocalNavController.current
+    val localBack = LocalOnBackPressedDispatcherOwner.current
     AndroidView(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +65,15 @@ internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
                         return false
                     }
                 }
-//                addJavascriptInterface(JS(this, it as Activity), "LingxianAndroid")
+                addJavascriptInterface(
+                    JS(
+                        webView = this,
+                        context = it as Activity,
+                        withChildScreen = viewModel.withChildScreen,
+                        localNav = localNav,
+                        localBack = localBack
+                    ), "LingxianAndroid"
+                )
                 val gameUrl = "https://www.doubao.com/chat/"
                 val newGameUrl = gameUrl.toUri().buildUpon()
                     .appendQueryParameter("uid", AppGlobal.userResponse?.id.toString())

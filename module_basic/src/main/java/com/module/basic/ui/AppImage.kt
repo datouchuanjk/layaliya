@@ -22,7 +22,6 @@ fun AppImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null,
-    defaultFileErrorModel: Int? = null,
     onClickable: (() -> Unit)? = null
 ) {
     val clickableModifier = modifier.then(if (onClickable == null) Modifier else Modifier.onClick {

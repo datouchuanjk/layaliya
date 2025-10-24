@@ -4,7 +4,7 @@ import com.module.agent.module.agentModule
 import com.module.app.viewmodel.LauncherViewModel
 import com.module.bag.module.*
 import com.module.basic.module.basicModule
-import com.module.basic.ui.BaseApplication
+import com.module.basic.ui.base.BaseApplication
 import com.module.charm.module.*
 import com.module.chat.module.chatModule
 import com.module.chatroom.module.chatroomModule

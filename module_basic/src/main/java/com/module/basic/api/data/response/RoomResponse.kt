@@ -7,7 +7,7 @@ data class RoomResponse(
     val followRoomId: Int?,
     val uid: Int,
     val isOpen: Int,
-    val id: Int,
+    val id: Int?,
     val name: String?,
     val cover: String?,
     @SerializedName("hot_val")

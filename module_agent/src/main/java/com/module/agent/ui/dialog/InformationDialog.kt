@@ -23,17 +23,17 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.module.agent.R
+import com.module.basic.api.data.response.SearchUserResponse
 import com.module.basic.api.data.response.UserResponse
 import com.module.basic.ui.AppDialog
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerWidth
 import com.module.basic.util.onClick
-import com.module.basic.util.todoImageUrl
 
 @Composable
 internal fun InformationDialog(
     isShow: Boolean,
-    userResponse: UserResponse?,
+    userResponse: SearchUserResponse?,
     onDismissRequest: () -> Unit,
     onSubmit: () -> Unit,
 ) {
@@ -51,7 +51,7 @@ internal fun InformationDialog(
             ) {
                 val (icon, name, info, button) = createRefs()
                 AppImage(
-                    model = todoImageUrl(), modifier = Modifier
+                    model = userResponse.avatar, modifier = Modifier
                         .constrainAs(icon) {
                             top.linkTo(parent.top, 12.dp)
                             start.linkTo(parent.start)
@@ -75,7 +75,7 @@ internal fun InformationDialog(
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 }) {
-                    Text("UID:${userResponse.id}", fontSize = 14.sp, color = Color(0xff999999))
+                    Text("UID:${userResponse.uuid}", fontSize = 14.sp, color = Color(0xff999999))
                 }
                 Row(
                     modifier = Modifier.constrainAs(button) {

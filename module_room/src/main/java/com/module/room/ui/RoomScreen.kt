@@ -47,7 +47,6 @@ import com.module.basic.ui.SpacerWidth
 import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.util.onClick
 import com.module.basic.viewmodel.apiHandlerViewModel
-import com.module.basic.util.todoImageUrl
 import com.module.room.R
 import com.module.room.viewmodel.RoomViewModel
 import org.koin.androidx.compose.get
@@ -159,7 +158,7 @@ private fun Item(
             }
             itemsIndexed(
                 pagingData = viewModel.followPagingDate,
-                key = { it.id }) { _, item ->
+                key = { it.id.toString() }) { _, item ->
                 ConstraintLayout(
                     modifier = Modifier
                         .fillParentMaxWidth()

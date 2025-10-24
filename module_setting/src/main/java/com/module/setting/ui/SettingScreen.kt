@@ -70,9 +70,28 @@ internal fun SettingScreen(viewModel: SettingViewModel = apiHandlerViewModel()) 
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Item(stringResource(R.string.setting_user_agreement)) { }
-                Item(stringResource(R.string.setting_privacy_policy)) { }
-                Item(stringResource(R.string.setting_about_us)) { }
+                val localNav = LocalNavController.current
+                Item(stringResource(R.string.setting_user_agreement)) { title ->
+                    localNav.navigate(
+                        AppRoutes.WebView.dynamic(
+                            "title" to title, "url" to "https://www.baidu.com"
+                        )
+                    )
+                }
+                Item(stringResource(R.string.setting_privacy_policy)) { title ->
+                    localNav.navigate(
+                        AppRoutes.WebView.dynamic(
+                            "title" to title, "url" to "https://www.baidu.com"
+                        )
+                    )
+                }
+                Item(stringResource(R.string.setting_about_us)) { title ->
+                    localNav.navigate(
+                        AppRoutes.WebView.dynamic(
+                            "title" to title, "url" to "https://www.baidu.com"
+                        )
+                    )
+                }
             }
             SpacerHeight(12.dp)
             Column(
@@ -95,7 +114,7 @@ internal fun SettingScreen(viewModel: SettingViewModel = apiHandlerViewModel()) 
             }
             SpacerHeight(12.dp)
             val localNav = LocalNavController.current
-            val sp = get<SharedPreferences> ()
+            val sp = get<SharedPreferences>()
             LoginOut {
                 sp.clearToken()
                 localNav.navigateAndPopAll(AppRoutes.Login.static)
@@ -106,8 +125,10 @@ internal fun SettingScreen(viewModel: SettingViewModel = apiHandlerViewModel()) 
 }
 
 @Composable
-private fun Item(name: String, block: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.onClick { block() }) {
+private fun Item(name: String, block: (String) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.onClick { block(name) }) {
         Text(text = name, fontSize = 20.sp, color = Color.Black)
         SpacerWeight(1f)
         AppMoreIcon()

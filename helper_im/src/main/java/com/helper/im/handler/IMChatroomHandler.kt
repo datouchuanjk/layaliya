@@ -69,6 +69,10 @@ class IMChatroomHandler(
                                     senderAvatar = user.avatar,
                                     senderName = user.name
                                 )
+                            }else  if (user.accountId == item.receiverId) {
+                                this[index] = item.copy(
+                                    receiverName = user.name,
+                                )
                             }
                         }
                     }

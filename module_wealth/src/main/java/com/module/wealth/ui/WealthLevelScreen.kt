@@ -49,7 +49,6 @@ import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWeight
 import com.module.basic.ui.AppTitleBar
-import com.module.basic.util.todoImageUrl
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.wealth.*
 import com.module.wealth.viewmodel.WealthLevelViewModel
@@ -141,7 +140,7 @@ private fun BgTop(viewModel: WealthLevelViewModel) {
                     .padding(2.dp)
             ) {
                 AppImage(
-                    model = todoImageUrl(),
+                    model = wealth?.userInfo?.avatar,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)

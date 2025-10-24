@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.helper.develop.nav.LocalNavController
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWeight
@@ -53,6 +54,7 @@ fun NavGraphBuilder.followersOrFansScreen() = composable(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FollowersOrFansScreen(viewModel: FollowersOrFansViewModel = apiHandlerViewModel()) {
+    val localNav = LocalNavController.current
     Scaffold(
         topBar = {
             AppTitleBar(
@@ -82,7 +84,9 @@ internal fun FollowersOrFansScreen(viewModel: FollowersOrFansViewModel = apiHand
                                 .size(48.dp)
                                 .clip(CircleShape),
                             model = item.avatar
-                        )
+                        ) {
+                            localNav.navigate(AppRoutes.PersonCenter.dynamic("uid" to item.uid.toString()))
+                        }
                         SpacerWidth(12.dp)
                         Column {
                             Text(
@@ -111,15 +115,15 @@ internal fun FollowersOrFansScreen(viewModel: FollowersOrFansViewModel = apiHand
                         }
 
                         SpacerWeight(1f)
-                            when (item.status) {
-                                1, 2 -> {
-                                    Followed(item,viewModel)
-                                }
-
-                                0 -> {
-                                    Unfollow(item,viewModel)
-                                }
+                        when (item.status) {
+                            1, 2 -> {
+                                Followed(item, viewModel)
                             }
+
+                            0 -> {
+                                Unfollow(item, viewModel)
+                            }
+                        }
 
                     }
                 }

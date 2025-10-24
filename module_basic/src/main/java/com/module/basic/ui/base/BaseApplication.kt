@@ -1,4 +1,4 @@
-package com.module.basic.ui
+package com.module.basic.ui.base
 
 import android.app.Application
 

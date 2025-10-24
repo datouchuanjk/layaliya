@@ -1,4 +1,4 @@
-package com.module.basic.ui
+package com.module.basic.ui.picker
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

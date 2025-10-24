@@ -44,6 +44,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.helper.develop.nav.LocalNavController
 import com.helper.develop.nav.navigateForResult
+import com.helper.develop.util.toast
 import com.helper.im.util.toConversationId
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppBackIcon
@@ -157,11 +158,13 @@ internal fun PersonCenterScreen(viewModel: PersonCenterViewModel = apiHandlerVie
                             shape = RoundedCornerShape(23.dp)
                         )
                         .onClick {
-                            Toast.makeText(localContext, "缺少云信id 不能调整 ", Toast.LENGTH_SHORT)
-                                .show()
-                            return@onClick
+                            val imAccount = viewModel.personResponse?.imAccount
+                            if (imAccount.isNullOrEmpty()) {
+                                localContext.toast(R.string.mine_imAccount_is_empty)
+                                return@onClick
+                            }
                             localNav.navigate(
-                                AppRoutes.Chat.dynamic("conversationId" to "".toConversationId())
+                                AppRoutes.Chat.dynamic("conversationId" to imAccount.toConversationId())
                             )
                         }
                         .wrapContentSize(),

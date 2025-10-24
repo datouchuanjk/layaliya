@@ -1,6 +1,7 @@
 package com.module.noble.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -50,7 +51,9 @@ internal class NobleHistoryViewModel(
         viewModelScope.launch {
             apiRequest {
                 api.receiveDiamond().checkAndGet()
+                api.canReceiveDiamond().checkAndGet()
             }.apiResponse {
+                _canReturnDiamondResponse = it
                 _receiveDiamondFlow.emit(Unit)
             }
         }

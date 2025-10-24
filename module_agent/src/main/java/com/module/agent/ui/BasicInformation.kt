@@ -125,6 +125,7 @@ private fun Invitation(viewModel: BasicInformationViewModel) {
                 .padding(horizontal = 12.dp)
         ) {
             BasicTextField(
+                modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     fontSize = 10.sp,
                     color = Color(0xff333333)

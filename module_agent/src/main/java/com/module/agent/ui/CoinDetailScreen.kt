@@ -68,7 +68,9 @@ internal fun CoinDetailScreen(viewModel: CoinDetailViewModel = apiHandlerViewMod
                 .padding(innerPadding)
         ) {
             SpacerHeight(16.dp)
-            WeekDatePicker()
+            WeekDatePicker { startTime, endTime ->
+                viewModel.refreshByTime(startTime, endTime)
+            }
             val pagingData = viewModel.pagingData
             AppPagingRefresh(
                 modifier = Modifier

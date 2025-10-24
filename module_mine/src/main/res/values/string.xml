@@ -6,18 +6,18 @@
     <string name="mine_wallet">Wallet</string>
     <string name="mine_view_more">View More</string>
     <string name="mine_store">Store</string>
+    <string name="mine_imAccount_is_empty">ImAccount is empty</string>
 
 
+    <string name="mine_actions_store">Store</string>
+    <string name="mine_actions_decoration">Decoration</string>
+    <string name="mine_actions_noble">Noble</string>
+    <string name="mine_actions_agency">Agency</string>
+    <string name="mine_actions_admin">Admin</string>
+    <string name="mine_actions_bd">BD</string>
+    <string name="mine_actions_coin_merchant">Coin Merchant</string>
 
-    <string-array name="mine_actions">
-        <item>Store</item>
-        <item>My decoration</item>
-        <item>Noble</item>
-        <item>Agency</item>
-        <item>Admin</item>
-        <item>BD</item>
-        <item>Coin Merchant</item>
-    </string-array>
+
     <string name="mine_charm_level">Charm Level</string>
     <string name="mine_wealth_level">Wealth level</string>
     <string name="mine_settings">Settings</string>

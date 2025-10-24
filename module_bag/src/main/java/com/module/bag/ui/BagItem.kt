@@ -74,7 +74,9 @@ internal fun BagItem(viewModel: BagViewModel) {
                 }
             }
         }
-        Buy(viewModel)
+        if(viewModel.selectedListItem!=null){
+            Buy(viewModel)
+        }
     }
 }
 @Composable

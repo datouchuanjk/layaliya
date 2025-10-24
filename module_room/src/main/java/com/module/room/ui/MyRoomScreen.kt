@@ -144,7 +144,6 @@ private fun Item(
                         model = item.cover,
                         modifier = Modifier
                             .size(60.dp)
-                            .clip(CircleShape)
                             .constrainAs(image) {
                                 start.linkTo(parent.start)
                                 top.linkTo(parent.top)
@@ -159,21 +158,21 @@ private fun Item(
                             start.linkTo(image.end, margin = 12.dp)
                             top.linkTo(image.top)
                         })
-                    Text(
-                        text = "这个是么逼？",
-                        color = Color(0xffcccccc),
-                        fontSize = 13.sp,
-                        modifier = Modifier.constrainAs(city) {
-                            start.linkTo(name.start)
-                            top.linkTo(name.bottom, margin = 4.dp)
-                        })
+//                    Text(
+//                        text = "这个是么逼？",
+//                        color = Color(0xffcccccc),
+//                        fontSize = 13.sp,
+//                        modifier = Modifier.constrainAs(city) {
+//                            start.linkTo(name.start)
+//                            top.linkTo(name.bottom, margin = 4.dp)
+//                        })
                     Text(
                         text = "UID:${item.uid}",
                         color = Color(0xff999999),
                         fontSize = 13.sp,
                         modifier = Modifier.constrainAs(uid) {
-                            start.linkTo(city.start)
-                            top.linkTo(city.bottom, margin = 4.dp)
+                            start.linkTo(name.start)
+                            top.linkTo(name.bottom, margin = 4.dp)
                         })
                     Image(
                         painter = painterResource(R.drawable.room_ic_home),

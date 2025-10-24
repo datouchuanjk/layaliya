@@ -17,7 +17,7 @@ import com.helper.develop.util.unzip
 import com.module.basic.api.data.response.ConfigResponse
 import com.module.basic.api.data.response.UserResponse
 import com.module.basic.api.service.BasicApiService
-import com.module.basic.ui.BaseApplication
+import com.module.basic.ui.base.BaseApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,6 +29,8 @@ import kotlin.collections.set
 import kotlin.collections.toMutableMap
 
 object AppGlobal {
+
+    val isDebug = true
 
     @SuppressLint("HardwareIds")
     val deviceId = Settings.Secure.getString(

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="bag_store">Bag</string>
+    <string name="bag_store">Decoration</string>
     <string name="bag_use">Use</string>
     <string name="bag_use_now">Use Now</string>
     <string name="bag_use_successful">Use successful</string>

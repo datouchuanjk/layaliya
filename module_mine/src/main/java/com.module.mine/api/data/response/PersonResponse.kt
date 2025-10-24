@@ -23,5 +23,7 @@ internal data class PersonResponse(
     val fansNum: Int?,
     @SerializedName("is_follow")
     val isFollow: Int?,
+    @SerializedName("im_account")
+    val imAccount: String,
     val top3: List<String?>?
 )

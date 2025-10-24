@@ -15,7 +15,7 @@ val nobleModule = module {
     }
 
     viewModel {
-        GiveToWhoViewModel(get())
+        GiveToWhoViewModel(get(),get())
     }
 
     viewModel {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="agent_not_find_user">Not find user</string>
     <string name="agent_agency">Agency</string>
     <string name="agent_proxy_name">Proxy Name</string>
     <string name="agent_payment_method">Payment Method</string>
@@ -21,7 +22,7 @@
     <string-array name="agent_tabs">
         <item>Basic information</item>
         <item>Idol List</item>
-        <item>Bill</item>
+<!--        <item>Bill</item>-->
     </string-array>
     <string name="agent_remaining_coins">Remaining coins</string>
     <string name="agent_total_coins">Total coins</string>

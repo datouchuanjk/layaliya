@@ -25,9 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -103,7 +101,7 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
                         ) {
                             val (icon, name, uid, coin, msg) = createRefs()
                             AppImage(
-                                model = todoImageUrl(), modifier = Modifier
+                                model = viewModel.userInfo?.avatar, modifier = Modifier
                                     .constrainAs(icon) {
                                         top.linkTo(parent.top)
                                         start.linkTo(parent.start)

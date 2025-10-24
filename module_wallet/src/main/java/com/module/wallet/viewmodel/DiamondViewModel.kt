@@ -26,7 +26,7 @@ class DiamondViewModel(
     private val api: WalletApiService,
     private val basicApi: BasicApiService,
     private val application: Application,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
 

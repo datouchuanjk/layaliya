@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,8 +87,13 @@ private fun TextMessage(item: IMChatroomMessage) {
         Column {
             Text(item.senderName.orEmpty(), fontSize = 14.sp, color = Color.White)
             SpacerHeight(4.dp)
+          val receiverName  = remember(item.receiverName){
+              item.receiverName
+          }?.run {
+              "@ $this"
+          }.orEmpty()
             Text(
-                item.text.orEmpty(),
+                "$receiverName ${item.text.orEmpty()}",
                 fontSize = 14.sp,
                 color = Color.White,
                 modifier = Modifier

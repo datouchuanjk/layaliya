@@ -54,14 +54,8 @@ internal class LoginViewModel(
         }
     }
 
-    fun facebookLogin() {
-        testLogin()
-    }
 
-    /**
-     * 登录完成之后
-     */
-    private fun testLogin() {
+     fun guestLogin() {
         viewModelScope.launch {
             if (!_isCheck) {
                 _loginWithNoCheck.emit(Unit)

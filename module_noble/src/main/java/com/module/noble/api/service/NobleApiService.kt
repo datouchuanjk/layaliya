@@ -6,11 +6,9 @@ import com.module.basic.api.data.request.BaseRequest
 import com.module.basic.api.data.response.BasePagingResponse
 import com.module.basic.api.data.response.BaseResponse
 import com.module.noble.api.data.request.BuyNobleRequest
-import com.module.noble.api.data.request.FindUserRequest
 import com.module.noble.api.data.request.GiveNobleRequest
 import com.module.noble.api.data.response.BuyOrGiveNobleRecordResponse
 import com.module.noble.api.data.response.CanReturnDiamondResponse
-import com.module.noble.api.data.response.FindUserResponse
 import com.module.noble.api.data.response.NobleResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -34,12 +32,6 @@ internal interface NobleApiService {
      */
     @POST("noble/send")
     suspend fun giveNoble(@Body request: GiveNobleRequest): BaseResponse<Unit>
-
-    /**
-     * 通过uid 找到需要赠送的人
-     */
-    @POST("noble/find-user")
-    suspend fun findUser(@Body request: FindUserRequest): BaseResponse<FindUserResponse>
 
     /**
      * 获取我有多少可以领取的砖石

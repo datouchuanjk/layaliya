@@ -1,8 +1,10 @@
 package com.module.basic.api.service
 
 import com.module.basic.api.data.request.BaseRequest
+import com.module.basic.api.data.request.UidRequest
 import com.module.basic.api.data.response.BaseResponse
 import com.module.basic.api.data.response.ConfigResponse
+import com.module.basic.api.data.response.SearchUserResponse
 import com.module.basic.api.data.response.UploadConfigResponse
 import com.module.basic.api.data.response.UserResponse
 import retrofit2.http.Body
@@ -31,6 +33,15 @@ interface BasicApiService {
     @POST("config/get-upload-config")
     suspend fun uploadConfig(@Body request: BaseRequest = BaseRequest()): BaseResponse<UploadConfigResponse>
 
+    /**
+     * 心跳
+     */
     @POST("heartbeat/index")
     suspend fun hearBeat(@Body request: BaseRequest = BaseRequest()): Any
+
+    /**
+     * 查找用户
+     */
+    @POST("search/user")
+    suspend fun searchUser(@Body request: UidRequest): BaseResponse<SearchUserResponse>
 }

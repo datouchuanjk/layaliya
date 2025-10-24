@@ -8,7 +8,9 @@ import com.helper.develop.util.filterDigit
 import com.module.agent.api.data.request.CoinMerchantSendRequest
 import com.module.agent.api.service.AgentApiService
 import com.module.basic.api.data.request.UidRequest
+import com.module.basic.api.data.response.SearchUserResponse
 import com.module.basic.api.data.response.UserResponse
+import com.module.basic.api.service.BasicApiService
 import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +18,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 internal class CoinMerchantViewModel(
-    private val api: AgentApiService
+    private val api: AgentApiService,
+    private val basicApi: BasicApiService,
 ) : BaseViewModel() {
 
     val userResponse get() = AppGlobal.userResponse
@@ -31,7 +34,7 @@ internal class CoinMerchantViewModel(
     }
 
 
-    private var _userInfo by mutableStateOf<UserResponse?>(null)
+    private var _userInfo by mutableStateOf<SearchUserResponse?>(null)
     val userInfo get() = _userInfo
 
     fun query() {
@@ -40,7 +43,7 @@ internal class CoinMerchantViewModel(
         }
         viewModelScope.launch {
             apiRequest {
-                api.findUserByUid(
+                basicApi.searchUser(
                                 UidRequest(_uid)
                             ).checkAndGet()
             }.apiResponse {

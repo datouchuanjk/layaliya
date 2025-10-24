@@ -58,7 +58,10 @@ internal fun BDScreen(viewModel: BDViewModel = apiHandlerViewModel()) {
                 .padding(it)
         ) {
             SpacerHeight(16.dp)
-            WeekDatePicker()
+            WeekDatePicker{
+                startTime, endTime ->
+                viewModel.refreshByTime(startTime,endTime)
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

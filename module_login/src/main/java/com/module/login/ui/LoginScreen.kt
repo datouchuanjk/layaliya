@@ -96,7 +96,7 @@ internal fun LoginScreen(viewModel: LoginViewModel = apiHandlerViewModel()) {
                         return@rememberLauncherForActivityResult
                     }
                     viewModel.googleLogin(idToken)
-                }else{
+                } else {
                     localContext.toast(R.string.login_error_google)
                 }
             }
@@ -125,12 +125,14 @@ internal fun LoginScreen(viewModel: LoginViewModel = apiHandlerViewModel()) {
             val hostController = LocalNavController.current
             LaunchedEffect(Unit) {
                 viewModel.loginResultFlow.collect {
-                    if(it)
-                    hostController.navigateTo(AppRoutes.Main.static)
-                    else{
-                        hostController.navigateTo(   AppRoutes.PersonEdit.dynamic(
-                            "fromComplete" to true
-                        ))
+                    if (it)
+                        hostController.navigateTo(AppRoutes.Main.static)
+                    else {
+                        hostController.navigateTo(
+                            AppRoutes.PersonEdit.dynamic(
+                                "fromComplete" to true
+                            )
+                        )
                     }
                 }
             }
@@ -146,11 +148,11 @@ internal fun LoginScreen(viewModel: LoginViewModel = apiHandlerViewModel()) {
             )
             SpacerHeight(16.dp)
             Text(
-                text = stringResource(R.string.login_facebook),
+                text = stringResource(R.string.login_guest),
                 color = Color(0xff333333),
                 fontSize = 20.sp,
                 modifier = Modifier.buttonModifier {
-                    viewModel.facebookLogin()
+                    viewModel.guestLogin()
                 }
             )
             SpacerHeight(50.dp)
@@ -163,9 +165,22 @@ internal fun LoginScreen(viewModel: LoginViewModel = apiHandlerViewModel()) {
                     block = { viewModel.isCheck },
                     clickable = viewModel::check,
                 )
+                val localNav = LocalNavController.current
                 SpacerWidth(8.dp)
                 AgreeText(viewModel) {
+                    when (it) {
+                        1 -> localNav.navigate(
+                            AppRoutes.WebView.dynamic(
+                                "title" to "User Agreement", "url" to "https://www.baidu.com"
+                            )
+                        )
 
+                        3 -> localNav.navigate(
+                            AppRoutes.WebView.dynamic(
+                                "title" to "Privacy Policy", "url" to "https://www.baidu.com"
+                            )
+                        )
+                    }
                 }
             }
             SpacerHeight(50.dp)

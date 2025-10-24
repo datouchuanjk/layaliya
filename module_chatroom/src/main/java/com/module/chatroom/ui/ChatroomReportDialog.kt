@@ -61,7 +61,6 @@ fun NavGraphBuilder.chatroomReportDialog() = dialog(
 @Composable
 internal fun ChatroomReportDialog(viewModel: ChatroomReportViewModel = apiHandlerViewModel()) {
     val back = LocalOnBackPressedDispatcherOwner.current
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
