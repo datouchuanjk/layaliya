@@ -271,26 +271,28 @@ private fun ChatRoomUserInfo(viewModel: ChatRoomViewModel) {
                 Text("UID:${viewModel.roomId}", fontSize = 8.sp, color = Color(0xffcccccc))
             }
             SpacerWidth(4.dp)
-            Box(
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .width(32.dp)
-                    .height(24.dp)
-                    .appBrushBackground(
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .onClick {
-                        if (roomInfo?.isFollow == 1) {
-                            viewModel.unFollowRoom()
-                        } else {
-                            viewModel.followRoom()
+            if(roomInfo?.isFollow !=1){
+                Box(
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .width(32.dp)
+                        .height(24.dp)
+                        .appBrushBackground(
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .onClick {
+                            if (roomInfo?.isFollow == 1) {
+                                viewModel.unFollowRoom()
+                            } else {
+                                viewModel.followRoom()
+                            }
                         }
-                    }
-                    .wrapContentSize()
-            ) {
-                AppImage(
-                    if (roomInfo?.isFollow == 1) R.drawable.room_ic_unfollow_room else R.drawable.room_ic_follow_room
-                )
+                        .wrapContentSize()
+                ) {
+                    AppImage(
+                        if (roomInfo?.isFollow == 1) R.drawable.room_ic_unfollow_room else R.drawable.room_ic_follow_room
+                    )
+                }
             }
         }
         SpacerWeight(1f)

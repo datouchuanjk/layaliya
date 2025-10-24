@@ -1,5 +1,6 @@
 package com.module.community.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +54,9 @@ import com.module.basic.util.*
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.community.viewmodel.CommunityViewModel
 import  com.module.community.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,7 +68,26 @@ fun Home3() {
 @Composable
 internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel()) {
     val state = rememberLazyListState()
-    val scope = rememberCoroutineScope()
+    var isRefresh by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val totalItemsCount by remember {
+        derivedStateOf {
+            state.layoutInfo.totalItemsCount
+        }
+    }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.layoutInfo.totalItemsCount }
+            .collect {
+                if (isRefresh) {
+                    delay(500)
+                    state.animateScrollToItem(0)
+                   withFrameMillis {  }
+                    isRefresh = false
+                }
+            }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,10 +112,9 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                 ) {
                     localNav.navigateForResult<Boolean>(AppRoutes.PostCommunity.static) {
                         if (it == true) {
+                            Log.e("1234", "isRefresh true")
+                            isRefresh = true
                             pagingData.refresh()
-                            scope.launch {
-                                state.animateScrollToItem(0)
-                            }
                         }
                     }
                 }
@@ -132,7 +163,7 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                 }
                                 .clip(CircleShape)) {
                             localNav.navigate(
-                                AppRoutes.PersonCenter.dynamic("uid" to item.id.toString())
+                                AppRoutes.PersonCenter.dynamic("uid" to item.uid.toString())
                             )
                         }
                         Text(
@@ -174,26 +205,6 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                 if (item.isFollow == 1) R.drawable.community_ic_unfollow else R.drawable.community_ic_follow
                             )
                         }
-
-//                        Text(
-//                            text = if (item.isFollow == 1) "+" else "-",
-//                            modifier = Modifier
-//                                .constrainAs(add) {
-//                                    top.linkTo(icon.top)
-//                                    end.linkTo(more.start, 12.dp)
-//                                }
-//                                .border(
-//                                    width = 1.dp,
-//                                    color = Color(0xffFF4070),
-//                                    shape = RoundedCornerShape(20.dp)
-//                                )
-//                                .onClick {
-//                                    viewModel.follow(index, item)
-//                                }
-//                                .padding(vertical = 5.dp, horizontal = 12.dp),
-//                            color = Color(0xffFF4071),
-//                            fontSize = 18.sp
-//                        )
                         Row(modifier = Modifier.constrainAs(userinfo) {
                             top.linkTo(name.bottom, 0.dp)
                             start.linkTo(name.start)

@@ -85,7 +85,7 @@ internal fun ConversationScreen(viewModel: ConversationViewModel = apiHandlerVie
                             modifier = Modifier
                                 .align(alignment = Alignment.BottomEnd)
                                 .size(8.dp)
-                                .background(color = Color(0xff30f130), shape = CircleShape)
+                                .background(color =if(item.online)  Color(0xff30f130) else  Color(0xfff5f5f5), shape = CircleShape)
                         )
                     }
                     SpacerWidth(12.dp)

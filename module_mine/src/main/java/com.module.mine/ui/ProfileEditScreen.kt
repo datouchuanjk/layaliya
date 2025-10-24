@@ -331,7 +331,7 @@ private fun Birthday(viewModel: ProfileEditViewModel) {
                 )
             ) {
                 isShow = false
-                viewModel.birthDay("${it.year}-${it.month + 1}-${it.dayOfMonth}")
+                viewModel.birthDay(it.YMD)
             }
         }
     }

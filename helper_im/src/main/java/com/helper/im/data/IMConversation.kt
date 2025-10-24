@@ -17,6 +17,7 @@ fun V2NIMLocalConversation.transform() = IMConversation(this)
 @Keep
  data class IMConversation(
     private val v2NIMLocalConversation: V2NIMLocalConversation,
+    val online: Boolean =false,
     val conversationId: String = v2NIMLocalConversation.conversationId,
     val targetId: String = V2NIMConversationIdUtil.conversationTargetId(conversationId),
     val name: String? = v2NIMLocalConversation.name,

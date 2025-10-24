@@ -97,7 +97,7 @@ internal fun Coins(viewModel: CoinsViewModel = apiHandlerViewModel()) {
                         color = Color.White
                     )
                     SpacerWidth(8.dp)
-                    AppImage(R.drawable.wallet_ic_coin)
+                    AppImage(R.drawable.wallet_ic_jb)
                 }
                 Text(
                     text = stringResource(R.string.wallet_balance),

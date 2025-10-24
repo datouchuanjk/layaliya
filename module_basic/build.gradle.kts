@@ -54,4 +54,5 @@ dependencies {
     api(project(":helper_develop"))
     api(project(":helper_im"))
     api("androidx.lifecycle:lifecycle-process:2.6.2")
+    implementation(libs.play.services.ads.identifier)
 }

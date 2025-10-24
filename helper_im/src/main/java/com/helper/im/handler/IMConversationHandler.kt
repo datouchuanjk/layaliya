@@ -9,6 +9,15 @@ import com.helper.im.data.transform
 import com.helper.im.util.logIM
 import com.helper.im.transform
 import com.helper.im.util.toTargetId
+import com.netease.nimlib.sdk.InvocationFuture
+import com.netease.nimlib.sdk.NIMClient
+import com.netease.nimlib.sdk.Observer
+import com.netease.nimlib.sdk.RequestCallback
+import com.netease.nimlib.sdk.event.EventSubscribeService
+import com.netease.nimlib.sdk.event.EventSubscribeServiceObserver
+import com.netease.nimlib.sdk.event.model.Event
+import com.netease.nimlib.sdk.event.model.EventSubscribeRequest
+import com.netease.nimlib.sdk.event.model.NimEventType
 import com.netease.nimlib.sdk.v2.V2NIMError
 import com.netease.nimlib.sdk.v2.conversation.V2NIMLocalConversationListener
 import com.netease.nimlib.sdk.v2.conversation.V2NIMLocalConversationService
@@ -24,7 +33,7 @@ import kotlin.coroutines.resume
 /**
  * 会话帮助类
  */
- class IMConversationHandler internal constructor(scope: CoroutineScope) :
+class IMConversationHandler internal constructor(scope: CoroutineScope) :
     Handler<V2NIMLocalConversationService>(scope),
     V2NIMLocalConversationListener {
 
@@ -48,7 +57,6 @@ import kotlin.coroutines.resume
         pagingData.handle {
             add(0, conversation.transform())
         }
-
     }
 
     override fun onConversationDeleted(conversationIds: MutableList<String>?) {
@@ -120,9 +128,10 @@ import kotlin.coroutines.resume
                 throw it.transform()
             })
         }
+        sub(result.conversationList.map { it.conversationId.toTargetId() })
         LoadResult(
             if (result.isFinished) null else result.offset,
-            result.conversationList.map { it.transform()}
+            result.conversationList.map { it.transform() }
                 .apply {
                     IMHelper.userHandler.refreshUserInfos(this.map { it.targetId })
                 }
@@ -144,4 +153,43 @@ import kotlin.coroutines.resume
             }
         }
     }
+
+    fun sub(ids: List<String>) {
+        NIMClient.getService(EventSubscribeService::class.java).subscribeEvent(
+            EventSubscribeRequest().apply {
+                eventType = 1
+                expiry = 1L
+                publishers = ids
+            }
+        ).setCallback(null)
+        NIMClient.getService(EventSubscribeService::class.java).subscribeEvent(
+            EventSubscribeRequest().apply {
+                eventType = 2
+                expiry = 30 * 24 * 60 * 60 * 1000
+                publishers = ids
+            }
+        ).setCallback(null)
+        NIMClient.getService(EventSubscribeService::class.java).subscribeEvent(
+            EventSubscribeRequest().apply {
+                eventType = 3
+                expiry = 1L
+                publishers = ids
+            }
+        ).setCallback(null)
+        NIMClient.getService(EventSubscribeServiceObserver::class.java).observeEventChanged({
+            val result = it ?: return@observeEventChanged
+            result.forEach { item ->
+                val online = item.eventType == 1
+                pagingData.handle {
+                    forEachIndexed { index, pagingItem ->
+                        if (pagingItem.targetId == item.publisherAccount) {
+                            set(index, pagingItem.copy(online = online))
+                        }
+                    }
+                }
+            }
+        }, true)
+    }
 }
+
+

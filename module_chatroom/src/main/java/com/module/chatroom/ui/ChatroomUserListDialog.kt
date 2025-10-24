@@ -184,7 +184,7 @@ private fun List(viewModel: ChatroomUserListViewModel, onClick: (String) -> Unit
                                 .clip(CircleShape)
                         ) {
                             localNav.navigate(
-                                AppRoutes.PersonCenter.dynamic("uid" to it.id.toString())
+                                AppRoutes.PersonCenter.dynamic("uid" to it.uid.toString())
                             )
                         }
                     }

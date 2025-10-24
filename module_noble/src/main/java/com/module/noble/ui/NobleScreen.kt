@@ -1,5 +1,6 @@
 package com.module.noble.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.PagerState
@@ -36,7 +38,11 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -157,46 +163,71 @@ internal fun NobleScreen(viewModel: NobleViewModel = apiHandlerViewModel()) {
                     .padding(horizontal = 15.dp),
                 painter = rememberAsyncImagePainter(viewModel.selectedNobleResponse?.bg)
             ) {
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 10.dp, vertical = 24.dp)
-                        .verticalScroll(rememberScrollState()),
-                    maxItemsInEachRow = 3,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    viewModel.selectedNobelPowerDataList.padToMultiple(3).forEach { item ->
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.weight(1 / 3f)
-                        ) {
-                            if (item != null) {
-                                AppImage(
-                                    model = item.icon,
-                                    modifier = Modifier
-                                        .size(60.dp)
-                                        .paint(
-                                            painter = rememberAsyncImagePainter(viewModel.selectedNobleResponse?.powerBg),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                        .wrapContentSize()
-                                        .size(30.dp),
-                                )
-                                SpacerHeight(4.dp)
-                                Text(
-                                    minLines = 2,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    text = item.name.orEmpty(),
-                                    fontSize = 12.sp,
-                                    color = Color.White,
-                                    textAlign = TextAlign.Center
-                                )
+                Box {
+                    val scrollState = rememberScrollState()
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 10.dp, vertical = 24.dp)
+                            .verticalScroll(scrollState),
+                        maxItemsInEachRow = 3,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        viewModel.selectedNobelPowerDataList.padToMultiple(3).forEach { item ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.weight(1 / 3f)
+                            ) {
+                                if (item != null) {
+                                    AppImage(
+                                        model = item.icon,
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .paint(
+                                                painter = rememberAsyncImagePainter(viewModel.selectedNobleResponse?.powerBg),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                            .wrapContentSize()
+                                            .size(30.dp),
+                                    )
+                                    SpacerHeight(4.dp)
+                                    Text(
+                                        minLines = 2,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        text = item.name.orEmpty(),
+                                        fontSize = 12.sp,
+                                        color = Color.White,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     }
+                    Canvas(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .fillMaxHeight()
+                            .padding(vertical = 5.dp)
+                            .padding(end = 1.5.dp)
+                            .width(1.dp)
+                    ) {
+                        val totalHeight = size.height
+                        val visibleRatio = totalHeight / (scrollState.maxValue + totalHeight)
+                        val scrollbarHeight = totalHeight * visibleRatio
+                        val scrollbarOffset =
+                            (scrollState.value.toFloat() / scrollState.maxValue) * (totalHeight - scrollbarHeight)
+
+                        drawRoundRect(
+                            color = Color.Gray.copy(alpha = 0.6f),
+                            topLeft = Offset(0f, scrollbarOffset),
+                            size = Size(size.width, scrollbarHeight),
+                            cornerRadius = CornerRadius(8.dp.toPx())
+                        )
+                    }
                 }
+
             }
             SpacerHeight(28.dp)
             BottomButton(viewModel)

@@ -12,6 +12,7 @@ import com.helper.im.data.IMUser
 import com.helper.im.data.transform
 import com.helper.im.util.logIM
 import com.helper.im.transform
+import com.helper.im.util.toTargetId
 import com.netease.nimlib.sdk.v2.message.V2NIMClearHistoryNotification
 import com.netease.nimlib.sdk.v2.message.V2NIMMessage
 import com.netease.nimlib.sdk.v2.message.V2NIMMessageCreator
@@ -45,15 +46,21 @@ class IMMessageHandler internal constructor(
     }
 
 
-
     private val _receiveMessagesFlow = MutableSharedFlow<Unit>()
     val receiveMessagesFlow = _receiveMessagesFlow.asSharedFlow()
 
     val userInfo = MutableStateFlow<IMUser?>(null)
-    val targetId: String? = V2NIMConversationIdUtil.conversationTargetId(conversationId)
+    val targetId: String? = conversationId.toTargetId()
 
     init {
         launch {
+            IMHelper.userHandler.userProfileChangedFlow.collect {
+                it.forEach {
+                    if (it.accountId == targetId) {
+                        userInfo.value = it
+                    }
+                }
+            }
             userInfo.value = withContext(Dispatchers.IO) {
                 IMHelper.userHandler.getLocalUserInfo(targetId)
             }
@@ -245,7 +252,7 @@ class IMMessageHandler internal constructor(
      * 发送文本消息
      */
     suspend fun sendTextMessage(message: String) {
-        if(message.isEmpty())return
+        if (message.isEmpty()) return
         logIM("sendTextMessage message->${message}")
         val v2TextMessage = V2NIMMessageCreator.createTextMessage(message)
         suspendCancellableCoroutine { b ->

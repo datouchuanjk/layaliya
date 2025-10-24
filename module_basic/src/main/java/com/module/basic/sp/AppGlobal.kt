@@ -1,39 +1,42 @@
 package com.module.basic.sp
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.provider.Settings
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.core.content.edit
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import com.helper.develop.util.downloadToFile
-import com.helper.develop.util.fromTypeJson
-import com.helper.develop.util.toJson
-import com.helper.develop.util.unzip
-import com.module.basic.api.data.response.ConfigResponse
-import com.module.basic.api.data.response.UserResponse
-import com.module.basic.api.service.BasicApiService
-import com.module.basic.ui.base.BaseApplication
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.UUID
-import kotlin.collections.orEmpty
-import kotlin.collections.set
-import kotlin.collections.toMutableMap
+import android.annotation.*
+import android.content.*
+import android.provider.*
+import android.util.*
+import androidx.compose.runtime.*
+import androidx.core.content.*
+import androidx.lifecycle.*
+import com.google.android.gms.ads.identifier.*
+import com.helper.develop.util.*
+import com.module.basic.api.data.response.*
+import com.module.basic.api.service.*
+import com.module.basic.ui.base.*
+import kotlinx.coroutines.*
+import java.io.*
+import java.util.*
 
 object AppGlobal {
 
-    val isDebug = true
+    init {
+        getGoogleAdId()
+    }
+
+    private var _googleId: String? = null
+    fun getGoogleAdId() {
+        val advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(BaseApplication.INSTANCE)
+        val gaId: String? = advertisingIdInfo.id
+        // 检查用户是否限制了广告追踪
+        val isLATEnabled: Boolean = advertisingIdInfo.isLimitAdTrackingEnabled
+        _googleId = if (!isLATEnabled && gaId != "00000000-0000-0000-0000-000000000000") {
+            gaId
+        } else {
+            null
+        }
+    }
 
     @SuppressLint("HardwareIds")
-    val deviceId = Settings.Secure.getString(
+    val deviceId = _googleId ?: Settings.Secure.getString(
         BaseApplication.INSTANCE.contentResolver,
         Settings.Secure.ANDROID_ID
     ) ?: UUID.randomUUID().toString()

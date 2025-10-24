@@ -173,7 +173,7 @@ private fun UserInfo(userInfo: UserResponse?) {
             AppMoreIcon()
         }
         Text(
-            text = "UID:${userInfo?.id.toString()}",
+            text = "UID:${userInfo?.uuid.toString()}",
             fontSize = 13.sp,
             color = Color(0xff999999),
             modifier = Modifier

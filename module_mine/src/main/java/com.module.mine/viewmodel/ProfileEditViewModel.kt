@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.helper.develop.util.YMD
+import com.helper.develop.util.year
 import com.module.basic.api.service.BasicApiService
 import com.module.basic.sp.AppGlobal
 import com.module.basic.util.UploadUtils
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.io.*
+import java.util.Calendar
 
 internal class ProfileEditViewModel(
     private val api: MineApiService,
@@ -82,6 +85,21 @@ internal class ProfileEditViewModel(
         _birthDay = birthDay
     }
 
+    init {
+        if (isFomComplete) {
+            if (_language .isNullOrEmpty()) {
+                _language = AppGlobal.configResponse?.language?.get(0)?.code
+            }
+            if (_countryCode .isNullOrEmpty()) {
+                _countryCode = AppGlobal.configResponse?.country?.get(0)?.code
+            }
+            if (_birthDay.isNullOrEmpty()) {
+                _birthDay = Calendar.getInstance().apply {
+                    year =year- 25
+                }.YMD
+            }
+        }
+    }
 
     private val _editSuccessfulFlow = MutableSharedFlow<Unit>()
     val editSuccessfulFlow = _editSuccessfulFlow.asSharedFlow()

@@ -63,7 +63,6 @@ android {
         }
     }
 }
-
 dependencies {
     implementation(project(":module_basic"))
     implementation(project(":module_room"))
