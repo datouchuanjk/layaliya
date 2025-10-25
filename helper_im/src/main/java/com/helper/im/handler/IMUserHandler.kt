@@ -8,6 +8,7 @@ import com.helper.im.util.logIM
 import com.netease.nimlib.sdk.v2.user.V2NIMUser
 import com.netease.nimlib.sdk.v2.user.V2NIMUserListener
 import com.netease.nimlib.sdk.v2.user.V2NIMUserService
+import com.netease.nimlib.sdk.v2.user.params.V2NIMUserUpdateParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -29,9 +30,13 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     val userProfileChangedFlow = _userProfileChangedFlow.asSharedFlow()
     override fun onUserProfileChanged(users: MutableList<V2NIMUser>?) {
         logIM("onUserProfileChanged users->${users}")
-        Log.e("1234","服务器回来了，${users?.map { 
-           "id=${ it.accountId} nickname=${it.name} 头像 ${it.avatar}"
-        }} ")
+        Log.e(
+            "1234", "服务器回来了，${
+                users?.map {
+                    "id=${it.accountId} nickname=${it.name} 头像 ${it.avatar}"
+                }
+            } "
+        )
         users ?: return
         if (users.isEmpty()) return
         launch {
@@ -64,14 +69,15 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     /**
      * 获取本地用户信息
      */
-    fun getLocalUserInfo(accountId: String?,refreshWhenNull: Boolean=true): IMUser? {
-        Log.e("1234","我开始获取 ${accountId} 的用户信息 ")
-        accountId?:return null
+    fun getLocalUserInfo(accountId: String?, refreshWhenNull: Boolean = true): IMUser? {
+        Log.e("1234", "我开始获取 ${accountId} 的用户信息 ")
+        accountId ?: return null
         return service.getUserInfo(accountId).data?.transform().apply {
-            if(this==null&&refreshWhenNull){
-                Log.e("1234","本地没有 ${accountId} 开始拉去服务器 ")
+            if (this == null && refreshWhenNull) {
+                Log.e("1234", "本地没有 ${accountId} 开始拉去服务器 ")
                 refreshUserInfos(accountId)
             }
         }
     }
+
 }
