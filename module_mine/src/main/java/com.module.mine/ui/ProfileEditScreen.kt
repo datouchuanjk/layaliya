@@ -9,12 +9,14 @@ import androidx.compose.foundation.text.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.*
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.navigation.*
 import androidx.navigation.compose.*
@@ -136,6 +138,7 @@ private fun Avatar(viewModel: ProfileEditViewModel) {
 private fun Nickname(viewModel: ProfileEditViewModel) {
     Item(stringResource(R.string.mine_nickname)) {
         BasicTextField(
+
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(align = Alignment.End),
@@ -143,17 +146,16 @@ private fun Nickname(viewModel: ProfileEditViewModel) {
             onValueChange = viewModel::nickname,
             textStyle = TextStyle(
                 fontSize = 16.sp,
-                color = Color(0xff666666)
-            ),
+                color = Color(0xff666666), textAlign = TextAlign.End),
             decorationBox = {
-                if (viewModel.nickname.isNullOrEmpty()) {
-                    Text(
-                        text = stringResource(R.string.mine_please_input),
-                        fontSize = 16.sp,
-                        color = Color(0xff999999)
-                    )
-                }
-                it()
+                    if (viewModel.nickname.isNullOrEmpty()) {
+                        Text(
+                            text = stringResource(R.string.mine_please_input),
+                            fontSize = 16.sp,
+                            color = Color(0xff999999)
+                        )
+                    }
+                    it()
             }
         )
     }
@@ -170,7 +172,8 @@ private fun Introduce(viewModel: ProfileEditViewModel) {
             onValueChange = viewModel::introduce,
             textStyle = TextStyle(
                 fontSize = 16.sp,
-                color = Color(0xff666666)
+                color = Color(0xff666666),
+                textAlign = TextAlign.End
             ),
             decorationBox = {
                 if (viewModel.introduce.isNullOrEmpty()) {

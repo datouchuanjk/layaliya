@@ -270,7 +270,7 @@ private fun BottomButton(viewModel: NobleViewModel) {
         var isShow by remember {
             mutableStateOf(false)
         }
-        AppImage(R.drawable.noble_ic_why)
+//        AppImage(R.drawable.noble_ic_why)
         GiveToWhoDialog(
             isShow = isShow,
             onDismissRequest = { isShow = false },
