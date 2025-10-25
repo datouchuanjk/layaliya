@@ -265,7 +265,7 @@ private fun ChatRoomUserInfo(viewModel: ChatRoomViewModel) {
                     .size(40.dp)
                     .clip(CircleShape),
             )
-            SpacerWidth(4.dp)
+            SpacerWidth(6.dp)
             Column {
                 Text(roomInfo?.name.orEmpty(), fontSize = 14.sp, color = Color.White)
                 Text("UID:${viewModel.roomId}", fontSize = 8.sp, color = Color(0xffcccccc))
@@ -274,7 +274,6 @@ private fun ChatRoomUserInfo(viewModel: ChatRoomViewModel) {
             if(roomInfo?.isFollow !=1){
                 Box(
                     modifier = Modifier
-                        .padding(end = 4.dp)
                         .width(32.dp)
                         .height(24.dp)
                         .appBrushBackground(
@@ -294,6 +293,7 @@ private fun ChatRoomUserInfo(viewModel: ChatRoomViewModel) {
                     )
                 }
             }
+            SpacerWidth(6.dp)
         }
         SpacerWeight(1f)
         if (viewModel.chatroomInfoResponse?.userInfo?.isMasterOrAdmin == true) {

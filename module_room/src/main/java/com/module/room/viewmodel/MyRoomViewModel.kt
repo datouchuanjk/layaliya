@@ -33,7 +33,7 @@ internal class MyRoomViewModel(
             0 -> {
                 AppGlobal.userResponse?.roomInfo?.run {
                     if (it.key == 1 && this.id != null && this.id!! > 0) {
-                        listOf(this)
+                        listOf(this.copy(uuid = AppGlobal.userResponse?.uuid))
                     } else {
                         listOf()
                     }

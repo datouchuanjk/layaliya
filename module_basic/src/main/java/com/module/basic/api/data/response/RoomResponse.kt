@@ -8,6 +8,7 @@ data class RoomResponse(
     val uid: Int,
     val isOpen: Int,
     val id: Int?,
+    val uuid: String?,
     val name: String?,
     val cover: String?,
     @SerializedName("hot_val")

@@ -35,6 +35,7 @@ internal class ChatViewModel(
     }
 
     val userInfo = messageHandler.userInfo.asStateFlow()
+
     val targetId: String? get() = messageHandler.targetId
 
     /**

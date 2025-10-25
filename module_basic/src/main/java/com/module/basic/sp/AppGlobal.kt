@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.core.content.*
 import androidx.lifecycle.*
 import com.google.android.gms.ads.identifier.*
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.helper.develop.util.*
 import com.module.basic.api.data.response.*
 import com.module.basic.api.service.*
@@ -24,22 +26,45 @@ object AppGlobal {
 
     private var _googleId: String? = null
     fun getGoogleAdId() {
-        val advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(BaseApplication.INSTANCE)
-        val gaId: String? = advertisingIdInfo.id
-        // 检查用户是否限制了广告追踪
-        val isLATEnabled: Boolean = advertisingIdInfo.isLimitAdTrackingEnabled
-        _googleId = if (!isLATEnabled && gaId != "00000000-0000-0000-0000-000000000000") {
-            gaId
-        } else {
-            null
+        ProcessLifecycleOwner.get().lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                if (GoogleApiAvailability.getInstance()
+                        .isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS
+                ) {
+                    _googleId = null
+                    Log.e("1234","炸了")
+                    return@withContext
+                }
+                _googleId = try {
+                    val advertisingIdInfo =
+                        AdvertisingIdClient.getAdvertisingIdInfo(BaseApplication.INSTANCE)
+                    val gaId: String? = advertisingIdInfo.id
+                    Log.e("1234","gaId=${gaId}")
+                    // 检查用户是否限制了广告追踪
+                    val isLATEnabled: Boolean = advertisingIdInfo.isLimitAdTrackingEnabled
+                    if (!isLATEnabled && gaId != "00000000-0000-0000-0000-000000000000") {
+                        gaId
+                    } else {
+                        Log.e("1234","炸了1")
+                        null
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("1234","炸了2 ${e.message}")
+                    null
+                }
+            }
         }
     }
 
-    @SuppressLint("HardwareIds")
-    val deviceId = _googleId ?: Settings.Secure.getString(
+    private val _androidId = Settings.Secure.getString(
         BaseApplication.INSTANCE.contentResolver,
         Settings.Secure.ANDROID_ID
-    ) ?: UUID.randomUUID().toString()
+    )
+    
+    private val uuid = UUID.randomUUID().toString()
+
+    val deviceId get() =  _googleId ?: _androidId ?: uuid
 
     private var _userResponse by mutableStateOf<UserResponse?>(null)
     val userResponse get() = _userResponse

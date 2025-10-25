@@ -1,6 +1,7 @@
 package com.helper.im.handler
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import com.helper.develop.paging.LoadResult
 import com.helper.develop.paging.PagingConfig
 import com.helper.develop.paging.PagingStart
@@ -13,6 +14,7 @@ import com.helper.im.data.transform
 import com.helper.im.util.logIM
 import com.helper.im.transform
 import com.helper.im.util.toTargetId
+import com.netease.nimlib.sdk.NIMClient
 import com.netease.nimlib.sdk.v2.message.V2NIMClearHistoryNotification
 import com.netease.nimlib.sdk.v2.message.V2NIMMessage
 import com.netease.nimlib.sdk.v2.message.V2NIMMessageCreator
@@ -33,6 +35,7 @@ import org.json.JSONObject
 import java.io.File
 import kotlin.collections.filter
 import kotlin.collections.forEachIndexed
+import kotlin.collections.map
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -43,24 +46,45 @@ class IMMessageHandler internal constructor(
 
     init {
         IMHelper.conversationHandler.clearUnreadCountById(conversationId)
+//        IMHelper.conversationHandler.setCurrentConversation(conversationId)
     }
 
-
+    init {
+        register {
+            IMHelper.conversationHandler.clearUnreadCountById(conversationId)
+            IMHelper.conversationHandler.setCurrentConversation(conversationId)
+            service.addMessageListener(this)
+            return@register {
+                service.removeMessageListener(this)
+                IMHelper.conversationHandler.setCurrentConversation(null)
+            }
+        }
+    }
     private val _receiveMessagesFlow = MutableSharedFlow<Unit>()
     val receiveMessagesFlow = _receiveMessagesFlow.asSharedFlow()
 
     val userInfo = MutableStateFlow<IMUser?>(null)
+
     val targetId: String? = conversationId.toTargetId()
 
     init {
         launch {
             IMHelper.userHandler.userProfileChangedFlow.collect {
+                Log.e(
+                    "1234", "聊天界面收到了 用户信息更新回调 ${
+                        it.map {
+                            "id=${it.accountId} nickname=${it.name} 头像 ${it.avatar}"
+                        }
+                    }} 目前聊天对象的id是${targetId} 确定更新"
+                )
                 it.forEach {
                     if (it.accountId == targetId) {
                         userInfo.value = it
                     }
                 }
             }
+        }
+        launch {
             userInfo.value = withContext(Dispatchers.IO) {
                 IMHelper.userHandler.getLocalUserInfo(targetId)
             }
@@ -199,14 +223,7 @@ class IMMessageHandler internal constructor(
         service.sendP2PMessageReceipt(message, {}, {})
     }
 
-    init {
-        register {
-            service.addMessageListener(this)
-            return@register {
-                service.removeMessageListener(this)
-            }
-        }
-    }
+
 
     val pagingData = buildPaging(
         coroutineScope = this,

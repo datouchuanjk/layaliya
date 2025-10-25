@@ -22,16 +22,16 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(project(":helper_develop"))
-    api("com.netease.nimlib:basesdk:10.9.30")
+    api("com.netease.nimlib:basesdk:10.9.52")
 // 聊天室功能
-    api("com.netease.nimlib:chatroom:10.9.30")
+    api("com.netease.nimlib:chatroom:10.9.52")
 // 厂商推送集成（小米、华为等）
-    api("com.netease.nimlib:push:10.9.30")
+    api("com.netease.nimlib:push:10.9.52")
 // 超大群功能
-    api("com.netease.nimlib:superteam:10.9.30")
+    api("com.netease.nimlib:superteam:10.9.52")
 // 全文检索插件
-    api("com.netease.nimlib:lucene:10.9.30")
+    api("com.netease.nimlib:lucene:10.9.52")
     //音频
-    api("com.netease.yunxin:nertc-audio:5.6.50")
-    api("com.netease.yunxin:nertc-audio:5.6.50")
+    api("com.netease.yunxin:nertc-audio:5.8.5001")
+    api("com.netease.yunxin:nertc-audio:5.8.5001")
 }

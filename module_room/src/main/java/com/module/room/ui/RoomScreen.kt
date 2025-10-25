@@ -193,7 +193,7 @@ private fun Item(
                             top.linkTo(image.top)
                         })
                     Text(
-                        text = "UID:${item.id}",
+                        text = "UID:${item.userUuid}",
                         color = Color(0xff999999),
                         fontSize = 12.sp,
                         modifier = Modifier.constrainAs(uid) {

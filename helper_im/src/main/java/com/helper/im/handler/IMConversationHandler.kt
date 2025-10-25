@@ -1,34 +1,20 @@
 package com.helper.im.handler
 
-import com.helper.develop.paging.LoadResult
-import com.helper.develop.paging.PagingConfig
-import com.helper.develop.paging.PagingStart
-import com.helper.develop.paging.buildPaging
-import com.helper.im.IMHelper
-import com.helper.im.data.transform
-import com.helper.im.util.logIM
-import com.helper.im.transform
-import com.helper.im.util.toTargetId
-import com.netease.nimlib.sdk.InvocationFuture
-import com.netease.nimlib.sdk.NIMClient
-import com.netease.nimlib.sdk.Observer
-import com.netease.nimlib.sdk.RequestCallback
-import com.netease.nimlib.sdk.event.EventSubscribeService
-import com.netease.nimlib.sdk.event.EventSubscribeServiceObserver
-import com.netease.nimlib.sdk.event.model.Event
-import com.netease.nimlib.sdk.event.model.EventSubscribeRequest
-import com.netease.nimlib.sdk.event.model.NimEventType
-import com.netease.nimlib.sdk.v2.V2NIMError
-import com.netease.nimlib.sdk.v2.conversation.V2NIMLocalConversationListener
-import com.netease.nimlib.sdk.v2.conversation.V2NIMLocalConversationService
-import com.netease.nimlib.sdk.v2.conversation.model.V2NIMLocalConversation
-import com.netease.nimlib.sdk.v2.conversation.params.V2NIMLocalConversationFilter
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.helper.develop.paging.*
+import com.helper.im.*
+import com.helper.im.data.*
+import com.helper.im.util.*
+import com.netease.nimlib.sdk.*
+import com.netease.nimlib.sdk.event.*
+import com.netease.nimlib.sdk.event.model.*
+import com.netease.nimlib.sdk.v2.*
+import com.netease.nimlib.sdk.v2.conversation.*
+import com.netease.nimlib.sdk.v2.conversation.model.*
+import com.netease.nimlib.sdk.v2.conversation.params.*
 import kotlinx.coroutines.*
-import kotlin.collections.forEachIndexed
-import kotlin.collections.removeAll
-import kotlin.coroutines.resume
+import kotlinx.coroutines.flow.*
+import kotlin.coroutines.*
+
 
 /**
  * 会话帮助类
@@ -109,6 +95,9 @@ class IMConversationHandler internal constructor(scope: CoroutineScope) :
         }
     }
 
+    fun setCurrentConversation(conversationId: String?) {
+            service.setCurrentConversation(conversationId)
+    }
 
     fun clearUnreadCountById(conversationId: String) {
         logIM("clearUnreadCountById conversationId->${conversationId}")

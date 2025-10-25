@@ -85,6 +85,7 @@ internal fun ChatScreen(viewModel: ChatViewModel = apiHandlerViewModel()) {
         }
     }
     val userInfo by viewModel.userInfo.collectAsState()
+
     Scaffold(
         topBar = {
             AppTitleBar(text = userInfo?.name.orEmpty())

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.helper.develop.nav.LocalNavController
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppSwitch
 import com.module.basic.ui.AppTabRow
@@ -43,6 +44,7 @@ import com.module.basic.ui.paging.AppPagingRefresh
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerWidth
 import com.module.basic.ui.paging.itemsIndexed
+import com.module.basic.util.onClick
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.room.R
 import com.module.room.viewmodel.MyRoomViewModel
@@ -82,6 +84,7 @@ internal fun MyRoomScreen() {
             when (index) {
                 0 -> stateHolder.SaveableStateProvider("my") {
                     Item(
+                        type = 0,
                         viewModel = apiHandlerViewModel(
                             key = "my",
                             parameters = {
@@ -93,6 +96,7 @@ internal fun MyRoomScreen() {
 
                 1 -> stateHolder.SaveableStateProvider("manage") {
                     Item(
+                        type = 1,
                         viewModel = apiHandlerViewModel(
                             key = "manage",
                             parameters = {
@@ -104,6 +108,7 @@ internal fun MyRoomScreen() {
 
                 2 -> stateHolder.SaveableStateProvider("follow") {
                     Item(
+                        type = 2,
                         viewModel = apiHandlerViewModel(
                             key = "follow",
                             parameters = {
@@ -120,6 +125,7 @@ internal fun MyRoomScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Item(
+    type: Int,
     viewModel: MyRoomViewModel = apiHandlerViewModel()
 ) {
     AppPagingRefresh(
@@ -127,16 +133,30 @@ private fun Item(
             .fillMaxSize(),
         pagingData = viewModel.pagingData
     ) {
+        val localNav = LocalNavController.current
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = 12.dp, horizontal = 15.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            itemsIndexed(pagingData = viewModel.pagingData, key = { it.uid }) { _, item ->
+            itemsIndexed(pagingData = viewModel.pagingData, key = { it.followRoomId.toString() }) { _, item ->
                 ConstraintLayout(
                     modifier = Modifier
                         .fillParentMaxWidth()
                         .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                        .onClick{
+                            val id = when(type){
+                                0 ->item.id.toString()
+                                1 ->item.id.toString()
+                                2 ->item.followRoomId.toString()
+                                else->""
+                            }
+                            localNav.navigate(
+                                AppRoutes.ChatroomEnterCheck.dynamic(
+                                    "roomId" to id
+                                )
+                            )
+                        }
                         .padding(12.dp)
                 ) {
                     val (image, name, city, uid, home, action) = createRefs()
@@ -167,7 +187,7 @@ private fun Item(
 //                            top.linkTo(name.bottom, margin = 4.dp)
 //                        })
                     Text(
-                        text = "UID:${item.uid}",
+                        text = "UID:${item.uuid}",
                         color = Color(0xff999999),
                         fontSize = 13.sp,
                         modifier = Modifier.constrainAs(uid) {
