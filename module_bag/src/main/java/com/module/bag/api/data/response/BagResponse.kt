@@ -19,7 +19,7 @@ internal data class BagResponse(
     @Keep
     data class Item(
         @SerializedName("expire_time")
-        val expireTime: Int?,
+        val expireTime: String?,
         val id: Int,
         val name: String?,
         val pic: String?,

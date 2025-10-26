@@ -85,10 +85,11 @@ internal class BasicInformationViewModel(
      */
 
     fun agentInvite() {
-        if (_inviteUid.isEmpty()) return
+        val id = _inviteUserResponse?.id.toString()
+        if (id.isEmpty()) return
         viewModelScope.launch {
             apiRequest {
-                api.agentInvite(AgentInviteRequest(_inviteUid)).checkAndGet()
+                api.agentInvite(AgentInviteRequest(id)).checkAndGet()
             }.apiResponse {
                 //邀请成功的话 邀请列表需要刷新一下
                 pagingData.refresh()

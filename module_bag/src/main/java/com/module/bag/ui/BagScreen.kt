@@ -61,7 +61,7 @@ internal fun BagScreen(viewModel: BagViewModel = apiHandlerViewModel()) {
             }
             val stateHolder = rememberSaveableStateHolder()
             viewModel.tabs.forEach {
-                if(it.index in arrayOf("Avatar Frame")){
+                if(it.index !in arrayOf("num")){
                     stateHolder.SaveableStateProvider(it.name.toString()) { BagItemNew(viewModel) }
                 }else{
                     stateHolder.SaveableStateProvider(it.name.toString()) { BagItem(viewModel) }

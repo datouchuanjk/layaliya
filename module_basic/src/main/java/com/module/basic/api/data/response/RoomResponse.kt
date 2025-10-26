@@ -6,7 +6,6 @@ data class RoomResponse(
     @SerializedName("follow_room_id")
     val followRoomId: Int?,
     val uid: Int,
-    val isOpen: Int,
     val id: Int?,
     val uuid: String?,
     val name: String?,

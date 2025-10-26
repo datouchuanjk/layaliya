@@ -213,7 +213,7 @@ private fun Item(
                                 end.linkTo(home.start, margin = 13.dp)
                             }) {
                             Text(
-                                text = if (item.isOpen == 1)
+                                text = if (item.isShow == 1)
                                     stringResource(R.string.room_hide) else
                                     stringResource(R.string.room_show),
                                 fontSize = 16.sp,
@@ -222,7 +222,7 @@ private fun Item(
                             )
                             SpacerWidth(6.dp)
                             AppSwitch(
-                                checked = item.isOpen == 1,
+                                checked = item.isShow == 1,
                             ) {
                                 viewModel.showOrHideRoom(item)
                             }

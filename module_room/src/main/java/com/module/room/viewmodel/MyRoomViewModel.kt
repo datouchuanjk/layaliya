@@ -63,13 +63,13 @@ internal class MyRoomViewModel(
 
     fun showOrHideRoom(response: RoomResponse) {
         viewModelScope.launch {
-            if (response.isOpen == 1) {
+            if (response.isShow == 1) {
                 apiRequest {
                     api.hideRoom().checkAndGet()
                 }.apiResponse {
                     pagingData.handle {
                         findIndex { it.uid == response.uid }?.let { index ->
-                            this[index] = response.copy(isOpen = 0)
+                            this[index] = response.copy(isShow = 0)
                         }
                     }
                 }
@@ -79,7 +79,7 @@ internal class MyRoomViewModel(
                 }.apiResponse {
                     pagingData.handle {
                         findIndex { it.uid == response.uid }?.let { index ->
-                            this[index] = response.copy(isOpen = 1)
+                            this[index] = response.copy(isShow = 1)
                         }
                     }
                 }

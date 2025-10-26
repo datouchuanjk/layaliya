@@ -55,7 +55,7 @@ internal fun LazyItemScope.InvitationMessageItem(item: IMMessage,block:(String)-
                             shape = RoundedCornerShape(12.dp)
                         )
                         .onClick {
-                            block(body.recordId)
+
                         }
                         .wrapContentSize()
                 )
@@ -71,7 +71,7 @@ internal fun LazyItemScope.InvitationMessageItem(item: IMMessage,block:(String)-
                             shape = RoundedCornerShape(12.dp)
                         )
                         .onClick {
-
+                            block(body.recordId)
                         }
                         .wrapContentSize()
                 )

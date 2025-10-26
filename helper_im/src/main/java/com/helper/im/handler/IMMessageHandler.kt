@@ -45,7 +45,7 @@ class IMMessageHandler internal constructor(
 ) : Handler<V2NIMMessageService>(scope), V2NIMMessageListener {
 
     init {
-        IMHelper.conversationHandler.clearUnreadCountById(conversationId)
+//        IMHelper.conversationHandler.clearUnreadCountById(conversationId)
 //        IMHelper.conversationHandler.setCurrentConversation(conversationId)
     }
 

@@ -104,6 +104,7 @@ internal fun ChatScreen(viewModel: ChatViewModel = apiHandlerViewModel()) {
                     localNav.navigate(
                         AppRoutes.Gift.dynamic(
                             "receiveUid" to viewModel.targetId,
+                            "receiveUid" to "47",
                             "receiveName" to userInfo?.name.orEmpty(),
                             "receiveAvatar" to userInfo?.avatar.orEmpty()
                         )

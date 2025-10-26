@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.helper.develop.util.fromJson
+import com.helper.develop.util.*
 import com.module.basic.api.data.response.ConfigResponse
 import com.module.basic.sp.AppGlobal
 import com.module.basic.util.UploadUtils
@@ -141,8 +141,10 @@ internal class CreateOrEditRoomViewModel(
                             mode = micNum?.code.toString()
                         )
                     ).checkAndGet()
-                    val roomId = JSONObject(result?.get("room_info")!!).getString("id")
-                    _roomCreateSuccessful.emit(roomId)
+                    val roomId = JSONObject(result?.get("room_info")!!).getIntOrNull("id").toString()
+                    roomId?.let {
+                        _roomCreateSuccessful.emit(it)
+                    }
                 } else {
                     api.roomEdit(
                         RoomCreateOrEditRequest(

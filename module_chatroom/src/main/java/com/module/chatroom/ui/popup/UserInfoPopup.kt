@@ -86,7 +86,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         onClick = {
             localNav.navigate(
                 AppRoutes.Gift.dynamic(
-                    "receiveUid" to other.uuid.toString(),
+                    "receiveUid" to other.id.toString(),
                     "receiveName" to other.nickname.toString(),
                     "receiveAvatar" to other.avatar.toString(),
                     "roomId" to viewModel.roomId

@@ -36,7 +36,9 @@ data class ChatroomInfoResponse(
         val rtcChannelName: String?,
         @SerializedName("rtc_uid")
         val rtcUid: String?,
-        val type: Int?
+        val type: Int?,
+        val uuid: Int?,
+        val hotVal: String?,
     ){
         val displayUserNum get() = if((userNum?:0)>999) "999+" else  userNum.toString()
     }

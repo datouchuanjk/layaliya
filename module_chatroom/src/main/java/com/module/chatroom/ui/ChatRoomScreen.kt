@@ -191,7 +191,12 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 }
                 SpacerHeight(10.dp)
                 val stateHolder = rememberSaveableStateHolder()
-                Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f).fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
                     when (index) {
                         0 -> stateHolder.SaveableStateProvider("all") {
                             ChatroomTextMessage(
@@ -223,7 +228,14 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                                 )
                             )
                         }
-                        Text("Game Bar", fontSize = 10.sp, color = Color.White, modifier = Modifier.align(alignment = Alignment.BottomCenter).padding(bottom = 6.dp))
+                        Text(
+                            "Game Bar",
+                            fontSize = 10.sp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .align(alignment = Alignment.BottomCenter)
+                                .padding(bottom = 6.dp)
+                        )
                     }
                 }
                 ChatAction(viewModel = viewModel)
@@ -268,10 +280,14 @@ private fun ChatRoomUserInfo(viewModel: ChatRoomViewModel) {
             SpacerWidth(6.dp)
             Column {
                 Text(roomInfo?.name.orEmpty(), fontSize = 14.sp, color = Color.White)
-                Text("UID:${viewModel.roomId}", fontSize = 8.sp, color = Color(0xffcccccc))
+                Text(
+                    "UID:${viewModel.chatroomInfoResponse?.roomInfo?.uuid}",
+                    fontSize = 8.sp,
+                    color = Color(0xffcccccc)
+                )
             }
             SpacerWidth(4.dp)
-            if(roomInfo?.isFollow !=1){
+            if (roomInfo?.isFollow != 1) {
                 Box(
                     modifier = Modifier
                         .width(32.dp)
@@ -395,7 +411,11 @@ private fun ChatRoomInfo(viewModel: ChatRoomViewModel, onShowSilencePickerDialog
                 contentDescription = null
             )
             SpacerWidth(4.dp)
-            Text("1.1k", fontSize = 14.sp, color = Color.White)
+            Text(
+                viewModel.chatroomInfoResponse?.roomInfo?.hotVal.toString(),
+                fontSize = 14.sp,
+                color = Color.White
+            )
         }
         SpacerWeight(1f)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -645,7 +665,7 @@ private fun RowScope.Input(
                 viewModel.input(it)
             },
             decorationBox = {
-                if (viewModel.input.isEmpty()&&viewModel.toNickname.trim().isEmpty()) {
+                if (viewModel.input.isEmpty() && viewModel.toNickname.trim().isEmpty()) {
                     Text(
                         stringResource(R.string.room_send_a_message),
                         style = TextStyle(fontSize = 12.sp, color = Color.White)

@@ -61,7 +61,7 @@ internal fun StoreScreen(viewModel: StoreViewModel = apiHandlerViewModel()) {
             }
             val stateHolder = rememberSaveableStateHolder()
             viewModel.tabs.forEach {
-                if(it.index in arrayOf("Avatar Frame")){
+                if(it.index !in arrayOf("num")){
                     stateHolder.SaveableStateProvider(it.name.toString()) { StoreItemNew(viewModel) }
                 }else{
                     stateHolder.SaveableStateProvider(it.name.toString()) { StoreItem(viewModel) }
