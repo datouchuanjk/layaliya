@@ -1,7 +1,6 @@
 package com.module.gift.ui
 
 import android.view.Gravity
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.*
@@ -26,7 +24,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
 import com.helper.develop.nav.*
-import com.helper.develop.util.toast
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppListPopup
 import com.module.basic.ui.AppTabRow
@@ -38,7 +35,6 @@ import com.module.basic.util.*
 import com.module.basic.viewmodel.*
 import com.module.gift.R
 import com.module.gift.viewmodel.*
-import kotlin.text.replace
 
 
 fun NavGraphBuilder.giftDialog() = dialog(
@@ -100,17 +96,48 @@ internal fun GiftDialog(viewModel: GiftViewModel = apiHandlerViewModel()) {
                 ) {
                     Text(stringResource(R.string.gift_to), fontSize = 14.sp, color = Color.White)
                     SpacerWidth(8.dp)
+                    var isShowPopup by remember {
+                        mutableStateOf(false)
+                    }
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         modifier = Modifier
                             .background(
                                 color = Color(0xff3C3A43),
                                 shape = RoundedCornerShape(20.dp)
-                            )
+                            ).onClick(viewModel.userInfos.size>1){
+                                isShowPopup = true
+                            }
                             .padding(vertical = 7.dp, horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(viewModel.receiveName, fontSize = 10.sp, color = Color.White)
+
+                        if (isShowPopup) {
+                            AppListPopup(
+                                list = viewModel.userInfos,
+                                map = { it?.name.toString() },
+                                onDismissRequest = {
+                                    isShowPopup = false
+                                },
+                                popupPosition = { anchorBounds: IntRect, windowSize: IntSize, popupContentSize: IntSize ->
+                                    IntOffset(
+                                        anchorBounds.left,
+                                        anchorBounds.top - popupContentSize.height - 5.dp.roundToPx()
+                                    )
+                                }, onSelected = {
+                                    viewModel.setCurrentUserInfo(it)
+                                }
+                            )
+                        }
+                        Text(viewModel.currentUserInfo?.name.orEmpty(), fontSize = 10.sp, color = Color.White)
+                        if(viewModel.userInfos.size>1){
+                            SpacerWidth(8.dp)
+                            Image(
+                                painter = painterResource(R.drawable.gift_ic_more),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                            )
+                        }
                     }
                     SpacerWeight(1f)
                     Row(verticalAlignment = Alignment.CenterVertically) {

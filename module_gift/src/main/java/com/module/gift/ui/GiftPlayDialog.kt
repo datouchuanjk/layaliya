@@ -76,9 +76,7 @@ private fun Top(jsonObject: JSONObject) {
     val sendUid = jsonObject.getStringOrNull("sendUid").orEmpty()
     val sendName = jsonObject.getStringOrNull("sendName").orEmpty()
     val sendAvatar = jsonObject.getStringOrNull("sendAvatar").orEmpty()
-    val receiveUid = jsonObject.getStringOrNull("receiveUid").orEmpty()
     val receiveName = jsonObject.getStringOrNull("receiveName").orEmpty()
-    val receiveAvatar = jsonObject.getStringOrNull("receiveAvatar").orEmpty()
     val giftName = jsonObject.getStringOrNull("giftName").orEmpty()
     val giftCount = jsonObject.getIntOrNull("giftCount")
     val bg = when (floatingScreenId) {
@@ -112,7 +110,7 @@ private fun Top(jsonObject: JSONObject) {
             )
             .height(height)
     ) {
-        Box(modifier = Modifier.height(42.dp))
+        Box(modifier = Modifier.height(30.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier

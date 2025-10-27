@@ -11,7 +11,6 @@ import com.module.chatroom.module.chatroomModule
 import com.module.community.module.communityModule
 import com.module.room.module.roomModule
 import com.module.login.module.loginModule
-import com.module.comment.module.commentModule
 import com.module.emoji.module.emojiModule
 import com.module.game.module.gameModule
 import com.module.gift.module.giftModule
@@ -50,7 +49,6 @@ class App : BaseApplication() {
                 agentModule,
                 giftModule,
                 emojiModule,
-                commentModule,
                 walletModule,
                 charmModule,
                 wealthModule,

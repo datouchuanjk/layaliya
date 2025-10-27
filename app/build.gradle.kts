@@ -35,6 +35,7 @@ android {
         }
         debug {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("Online")
         }
     }
     compileOptions {
@@ -74,7 +75,6 @@ dependencies {
     implementation(project(":module_login"))
     implementation(project(":module_noble"))
     implementation(project(":module_agent"))
-    implementation(project(":module_comment"))
     implementation(project(":module_gift"))
     implementation(project(":module_emoji"))
     implementation(project(":module_wallet"))

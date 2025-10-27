@@ -103,10 +103,7 @@ internal fun ChatScreen(viewModel: ChatViewModel = apiHandlerViewModel()) {
                 onGift = {
                     localNav.navigate(
                         AppRoutes.Gift.dynamic(
-                            "receiveUid" to viewModel.targetId,
-                            "receiveUid" to "47",
-                            "receiveName" to userInfo?.name.orEmpty(),
-                            "receiveAvatar" to userInfo?.avatar.orEmpty()
+                            "yxIds" to listOf(viewModel.targetId).joinToString(","),
                         )
                     )
                 },
@@ -168,7 +165,7 @@ private fun ColumnScope.ChatList(
                 notLoadingContent = null
             ) { _, item ->
                 viewModel.sendP2PMessageReceipt(item)
-                when (val body =item.body) {
+                when (val body = item.body) {
                     is IMTextBody -> {
                         TextMessageItem(item)
                     }
@@ -182,8 +179,8 @@ private fun ColumnScope.ChatList(
                     }
 
                     is IMInvitationBody -> {
-                        InvitationMessageItem(item){
-                          viewModel.acceptInvite(item,body,it)
+                        InvitationMessageItem(item) {
+                            viewModel.acceptInvite(it)
                         }
                     }
 

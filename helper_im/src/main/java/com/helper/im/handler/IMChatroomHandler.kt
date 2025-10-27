@@ -131,10 +131,27 @@ class IMChatroomHandler(
     }
 
     suspend fun sendEmoji(string: String) {
-        val jsonObject = JSONObject().apply {
+        var jsonObject = JSONObject().apply {
             put("code", 1036)
             put("data", JSONObject().apply {
                 put("emoji", JSONObject(string))
+            })
+        }
+        suspendCancellableCoroutine { b ->
+            val message = V2NIMChatroomMessageCreator.createCustomMessage(jsonObject.toString())
+            _chatroomService?.sendMessage(message, null, {
+                b.resume(Unit)
+            }, {
+                b.resumeWithException(it.transform())
+            }, {})
+        }
+        delay(5000)
+        val item =JSONObject(string)
+        item.remove("emojiId")
+         jsonObject = JSONObject().apply {
+            put("code", 1036)
+            put("data", JSONObject().apply {
+                put("emoji", item)
             })
         }
         suspendCancellableCoroutine { b ->
@@ -179,15 +196,8 @@ class IMChatroomHandler(
         if(text.isEmpty())return
         suspendCancellableCoroutine { b ->
             val message = V2NIMChatroomMessageCreator.createTextMessage(text)
-            val params = if (toAccId.isNullOrEmpty()) {
-                null
-            } else {
-                V2NIMSendChatroomMessageParams().apply {
-                    receiverIds = listOf(toAccId)
-                }
-            }
             message.serverExtension = toAccId
-            _chatroomService?.sendMessage(message, params, {
+            _chatroomService?.sendMessage(message, null, {
                 b.resume(Unit)
             }, {
                 b.resumeWithException(it.transform())
@@ -341,7 +351,9 @@ class IMChatroomHandler(
     override fun onChatroomStatus(status: V2NIMChatroomStatus?, error: V2NIMError?) {}
     override fun onChatroomEntered() {}
     override fun onChatroomExited(error: V2NIMError?) {}
-    override fun onChatroomMemberEnter(member: V2NIMChatroomMember?) {}
+    override fun onChatroomMemberEnter(member: V2NIMChatroomMember?) {
+        IMHelper.userHandler.refreshUserInfos(member?.accountId)
+    }
     override fun onChatroomMemberExit(accountId: String?) {}
 
     override fun onChatroomMemberRoleUpdated(

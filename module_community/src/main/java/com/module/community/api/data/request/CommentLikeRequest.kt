@@ -1,4 +1,4 @@
-package com.module.comment.api.data.request
+package com.module.community.api.data.request
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName

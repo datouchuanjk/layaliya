@@ -3,9 +3,13 @@ package com.module.community.api.service
 import com.module.basic.api.data.request.*
 import com.module.basic.api.data.response.BasePagingResponse
 import com.module.basic.api.data.response.BaseResponse
+import com.module.community.api.data.request.CommentLikeRequest
+import com.module.community.api.data.request.CommentListRequest
 import com.module.community.api.data.request.CommunityLikeRequest
 import com.module.community.api.data.request.CommunityListRequest
+import com.module.community.api.data.request.PostCommentRequest
 import com.module.community.api.data.request.PostCommunityRequest
+import com.module.community.api.data.response.CommentResponse
 import com.module.community.api.data.response.CommunityResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -47,4 +51,29 @@ internal interface CommunityApiService {
      */
     @POST("user/un-follow-user")
     suspend fun unfollowUser(@Body request: UidRequest): BaseResponse<Unit>
+
+
+    /**
+     * 发布一个评论
+     */
+    @POST("zone/comment")
+    suspend fun postComment(@Body request: PostCommentRequest): BaseResponse<CommentResponse>
+
+    /**
+     * 评论列表
+     */
+    @POST("zone/comment-list")
+    suspend fun commentList(@Body request: CommentListRequest): BaseResponse<BasePagingResponse<CommentResponse>>
+
+    /**
+     * 点赞
+     */
+    @POST("zone/comment-praise")
+    suspend fun commentLike(@Body request: CommentLikeRequest): BaseResponse<Unit>
+
+    /**
+     * 点赞
+     */
+    @POST("zone/un-comment-praise")
+    suspend fun commentUnlike(@Body request: CommentLikeRequest): BaseResponse<Unit>
 }

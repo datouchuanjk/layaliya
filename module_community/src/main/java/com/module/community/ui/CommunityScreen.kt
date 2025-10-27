@@ -46,6 +46,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.helper.develop.nav.LocalNavController
 import com.helper.develop.nav.navigateForResult
+import com.helper.develop.util.fromJson
+import com.helper.develop.util.toJson
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.*
 import com.module.basic.ui.paging.AppPagingRefresh
@@ -54,6 +56,7 @@ import com.module.basic.util.*
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.community.viewmodel.CommunityViewModel
 import  com.module.community.R
+import com.module.community.api.data.response.CommunityResponse
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -83,7 +86,7 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                 if (isRefresh) {
                     delay(500)
                     state.animateScrollToItem(0)
-                   withFrameMillis {  }
+                    withFrameMillis { }
                     isRefresh = false
                 }
             }
@@ -149,7 +152,19 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                     it.id
                 }) { index, item ->
                     ConstraintLayout(
-                        modifier = Modifier.fillParentMaxWidth()
+                        modifier = Modifier
+                            .fillParentMaxWidth()
+                            .onClick {
+                                localNav.navigateForResult<String>(
+                                    AppRoutes.CommunityDetail.dynamic(
+                                        "data" to item.toJson()
+                                    )
+                                ) {
+                                    it?.fromJson<CommunityResponse>()?.let { newItem ->
+                                        viewModel.refresh(index, item, newItem)
+                                    }
+                                }
+                            }
                     ) {
                         val (icon, name, userinfo, add, more, content, images, action, line) = createRefs()
                         val localNav = LocalNavController.current
@@ -174,36 +189,28 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                 top.linkTo(icon.top)
                                 start.linkTo(icon.end, 12.dp)
                             })
-//                        Text(
-//                            text = "...",
-//                            modifier = Modifier
-//                                .constrainAs(more) {
-//                                    top.linkTo(icon.top)
-//                                    end.linkTo(parent.end, 15.dp)
-//                                },
-//                            color = Color(0xff333333),
-//                            fontSize = 14.sp
-//                        )
 
-                        Box(
-                            modifier = Modifier
-                                .constrainAs(add) {
-                                    top.linkTo(icon.top)
-                                    end.linkTo(parent.end, 12.dp)
-                                }
-                                .width(32.dp)
-                                .height(24.dp)
-                                .appBrushBackground(
-                                    shape = RoundedCornerShape(12.dp)
+                        if (item.isFollow != 1) {
+                            Box(
+                                modifier = Modifier
+                                    .constrainAs(add) {
+                                        top.linkTo(icon.top)
+                                        end.linkTo(parent.end, 12.dp)
+                                    }
+                                    .width(32.dp)
+                                    .height(24.dp)
+                                    .appBrushBackground(
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .onClick {
+                                        viewModel.follow(item)
+                                    }
+                                    .wrapContentSize()
+                            ) {
+                                AppImage(
+                                    if (item.isFollow == 1) R.drawable.community_ic_unfollow else R.drawable.community_ic_follow
                                 )
-                                .onClick {
-                                    viewModel.follow(index, item)
-                                }
-                                .wrapContentSize()
-                        ) {
-                            AppImage(
-                                if (item.isFollow == 1) R.drawable.community_ic_unfollow else R.drawable.community_ic_follow
-                            )
+                            }
                         }
                         Row(modifier = Modifier.constrainAs(userinfo) {
                             top.linkTo(name.bottom, 0.dp)
@@ -258,13 +265,7 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                 color = Color(0xff333333)
                             )
                             SpacerWidth(24.dp)
-                            AppIcon(res = R.drawable.community_ic_comment) {
-                                localNav.navigateForResult<Int>(AppRoutes.Comment.dynamic("id" to item.id.toString())) {
-                                    if (it != null) {
-                                        viewModel.uploadCommentNum(item, it)
-                                    }
-                                }
-                            }
+                            AppIcon(res = R.drawable.community_ic_comment)
                             SpacerWidth(4.dp)
                             Text(
                                 text = item.commentNum.toString(),

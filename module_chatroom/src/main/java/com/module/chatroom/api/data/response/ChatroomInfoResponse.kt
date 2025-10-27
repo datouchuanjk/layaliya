@@ -53,6 +53,8 @@ data class ChatroomInfoResponse(
         val avatar: String?,
         @SerializedName("rtc_uid")
         val rtcUid: String?,
+        @SerializedName("yx_id")
+        val yxId: String?,
         val emojiId: String?
     )
 
@@ -76,8 +78,7 @@ data class ChatroomInfoResponse(
         @SerializedName("is_mysterious_person")
         val isMysteriousPerson:Int?,
     ) {
-//        val isMaster get() = role == 1
-        val isMaster get() =true
+        val isMaster get() = role == 1
         val isAdmin get() = role == 2
         val isMasterOrAdmin get() = isMaster || isAdmin
     }

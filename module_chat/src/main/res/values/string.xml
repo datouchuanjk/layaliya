@@ -7,6 +7,7 @@
     <string name="chat_gift">Gift</string>
     <string name="chat_no">No</string>
     <string name="chat_confirm">Confirm</string>
+    <string name="chat_accept_invite">Accept Invite</string>
 
 
 </resources>

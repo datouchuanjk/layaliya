@@ -35,7 +35,6 @@ import com.module.basic.ui.base.webViewScreen
 import com.module.basic.util.LocalKeyboardHeight
 import com.module.charm.ui.*
 import com.module.chat.ui.chatScreen
-import com.module.comment.ui.commentDialog
 import com.module.community.ui.postCommunityScreen
 import com.module.login.ui.loginScreen
 import com.module.mine.ui.*
@@ -47,6 +46,7 @@ import com.module.noble.ui.nobleHistoryScreen
 import com.module.noble.ui.nobleScreen
 import com.module.chatroom.ui.chatroomReportDialog
 import com.module.chatroom.ui.chatroomUserListDialog
+import com.module.community.ui.communityDetailScreen
 import com.module.emoji.ui.emojiDialog
 import com.module.game.ui.gameScreen
 import com.module.gift.ui.*
@@ -125,10 +125,10 @@ class HostActivity : ComponentActivity() {
                         nobleHistoryScreen()
                         agentScreen()
                         postCommunityScreen()
+                        communityDetailScreen()
                         walletScreen()
                         adminScreen()
                         bdScreen()
-                        commentDialog()
                         giftDialog()
                         emojiDialog()
                         bagScreen()

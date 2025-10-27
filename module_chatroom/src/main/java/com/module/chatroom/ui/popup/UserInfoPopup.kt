@@ -86,9 +86,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         onClick = {
             localNav.navigate(
                 AppRoutes.Gift.dynamic(
-                    "receiveUid" to other.id.toString(),
-                    "receiveName" to other.nickname.toString(),
-                    "receiveAvatar" to other.avatar.toString(),
+                    "yxIds" to listOf(other.id.toString()).joinToString(","),
                     "roomId" to viewModel.roomId
                 )
             )
@@ -214,136 +212,137 @@ internal fun UserInfoPopup(
             },
         ) {
 
-                ConstraintLayout(
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .background(color = Color.Black.copy(0.75f), shape = RoundedCornerShape(20.dp))
+            ) {
+                val isMysteriousPerson = viewModel.currentUserDetail?.isMysteriousPerson == 1
+                val (icon, name, info, warning, row) = createRefs()
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
-                        .background(color = Color.Black.copy(0.75f), shape = RoundedCornerShape(20.dp))
+                        .constrainAs(icon) {
+                            top.linkTo(parent.top, 12.dp)
+                            start.linkTo(parent.start, 12.dp)
+                        }
+                        .size(48.dp)
                 ) {
-                    val isMysteriousPerson = viewModel.currentUserDetail?.isMysteriousPerson == 1
-                    val (icon, name, info, warning, row) = createRefs()
-                    Box(
-                        modifier = Modifier
-                            .constrainAs(icon) {
-                                top.linkTo(parent.top, 12.dp)
-                                start.linkTo(parent.start, 12.dp)
-                            }
-                            .size(48.dp)
-                    ) {
-                        if (isMysteriousPerson) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape)
-                                    .background(color = Color(0xffD9D9D9)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                AppImage(
-                                    model = R.drawable.room_ic_no_body_avatar
-                                )
-                            }
-                        } else {
-                            val localNav = LocalNavController.current
+                    if (isMysteriousPerson) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                                .background(color = Color(0xffD9D9D9)),
+                            contentAlignment = Alignment.Center
+                        ) {
                             AppImage(
-                                model = viewModel.currentUserDetail?.avatar,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape)
-                            ){
-                                localNav.navigate(
-                                    AppRoutes.PersonCenter.dynamic("uid" to viewModel.currentUserDetail?.id.toString())
-                                )
-                            }
+                                model = R.drawable.room_ic_no_body_avatar
+                            )
+                        }
+                    } else {
+                        val localNav = LocalNavController.current
+                        AppImage(
+                            model = viewModel.currentUserDetail?.avatar,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                        ) {
+                            localNav.navigate(
+                                AppRoutes.PersonCenter.dynamic("uid" to viewModel.currentUserDetail?.id.toString())
+                            )
                         }
                     }
+                }
 
-                    Text(
-                        if (isMysteriousPerson) stringResource(R.string.room_no_body_nickname) else viewModel.currentUserDetail?.nickname.orEmpty().trim(),
-                        fontSize = 20.sp,
-                        color = Color.White,
-                        modifier = Modifier.constrainAs(name) {
-                            top.linkTo(icon.top)
-                            start.linkTo(icon.end, 12.dp)
-                            if(isMysteriousPerson){
-                                bottom.linkTo(icon.bottom)
-                            }
-                        })
-                  if(!isMysteriousPerson){
-                      Row(
-                          verticalAlignment = Alignment.CenterVertically,
-                          modifier = Modifier.constrainAs(info) {
-                              top.linkTo(name.bottom)
-                              start.linkTo(name.start)
-                              end.linkTo(parent.end, 12.dp)
-                              width = Dimension.fillToConstraints
-                          }
-                      ) {
-                          Text(
-                              " UID:${viewModel.currentUserDetail?.uuid}",
-                              fontSize = 14.sp,
-                              color = Color(0xffe6e6e6)
-                          )
-                      }
-                  }
-                    val nav = LocalNavController.current
-                    AppImage(
-                        modifier = Modifier.constrainAs(warning) {
-                            top.linkTo(icon.top)
+                Text(
+                    if (isMysteriousPerson) stringResource(R.string.room_no_body_nickname) else viewModel.currentUserDetail?.nickname.orEmpty()
+                        .trim(),
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    modifier = Modifier.constrainAs(name) {
+                        top.linkTo(icon.top)
+                        start.linkTo(icon.end, 12.dp)
+                        if (isMysteriousPerson) {
+                            bottom.linkTo(icon.bottom)
+                        }
+                    })
+                if (!isMysteriousPerson) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.constrainAs(info) {
+                            top.linkTo(name.bottom)
+                            start.linkTo(name.start)
                             end.linkTo(parent.end, 12.dp)
-                        },
-                        model = R.drawable.room_ic_chat_report
-                    ) {
-                        nav.navigate(
-                            AppRoutes.ChatroomReport.dynamic(
-                                "type" to 0,
-                                "objId" to viewModel.currentUserDetail?.uuid.toString()
-                            )
-                        )
-                    }
-                  val list =   getItems(viewModel, onSilence)
-                    FlowRow(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        maxItemsInEachRow = min(list.size,4),
-                        modifier = Modifier.constrainAs(row) {
-                            top.linkTo(icon.bottom, 24.dp)
-                            start.linkTo(parent.start, 0.dp)
-                            end.linkTo(parent.end, 0.dp)
-                            bottom.linkTo(parent.bottom, 12.dp)
                             width = Dimension.fillToConstraints
                         }
                     ) {
-                        list.forEach {
-                                if(it==null){
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                           ) {
-                                        Box(
-                                            modifier = Modifier.size(32.dp),
-                                        )
-                                        SpacerHeight(4.dp)
-                                        Text(text ="", fontSize = 12.sp, color = Color.White)
-                                    }
-                                }else{
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .onClick(enabled = it.enable) {
-                                                onDismissRequest()
-                                                it.onClick()
-                                            }) {
-                                        Image(
-                                            modifier = Modifier.size(32.dp),
-                                            painter = it.image,
-                                            contentScale = ContentScale.Crop,
-                                            contentDescription = null,
-                                        )
-                                        SpacerHeight(4.dp)
-                                        Text(text = it.text, fontSize = 12.sp, color = Color.White)
-                                    }
-                                }
+                        Text(
+                            " UID:${viewModel.currentUserDetail?.uuid}",
+                            fontSize = 14.sp,
+                            color = Color(0xffe6e6e6)
+                        )
+                    }
+                }
+                val nav = LocalNavController.current
+                AppImage(
+                    modifier = Modifier.constrainAs(warning) {
+                        top.linkTo(icon.top)
+                        end.linkTo(parent.end, 12.dp)
+                    },
+                    model = R.drawable.room_ic_chat_report
+                ) {
+                    nav.navigate(
+                        AppRoutes.ChatroomReport.dynamic(
+                            "type" to 0,
+                            "objId" to viewModel.currentUserDetail?.uuid.toString()
+                        )
+                    )
+                }
+                val list = getItems(viewModel, onSilence)
+                FlowRow(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    maxItemsInEachRow = min(list.size, 4),
+                    modifier = Modifier.constrainAs(row) {
+                        top.linkTo(icon.bottom, 24.dp)
+                        start.linkTo(parent.start, 0.dp)
+                        end.linkTo(parent.end, 0.dp)
+                        bottom.linkTo(parent.bottom, 12.dp)
+                        width = Dimension.fillToConstraints
+                    }
+                ) {
+                    list.forEach {
+                        if (it == null) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(32.dp),
+                                )
+                                SpacerHeight(4.dp)
+                                Text(text = "", fontSize = 12.sp, color = Color.White)
+                            }
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .onClick(enabled = it.enable) {
+                                        onDismissRequest()
+                                        it.onClick()
+                                    }) {
+                                Image(
+                                    modifier = Modifier.size(32.dp),
+                                    painter = it.image,
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null,
+                                )
+                                SpacerHeight(4.dp)
+                                Text(text = it.text, fontSize = 12.sp, color = Color.White)
+                            }
+                        }
                     }
                 }
             }

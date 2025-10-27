@@ -348,47 +348,88 @@ private fun VipBanner(
         animator = null
     ) { page ->
         val item = viewModel.nobleList[page]
-        Background(
-            modifier = Modifier.fillMaxSize(),
-            painter = rememberAsyncImagePainter(item.iconBg)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
+            Background(
+                modifier = Modifier
+                    .padding(top = 21.dp)
+                    .fillMaxSize(),
+                painter = rememberAsyncImagePainter(item.iconBg)
             ) {
-                Text(
-                    modifier = Modifier.padding(top = 17.dp, start = 22.dp),
-                    text = item.name.orEmpty(),
-                    style = TextStyle(
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold,
-                        brush = item.textColor
-                    )
-                )
-                Text(
-                    modifier = Modifier
-                        .align(alignment = Alignment.BottomStart)
-                        .onClick {
-                            isShowExplainDialog = true
+                Box {
+                    Column {
+                        Text(
+                            modifier = Modifier.padding(top = 12.dp, start = 9.dp),
+                            text = item.name.orEmpty(),
+                            style = TextStyle(
+                                fontSize = 40.sp,
+                                fontWeight = FontWeight.Bold,
+                                brush = item.textColor
+                            )
+                        )
+                        if (viewModel.nobleExpireTime != null) {
+                            Text(
+                                modifier = Modifier.padding(start = 14.dp),
+                                text = "Expiration Date: ${viewModel.nobleExpireTime}",
+                                style = TextStyle(
+                                    fontSize = 10.sp,
+                                    color = item.secondTextColor
+                                )
+                            )
                         }
-                        .padding(bottom = 12.dp, start = 22.dp),
-                    text = item.description.orEmpty(),
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        color = item.secondTextColor
-                    )
-                )
-                val localNav = LocalNavController.current
+                    }
+                    Row(
+                        modifier = Modifier
+                            .align(alignment = Alignment.BottomStart)
+                            .onClick {
+                                isShowExplainDialog = true
+                            }
+                            .padding(bottom = 22.dp, start = 14.dp),
+                    ) {
+                        Text(
+                            text = item.description.orEmpty(),
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                color = item.secondTextColor
+                            )
+                        )
+                        SpacerWidth(3.dp)
+                        AppImage(
+                            model = R.drawable.noble_ic_why
+                        )
+                    }
+                }
+            }
+            val localNav = LocalNavController.current
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .align(alignment = Alignment.TopEnd)
+            ) {
                 AppImage(
+                    modifier = Modifier.size(120.dp),
                     model = item.icon,
+                )
+                SpacerHeight(4.dp)
+                Row(
                     modifier = Modifier
-                        .padding(12.dp)
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                        .align(alignment = Alignment.CenterEnd)
+                        .background(
+                            color = Color(0xff333333),
+                            shape = RoundedCornerShape(20.dp)
+                        )
                         .onClick {
                             localNav.navigate(AppRoutes.NobleHistory.dynamic("name" to viewModel.selectedNobleResponse?.name.orEmpty()))
-                        },
-                )
+                        }
+                        .padding(horizontal = 13.dp, vertical = 6.dp)
+                ) {
+
+                    Text("Get back", fontSize = 12.sp, color = Color.White)
+                    SpacerWidth(2.dp)
+                    AppImage(
+                        model = R.drawable.noble_ic_coin
+                    )
+                }
             }
         }
     }

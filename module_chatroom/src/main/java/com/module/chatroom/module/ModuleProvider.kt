@@ -20,7 +20,7 @@ val chatroomModule = module {
     }
 
     viewModel {
-        ChatRoomViewModel(get(), get(),get())
+        ChatRoomViewModel(get(), get(),get(),get())
     }
 
     viewModel{

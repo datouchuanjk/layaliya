@@ -1,14 +1,18 @@
 package com.module.chat.viewmodel
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.helper.develop.util.toast
 import com.helper.im.IMHelper
 import com.helper.im.data.*
 import com.module.basic.viewmodel.BaseViewModel
+import com.module.chat.R
 import com.module.chat.api.data.request.AcceptInviteRequest
 import com.module.chat.api.service.*
 import com.netease.nimlib.sdk.v2.message.*
@@ -18,6 +22,7 @@ import java.io.File
 
 internal class ChatViewModel(
     private val api: ChatApiService,
+    val application: Application,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -86,12 +91,12 @@ internal class ChatViewModel(
     /**
      * 同意
      */
-    fun acceptInvite(message: IMMessage, body: IMInvitationBody,id:String) {
+    fun acceptInvite(id:String) {
         viewModelScope.launch {
             apiRequest {
-                api.acceptInvite(AcceptInviteRequest(id))
-            }.apiResponse {
-
+                api.acceptInvite(AcceptInviteRequest(id)).checkAndGet()
+            }.apiResponse() {
+                application.toast(R.string.chat_accept_invite)
             }
         }
     }

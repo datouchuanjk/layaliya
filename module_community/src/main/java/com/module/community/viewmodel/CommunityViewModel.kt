@@ -1,5 +1,6 @@
 package com.module.community.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.helper.develop.util.findIndex
 import com.module.basic.api.data.request.*
@@ -61,7 +62,7 @@ internal class CommunityViewModel(
         }
     }
 
-    fun follow(index: Int, item: CommunityResponse) {
+    fun follow(item: CommunityResponse) {
         val isFollow = item.isFollow == 1
         viewModelScope.launch {
             apiRequest {
@@ -71,25 +72,42 @@ internal class CommunityViewModel(
                     api.followUser(UidRequest(uid = item.uid.toString())).checkAndGet()
                 }
             }.apiResponse {
-                pagingData.handle {
-                    set(
-                        index,
-                        item.copy(
+                pagingData.map {
+                    if (it.uid == item.uid) {
+                        it.copy(
                             isFollow = if (isFollow) 0 else 1,
                         )
-                    )
+                    } else {
+                        it
+                    }
                 }
             }
         }
     }
 
-    fun uploadCommentNum(communityResponse: CommunityResponse, count: Int) {
-        pagingData.handle {
-            findIndex { it.id == communityResponse.id }?.let { index ->
-                this[index] = communityResponse.copy(
-                    commentNum = communityResponse.commentNum + count
-                )
+    fun refresh(
+        index: Int,
+        oldItem: CommunityResponse,
+        newItem: CommunityResponse
+    ) {
+        if (oldItem.isFollow != newItem.isFollow) {
+            pagingData.map {
+                if (it.id == newItem.id) {
+                    newItem
+                } else if (it.uid == newItem.uid) {
+                    it.copy(
+                        isFollow = newItem.isFollow,
+                    )
+                } else {
+                    it
+                }
+            }
+        } else {
+            pagingData.handle {
+                set(index, newItem)
             }
         }
     }
+
+
 }

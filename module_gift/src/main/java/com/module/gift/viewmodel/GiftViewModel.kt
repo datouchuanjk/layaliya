@@ -4,17 +4,14 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import androidx.navigation.*
 import com.helper.develop.nav.*
-import com.helper.develop.util.*
 import com.helper.im.IMHelper
-import com.helper.im.util.toConversationId
+import com.helper.im.data.IMUser
 import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.*
-import com.module.gift.api.data.*
 import com.module.gift.api.data.request.SendGiftRequest
 import com.module.gift.api.data.response.*
 import com.module.gift.api.service.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import org.json.JSONObject
 
 internal class GiftViewModel(
@@ -83,10 +80,34 @@ internal class GiftViewModel(
     private var _sendGiftLoading by mutableStateOf(false)
     val sendGiftLoading get() = _sendGiftLoading
     private val _roomId = savedStateHandle.get<String>("roomId").orEmpty()
-    private val _receiveUid = savedStateHandle.get<String>("receiveUid").orEmpty()
-    private val _receiveAvatar = savedStateHandle.get<String>("receiveAvatar").orEmpty()
-    val receiveName = savedStateHandle.get<String>("receiveName").orEmpty()
+    init {
+        val a =""
+    }
+    private val _yxIds = savedStateHandle.get<String>("yxIds").orEmpty().split(",").toList()
 
+    private val _userInfos = mutableStateMapOf<String, IMUser?>()
+
+    val userInfos get() = _userInfos.filter { it.value != null }.map { it.value }
+
+    private var _currentUserInfo by mutableStateOf<IMUser?>(null)
+    val currentUserInfo get() = _currentUserInfo
+    fun setCurrentUserInfo(index: Int) {
+        _currentUserInfo = userInfos[index]
+    }
+
+    init {
+        _userInfos.putAll(IMHelper.userHandler.getLocalUserInfos(_yxIds))
+        _currentUserInfo = userInfos.getOrNull(0)
+        viewModelScope.launch {
+            IMHelper.userHandler.userProfileChangedFlow.collect {
+                it.forEach { newUser ->
+                    if (_userInfos.contains(newUser.accountId)) {
+                        _userInfos[newUser.accountId] = newUser
+                    }
+                }
+            }
+        }
+    }
 
     fun sendGift(localNav: NavHostController) {
         val giftId = selectedListItem?.id ?: return
@@ -97,7 +118,7 @@ internal class GiftViewModel(
                 api.sendGift(
                     SendGiftRequest(
                         roomId = _roomId,
-                        receiveUid = _receiveUid,
+                        receiveUid = _currentUserInfo?.uid.orEmpty(),
                         num = selectedNum,
                         giftId = giftId
                     )
@@ -105,18 +126,16 @@ internal class GiftViewModel(
             }.apiResponse(loading = { it, _ ->
                 _sendGiftLoading = it
             }) {
-            val jsonObject = JSONObject()
-            jsonObject.put("sendUid", AppGlobal.userResponse?.id.toString())
-            jsonObject.put("sendName", AppGlobal.userResponse?.nickname.toString())
-            jsonObject.put("sendAvatar", AppGlobal.userResponse?.avatar.toString())
-            jsonObject.put("receiveUid", _receiveUid)
-            jsonObject.put("receiveName", receiveName)
-            jsonObject.put("receiveAvatar", _receiveAvatar)
-            jsonObject.put("giftId", giftId.toString())
-            jsonObject.put("giftName", giftName)
-            jsonObject.put("giftCount", selectedNum)
-            jsonObject.put("floatingScreenId", floatingScreenId)
-            localNav.emitResult("send_gift_result", jsonObject.toString())
+                val jsonObject = JSONObject()
+                jsonObject.put("sendUid", AppGlobal.userResponse?.id.toString())
+                jsonObject.put("sendName", AppGlobal.userResponse?.nickname.toString())
+                jsonObject.put("sendAvatar", AppGlobal.userResponse?.avatar.toString())
+                jsonObject.put("receiveName", currentUserInfo?.name)
+                jsonObject.put("giftId", giftId.toString())
+                jsonObject.put("giftName", giftName)
+                jsonObject.put("giftCount", selectedNum)
+                jsonObject.put("floatingScreenId", floatingScreenId)
+                localNav.emitResult("send_gift_result", jsonObject.toString())
             }
         }
     }

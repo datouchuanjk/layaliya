@@ -66,6 +66,11 @@ object AppRoutes {
             defaultValue = ""
         }.build()
 
+    val CommunityDetail= NavRouter.Builder("CommunityDetail")
+        .argument("data") {
+            type = NavType.StringType
+            defaultValue = ""
+        }.build()
     val Setting = NavRouter.Builder("Setting").build()
     val Store = NavRouter.Builder("Store").build()
     val Bag = NavRouter.Builder("Bag").build()
@@ -105,7 +110,7 @@ object AppRoutes {
     val Game = NavRouter.Builder("Game")
         .argument("withChildScreen") {
             type = NavType.BoolType
-           defaultValue = true
+            defaultValue = true
         }
         .argument("roomId") {
             type = NavType.StringType
@@ -132,14 +137,10 @@ object AppRoutes {
             type = NavType.StringType
             defaultValue = "0"
         }
-        .argument("receiveUid") {
+        .argument("yxIds") {
             type = NavType.StringType
-        }
-        .argument("receiveName") {
-            type = NavType.StringType
-        }
-        .argument("receiveAvatar") {
-            type = NavType.StringType
+            nullable = true
+            defaultValue = null
         }
         .build()
 

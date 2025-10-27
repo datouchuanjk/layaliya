@@ -50,6 +50,11 @@ class PagingData<T> internal constructor(
         block(list)
     }
 
+    fun map(block: (T) -> T) {
+        list.forEachIndexed { index, t ->
+            list[index] = block(t)
+        }
+    }
 
 
     fun find(predicate: (T) -> Boolean): T? {

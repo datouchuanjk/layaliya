@@ -1,38 +1,35 @@
-package com.module.comment.viewmodel
+package com.module.community.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.helper.develop.util.findIndex
 import com.module.basic.util.buildOffsetPaging
 import com.module.basic.viewmodel.BaseViewModel
-import com.module.comment.api.data.request.CommentLikeRequest
-import com.module.comment.api.data.request.CommentListRequest
-import com.module.comment.api.data.request.PostCommentRequest
-import com.module.comment.api.data.response.CommentResponse
-import com.module.comment.api.service.CommentApiService
+import com.module.community.api.data.request.CommentLikeRequest
+import com.module.community.api.data.request.CommentListRequest
+import com.module.community.api.data.request.PostCommentRequest
+import com.module.community.api.data.response.CommentResponse
+import com.module.community.api.service.CommunityApiService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 internal class CommentViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val api: CommentApiService
+    val id: String,
+    private val api: CommunityApiService
 ) : BaseViewModel() {
-
-    private var _businessId: String = savedStateHandle.get<String>("id").orEmpty()
 
     /**
      * 列表
      */
     var pagingData = buildOffsetPaging(viewModelScope) {
         api.commentList(
-                CommentListRequest(
-                    zoneId = _businessId,
-                    page = it.key!!
-                )
+            CommentListRequest(
+                zoneId = id,
+                page = it.key!!
+            )
             ).checkAndGet()?.list
     }.pagingData
 
@@ -45,9 +42,9 @@ internal class CommentViewModel(
             apiRequest {
                 if (isLike) {
                     api.commentUnlike(
-                                        CommentLikeRequest(
-                                            commentId = item.id.toString()
-                                        )
+                        CommentLikeRequest(
+                            commentId = item.id.toString()
+                        )
                                     ).checkAndGet()
                 } else {
                     api.commentLike(
@@ -84,6 +81,9 @@ internal class CommentViewModel(
     fun commentId(response: CommentResponse?) {
         _commentResponse = response
     }
+    fun clearComment(){
+        _commentResponse =null
+    }
 
     private var _commentCount = 0
     private val _postCommentSuccessfulFlow = MutableSharedFlow<Int>()
@@ -95,11 +95,11 @@ internal class CommentViewModel(
         viewModelScope.launch {
             apiRequest {
                 api.postComment(
-                                PostCommentRequest(
-                                    zoneId = _businessId,
-                                    content = _input,
-                                    commentId = _commentResponse?.id?.toString() ?: "0"
-                                )
+                    PostCommentRequest(
+                        zoneId = id,
+                        content = _input,
+                        commentId = _commentResponse?.id?.toString() ?: "0"
+                    )
                             ).checkAndGet()
             }.apiResponse(
                 loading = { it,_->
@@ -111,19 +111,7 @@ internal class CommentViewModel(
                 _postCommentSuccessfulFlow.emit(_commentCount)
                 result?.let {
                     pagingData.handle {
-                        if (_commentResponse == null) {
-                            add(0, result)
-                        } else {
-                            findIndex {
-                                it.id == _commentResponse!!.id
-                            }?.let { findIndex ->
-                                if (findIndex == lastIndex) {
-                                    add(result)
-                                } else {
-                                    add(findIndex + 1, result)
-                                }
-                            } ?: add(0, result)
-                        }
+                            add(result)
                     }
                 }
 

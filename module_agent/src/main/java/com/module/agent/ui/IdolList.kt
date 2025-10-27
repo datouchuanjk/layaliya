@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,9 +18,11 @@ import androidx.compose.ui.unit.sp
 import com.module.agent.R
 import com.module.agent.viewmodel.*
 import com.module.basic.ui.paging.AppPagingBox
+import com.module.basic.ui.paging.AppPagingRefresh
 import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.viewmodel.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun IdolList(viewModel: IdolListViewModel = apiHandlerViewModel()) {
     val pagingData = viewModel.pagingData
@@ -30,7 +33,7 @@ internal fun IdolList(viewModel: IdolListViewModel = apiHandlerViewModel()) {
             .padding(horizontal = 15.dp)
     ) {
         Title()
-        AppPagingBox(
+        AppPagingRefresh(
             modifier = Modifier.fillMaxSize(),
             pagingData = pagingData
         ) {

@@ -32,25 +32,25 @@ object AppGlobal {
                         .isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS
                 ) {
                     _googleId = null
-                    Log.e("1234","炸了")
+                    Log.e("1234", "炸了")
                     return@withContext
                 }
                 _googleId = try {
                     val advertisingIdInfo =
                         AdvertisingIdClient.getAdvertisingIdInfo(BaseApplication.INSTANCE)
                     val gaId: String? = advertisingIdInfo.id
-                    Log.e("1234","gaId=${gaId}")
+                    Log.e("1234", "gaId=${gaId}")
                     // 检查用户是否限制了广告追踪
                     val isLATEnabled: Boolean = advertisingIdInfo.isLimitAdTrackingEnabled
                     if (!isLATEnabled && gaId != "00000000-0000-0000-0000-000000000000") {
                         gaId
                     } else {
-                        Log.e("1234","炸了1")
+                        Log.e("1234", "炸了1")
                         null
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Log.e("1234","炸了2 ${e.message}")
+                    Log.e("1234", "炸了2 ${e.message}")
                     null
                 }
             }
@@ -61,10 +61,10 @@ object AppGlobal {
         BaseApplication.INSTANCE.contentResolver,
         Settings.Secure.ANDROID_ID
     )
-    
+
     private val uuid = UUID.randomUUID().toString()
 
-    val deviceId get() =  _googleId ?: _androidId ?: uuid
+    val deviceId get() = _googleId ?: _androidId ?: uuid
 
     private var _userResponse by mutableStateOf<UserResponse?>(null)
     val userResponse get() = _userResponse
@@ -105,7 +105,8 @@ object AppGlobal {
     fun getEmojiFileById(id: String) =
         File(BaseApplication.INSTANCE.filesDir, "emoji/${id}/gif.gif")
 
-    val emojiIds = mutableListOf<String>()
+    private val _emojiIds = mutableListOf<String>()
+    val emojiIds get() = _emojiIds
 
     fun preloadGift() {
         Log.e("1234", "开始预加载礼物图片 ${configResponse?.giftConfig?.map { it.svg }}")
@@ -175,16 +176,19 @@ object AppGlobal {
     }
 
     fun preloadEmoji() {
+        val sp = context.getSharedPreferences("emoji", Context.MODE_PRIVATE)
         Log.e("1234", "开始预加载表情")
         val context = BaseApplication.INSTANCE
         val url = configResponse?.meme ?: return
         val rootFile = File(context.filesDir, "emoji")
         rootFile.mkdirs()
-        if (rootFile.exists() && rootFile.length() > 0 && (!rootFile.listFiles().isNullOrEmpty())) {
+        if (rootFile.exists() && rootFile.length() > 0 && (!rootFile.listFiles()
+                .isNullOrEmpty()) && sp.getBoolean("emoji_cache_complete", false)
+        ) {
             rootFile.listFiles()?.filter { it.isDirectory }?.forEach {
-                emojiIds.add(it.name)
+                _emojiIds.add(it.name)
             }
-            if (emojiIds.isNotEmpty()) {
+            if (_emojiIds.isNotEmpty()) {
                 Log.e("1234", "本地有表情 return")
                 return
             }
@@ -199,15 +203,23 @@ object AppGlobal {
                     Log.e("1234", "表情下载完成 开始解压")
                     zipFile.unzip(zipDownloadCompleteFile)
                     Log.e("1234", "表情下载完成 解压完成")
+
                     zipDownloadCompleteFile.listFiles()?.filter { it.isDirectory }?.forEach {
                         it.listFiles()?.filter { it.isFile }?.withIndex()?.forEach { itemGift ->
+                            Log.e(
+                                "1234",
+                                "item =${itemGift.index}   filename= ${itemGift.value.name}"
+                            )
                             val file = File(rootFile, itemGift.index.toString())
                             file.mkdirs()
                             itemGift.value.copyTo(File(file, "gif.gif"))
-                            emojiIds.add(itemGift.index.toString())
+                            _emojiIds.add(itemGift.index.toString())
                         }
                     }
-                    Log.e("1234", "一共有${emojiIds.size}个表情")
+                    Log.e("1234", "一共有${_emojiIds.size}个表情")
+                    sp.edit {
+                        putBoolean("emoji_cache_complete", true)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

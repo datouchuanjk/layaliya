@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,11 +36,13 @@ import com.module.agent.viewmodel.BasicInformationViewModel
 import com.module.basic.ui.paging.AppPagingBox
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWidth
+import com.module.basic.ui.paging.AppPagingRefresh
 import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.util.onClick
 import com.module.basic.viewmodel.apiHandlerViewModel
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BasicInformation(viewModel: BasicInformationViewModel = apiHandlerViewModel()) {
     Column(
@@ -102,9 +105,9 @@ private fun TopInput(
 @Composable
 private fun Invitation(viewModel: BasicInformationViewModel) {
     InformationDialog(
-        isShow = viewModel.inviteUserResponse !=null,
+        isShow = viewModel.inviteUserResponse != null,
         userResponse = viewModel.inviteUserResponse,
-        onDismissRequest = {viewModel.clearInviteUserResponse()},
+        onDismissRequest = { viewModel.clearInviteUserResponse() },
         onSubmit = {
             viewModel.agentInvite()
         }
@@ -154,7 +157,7 @@ private fun Invitation(viewModel: BasicInformationViewModel) {
                 .fillMaxHeight()
                 .background(color = Color(0xff333333), shape = RoundedCornerShape(15.dp))
                 .onClick {
-                   viewModel.findUserByUid()
+                    viewModel.findUserByUid()
                 }
                 .padding(horizontal = 12.dp)
                 .wrapContentSize()
@@ -162,6 +165,7 @@ private fun Invitation(viewModel: BasicInformationViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Bottom(viewModel: BasicInformationViewModel) {
     val pagingData = viewModel.pagingData
@@ -172,7 +176,7 @@ private fun Bottom(viewModel: BasicInformationViewModel) {
             .padding(horizontal = 15.dp)
     ) {
         Title()
-        AppPagingBox(
+        AppPagingRefresh(
             pagingData = pagingData, modifier = Modifier
                 .fillMaxSize()
         ) {

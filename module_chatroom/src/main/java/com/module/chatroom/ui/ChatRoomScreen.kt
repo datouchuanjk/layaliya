@@ -2,7 +2,9 @@ package com.module.chatroom.ui
 
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.WindowManager
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.*
 import androidx.compose.ui.Alignment
@@ -44,6 +47,8 @@ import com.module.chatroom.ui.popup.list.AdminListPopup
 import com.module.chatroom.ui.popup.list.KickoutListPopup
 import com.module.chatroom.ui.popup.list.MuteListPopup
 import com.module.chatroom.viewmodel.*
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlin.collections.joinToString
 
 fun NavGraphBuilder.chatRoomScreen() =
     composable(route = AppRoutes.Chatroom.static, arguments = AppRoutes.Chatroom.arguments) {
@@ -53,8 +58,22 @@ fun NavGraphBuilder.chatRoomScreen() =
 /**
  * 语聊房间
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()) {
+    val localActivity = LocalActivity.current
+    LaunchedEffect(viewModel) {
+        snapshotFlow {
+            viewModel.myMikeInfo != null
+        }.distinctUntilChanged()
+            .collect {
+                if (it) {
+                    localActivity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    localActivity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+            }
+    }
 
     Scaffold { innerPadding ->
         val localContext = LocalContext.current
@@ -126,9 +145,11 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
             message = "System is Failed please retry"
         )
         val localFocus = LocalFocusManager.current
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
+
                 .onClick {
                     localFocus.clearFocus()
                 }
@@ -141,104 +162,113 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
             )
             viewModel.chatroomInfoResponse ?: return@Box
             val isShowKeyboard = LocalKeyboardHeight.current > 0.dp
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(bottom = LocalKeyboardHeight.current)
-                    .padding(horizontal = 15.dp)
-            ) {
-                var isShowSilenceDialog by remember {
-                    mutableStateOf(false)
+            PullToRefreshBox(
+                modifier = Modifier.fillMaxSize(),
+                isRefreshing = viewModel.isRoomRefreshing,
+                onRefresh = {
+                    viewModel.initRoom(true)
                 }
-                if (isShowSilenceDialog) {
-                    AppDialog(
-                        usePlatformDefaultWidth = false,
-                        layoutParamsSetting = {
-                            it.dimAmount = 0.1f
-                            it.gravity = Gravity.BOTTOM
-                        }, onDismissRequest = { isShowSilenceDialog = false }
-                    ) {
-                        AppSilencePicker(
-                            modifier = Modifier.background(
-                                color = Color.White,
-                                shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
-                            )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(innerPadding)
+                        .padding(bottom = LocalKeyboardHeight.current)
+                        .padding(horizontal = 15.dp)
+                ) {
+                    var isShowSilenceDialog by remember {
+                        mutableStateOf(false)
+                    }
+                    if (isShowSilenceDialog) {
+                        AppDialog(
+                            usePlatformDefaultWidth = false,
+                            layoutParamsSetting = {
+                                it.dimAmount = 0.1f
+                                it.gravity = Gravity.BOTTOM
+                            }, onDismissRequest = { isShowSilenceDialog = false }
                         ) {
-                            isShowSilenceDialog = false
-                            viewModel.silence(it.type)
+                            AppSilencePicker(
+                                modifier = Modifier.background(
+                                    color = Color.White,
+                                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                                )
+                            ) {
+                                isShowSilenceDialog = false
+                                viewModel.silence(it.type)
+                            }
                         }
                     }
-                }
-                SpacerHeight(13.dp)
-                ChatRoomUserInfo(viewModel)
-                SpacerHeight(11.dp)
-                ChatRoomInfo(viewModel) {
-                    isShowSilenceDialog = true
-                }
-                SpacerHeight(12.dp)
-                AnimatedVisibility(visible = !isShowKeyboard) {
-                    Mic(viewModel) {
+                    SpacerHeight(13.dp)
+                    ChatRoomUserInfo(viewModel)
+                    SpacerHeight(11.dp)
+                    ChatRoomInfo(viewModel) {
                         isShowSilenceDialog = true
                     }
-                }
-                SpacerHeight(15.dp)
-                var index by remember {
-                    mutableIntStateOf(0)
-                }
-                MessageTab(index) {
-                    index = it
-                }
-                SpacerHeight(10.dp)
-                val stateHolder = rememberSaveableStateHolder()
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                ) {
-                    when (index) {
-                        0 -> stateHolder.SaveableStateProvider("all") {
-                            ChatroomTextMessage(
-                                viewModel,
-                                viewModel.pagingData
-                            )
-                        }
-
-                        1 -> stateHolder.SaveableStateProvider("chat") {
-                            ChatroomTextMessage(
-                                viewModel,
-                                viewModel.pagingData
-                            )
-                        }
-
-                        2 -> stateHolder.SaveableStateProvider("me") {
-                            ChatroomTextMessage(
-                                viewModel,
-                                viewModel.pagingData.filter { it.isSelf || it.receiverId == AppGlobal.userResponse?.imAccount }
-                            )
+                    SpacerHeight(12.dp)
+                    AnimatedVisibility(visible = !isShowKeyboard) {
+                        Mic(viewModel) {
+                            isShowSilenceDialog = true
                         }
                     }
-                    Box {
-                        AppImage(model = R.drawable.room_ic_game) {
-                            localNav.navigate(
-                                AppRoutes.Game.dynamic(
-                                    "withChildScreen" to false,
-                                    "roomId" to viewModel.roomId
+                    SpacerHeight(15.dp)
+                    var index by remember {
+                        mutableIntStateOf(0)
+                    }
+                    MessageTab(index) {
+                        index = it
+                    }
+                    SpacerHeight(10.dp)
+                    val stateHolder = rememberSaveableStateHolder()
+                    Row(
+                        verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
+                        when (index) {
+                            0 -> stateHolder.SaveableStateProvider("all") {
+                                ChatroomTextMessage(
+                                    viewModel,
+                                    viewModel.pagingData
                                 )
+                            }
+
+                            1 -> stateHolder.SaveableStateProvider("chat") {
+                                ChatroomTextMessage(
+                                    viewModel,
+                                    viewModel.pagingData.filter { it.body == null }
+                                )
+                            }
+
+                            2 -> stateHolder.SaveableStateProvider("me") {
+                                ChatroomTextMessage(
+                                    viewModel,
+                                    viewModel.pagingData.filter { it.isSelf || it.receiverId == AppGlobal.userResponse?.imAccount }
+                                )
+                            }
+                        }
+                        Box {
+                            AppImage(model = R.drawable.room_ic_game) {
+                                localNav.navigate(
+                                    AppRoutes.Game.dynamic(
+                                        "withChildScreen" to false,
+                                        "roomId" to viewModel.roomId
+                                    )
+                                )
+                            }
+                            Text(
+                                "Game Bar",
+                                fontSize = 10.sp,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .align(alignment = Alignment.BottomCenter)
+                                    .padding(bottom = 6.dp)
                             )
                         }
-                        Text(
-                            "Game Bar",
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            modifier = Modifier
-                                .align(alignment = Alignment.BottomCenter)
-                                .padding(bottom = 6.dp)
-                        )
                     }
+                    ChatAction(viewModel = viewModel)
                 }
-                ChatAction(viewModel = viewModel)
             }
         }
     }
@@ -287,7 +317,7 @@ private fun ChatRoomUserInfo(viewModel: ChatRoomViewModel) {
                 )
             }
             SpacerWidth(4.dp)
-            if (roomInfo?.isFollow != 1) {
+            if (roomInfo?.isFollow != 1 && viewModel.chatroomInfoResponse?.roomInfo?.uuid.toString() != AppGlobal.userResponse?.uuid) {
                 Box(
                     modifier = Modifier
                         .width(32.dp)
@@ -621,6 +651,31 @@ private fun ChatAction(
                         }
                     }
                 }
+                if (!viewModel.chatroomInfoResponse?.mikeInfo.isNullOrEmpty()) {
+                    SpacerWidth(10.dp)
+                    Box(
+                        modifier = Modifier
+                            .background(color = Color.White.copy(0.2f), shape = CircleShape)
+                            .size(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AppImage(
+                            model = R.drawable.room_ic_action_send_gift,
+                            modifier = Modifier
+                                .size(30.dp)
+                        ) {
+                            val yxIds = viewModel.chatroomInfoResponse?.mikeInfo?.map {
+                                it?.yxId.toString()
+                            }.orEmpty().joinToString(",")
+                            localNav.navigate(
+                                AppRoutes.Gift.dynamic(
+                                    "yxIds" to yxIds,
+                                    "roomId" to viewModel.roomId
+                                )
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -664,15 +719,15 @@ private fun RowScope.Input(
             onValueChange = {
                 viewModel.input(it)
             },
-            decorationBox = {
-                if (viewModel.input.isEmpty() && viewModel.toNickname.trim().isEmpty()) {
-                    Text(
-                        stringResource(R.string.room_send_a_message),
-                        style = TextStyle(fontSize = 12.sp, color = Color.White)
-                    )
-                }
-                it()
-            },
+//            decorationBox = {
+//                if (viewModel.input.isEmpty() && viewModel.toNickname.trim().isEmpty()) {
+//                    Text(
+//                        stringResource(R.string.room_send_a_message),
+//                        style = TextStyle(fontSize = 12.sp, color = Color.White)
+//                    )
+//                }
+//                it()
+//            },
             textStyle = TextStyle(fontSize = 12.sp, color = Color.White),
             modifier = Modifier
                 .focusRequester(viewModel.focusRequester)

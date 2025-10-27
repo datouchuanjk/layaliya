@@ -5,8 +5,10 @@ import com.module.basic.api.data.request.BaseRequest
 import com.module.basic.api.data.response.*
 import com.module.room.api.data.request.FollowRoomRequest
 import com.module.room.api.data.request.RoomCreateOrEditRequest
+import com.module.room.api.data.response.CreateRoomResponse
 import com.module.room.api.data.response.FollowRoomResponse
 import com.module.room.api.data.response.RoomCheckResponse
+import org.json.JSONObject
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -34,7 +36,7 @@ internal interface RoomApiService {
      * 创建房间
      */
     @POST("room/create-room")
-    suspend fun roomCreate(@Body request: RoomCreateOrEditRequest): BaseResponse<Map<String,String>>
+    suspend fun roomCreate(@Body request: RoomCreateOrEditRequest): BaseResponse<CreateRoomResponse>
 
     /**
      * 能不能创建房间？

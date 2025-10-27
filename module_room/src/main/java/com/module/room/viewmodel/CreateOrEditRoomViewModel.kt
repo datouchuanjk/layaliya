@@ -1,6 +1,7 @@
 package com.module.room.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -140,9 +141,8 @@ internal class CreateOrEditRoomViewModel(
                             type = roomType?.id?.toString() ?: "1",
                             mode = micNum?.code.toString()
                         )
-                    ).checkAndGet()
-                    val roomId = JSONObject(result?.get("room_info")!!).getIntOrNull("id").toString()
-                    roomId?.let {
+                    ).checkAndGet()?.roomInfo?.id
+                    result?.let {
                         _roomCreateSuccessful.emit(it)
                     }
                 } else {

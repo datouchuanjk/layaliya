@@ -1,6 +1,7 @@
 package com.module.chatroom.viewmodel
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
@@ -11,11 +12,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.core.content.edit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.helper.develop.paging.PagingStart
 import com.helper.develop.util.fromJson
 import com.helper.develop.util.fromTypeJson
+import com.helper.develop.util.getStringOrNull
 import com.helper.develop.util.toJson
 import com.helper.develop.util.toast
 import com.helper.im.IMHelper
@@ -47,6 +50,7 @@ import java.lang.NullPointerException
 internal class ChatRoomViewModel(
     private val application: Application,
     private val api: ChatroomApiService,
+    private val sp: SharedPreferences,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
@@ -152,7 +156,9 @@ internal class ChatRoomViewModel(
 
     val receiveGiftFlow = chatroomHandler.receiveGiftFlow
 
-    fun initRoom() {
+  private  var _isRefreshing by mutableStateOf(false)
+    val isRoomRefreshing get() = _isRefreshing
+    fun initRoom(isRefresh: Boolean = false) {
         viewModelScope.launch {
             apiRequest {
                 _chatroomInfoResponse =
@@ -169,9 +175,17 @@ internal class ChatRoomViewModel(
                     token = AppGlobal.userResponse?.imToken.orEmpty(),
                 )
                 initChatroomFlow()
-                chatroomHandler.sendJoinCurrentMessage(
-                    _chatroomInfoResponse?.notice?.toJson().orEmpty()
-                )
+                val key = "${AppGlobal.userResponse?.id}_lastJoinTime_${roomId}" //包含用户id和房间id 防止串号
+                val lastJoinTimeMillis = sp.getLong(key, 0L)
+                val currentTimeMillis = System.currentTimeMillis()
+                if (currentTimeMillis - lastJoinTimeMillis > 5 * 60 * 1000) {
+                    chatroomHandler.sendJoinCurrentMessage(
+                        _chatroomInfoResponse?.notice?.toJson().orEmpty()
+                    )
+                    sp.edit {
+                        putLong(key, currentTimeMillis)
+                    }
+                }
                 val rtcToken = _chatroomInfoResponse?.roomInfo?.rtcToken
                     ?: throw NullPointerException("token is empty")
                 val channelName = _chatroomInfoResponse?.roomInfo?.rtcChannelName
@@ -190,6 +204,12 @@ internal class ChatRoomViewModel(
                 )
             }.apiResponse(catch = { a, b ->
                 _initFailedFlow.emit(Unit)
+            }, loading = { a, b ->
+                if (isRefresh) {
+                    _isRefreshing = a
+                } else {
+                    b()
+                }
             })
         }
     }
@@ -299,7 +319,7 @@ internal class ChatRoomViewModel(
             chatroomHandler.receiveEmojiFlow.collect { it ->
                 Log.e("1234", "房间收到了表情自定义消息")
                 val jsonObject = JSONObject(it)
-                val emojiId = jsonObject.getString("emojiId")
+                val emojiId = jsonObject.getStringOrNull("emojiId")
                 val uid = jsonObject.getString("uid")
                 _chatroomInfoResponse?.mikeInfo?.withIndex()
                     ?.find { it.value?.uid.toString() == uid }?.let { indexValue ->
@@ -308,19 +328,10 @@ internal class ChatRoomViewModel(
                         val newMikeInfo = _chatroomInfoResponse?.mikeInfo?.toMutableList()
                         newMikeInfo?.set(index, value?.copy(emojiId = emojiId))
                         _chatroomInfoResponse = _chatroomInfoResponse?.copy(mikeInfo = newMikeInfo)
-                        resetEmojiJob?.cancel()
-                        resetEmojiJob = launch {
-                            delay(5000)
-                            newMikeInfo?.set(index, value?.copy(emojiId = null))
-                            _chatroomInfoResponse =
-                                _chatroomInfoResponse?.copy(mikeInfo = newMikeInfo)
-                        }
                     }
             }
         }
     }
-
-    private var resetEmojiJob: Job? = null
 
 
     /**

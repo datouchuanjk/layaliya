@@ -21,8 +21,11 @@ fun V2NIMMessage.transform() = IMMessage(this)
 data class IMMessage(
     val v2NIMMessage: V2NIMMessage,
     private val userInfo: IMUser? = IMHelper.userHandler.getLocalUserInfo(v2NIMMessage.senderId),
+    private val receiverInfo: IMUser? = IMHelper.userHandler.getLocalUserInfo(v2NIMMessage.receiverId),
     val senderAvatar: String? = userInfo?.avatar,
     val senderName: String? = userInfo?.name,
+    val receiverAvatar: String? = receiverInfo?.avatar,
+    val receiverName: String? = receiverInfo?.name,
     val time: String = v2NIMMessage.createTime.format(),
     val text: String? = when (v2NIMMessage.messageType) {
         V2NIMMessageType.V2NIM_MESSAGE_TYPE_TEXT -> v2NIMMessage.text

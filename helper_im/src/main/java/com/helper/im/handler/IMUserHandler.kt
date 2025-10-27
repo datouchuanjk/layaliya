@@ -1,14 +1,12 @@
 package com.helper.im.handler
 
 import android.util.Log
-import com.helper.im.data.IMConversation
 import com.helper.im.data.IMUser
 import com.helper.im.data.transform
 import com.helper.im.util.logIM
 import com.netease.nimlib.sdk.v2.user.V2NIMUser
 import com.netease.nimlib.sdk.v2.user.V2NIMUserListener
 import com.netease.nimlib.sdk.v2.user.V2NIMUserService
-import com.netease.nimlib.sdk.v2.user.params.V2NIMUserUpdateParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -55,7 +53,8 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     /**
      *有新会话 那么我会冲服务器拉一次
      */
-    internal fun refreshUserInfos(accountId: String) {
+    internal fun refreshUserInfos(accountId: String?) {
+        accountId ?: return
         service.getUserListFromCloud(listOf(accountId), {}, {})
     }
 
@@ -69,15 +68,29 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     /**
      * 获取本地用户信息
      */
-    fun getLocalUserInfo(accountId: String?, refreshWhenNull: Boolean = true): IMUser? {
+    fun getLocalUserInfo(accountId: String?): IMUser? {
         Log.e("1234", "我开始获取 ${accountId} 的用户信息 ")
         accountId ?: return null
         return service.getUserInfo(accountId).data?.transform().apply {
-            if (this == null && refreshWhenNull) {
+            if (this == null) {
                 Log.e("1234", "本地没有 ${accountId} 开始拉去服务器 ")
                 refreshUserInfos(accountId)
+            } else {
+                Log.e("1234", "本地有 ${accountId}的信息 ")
             }
         }
+    }
+
+    fun getLocalUserInfos(accountId: List<String>): Map<String, IMUser?> {
+        val map = accountId.associateWith {
+            service.getUserInfo(it).apply {
+                Log.e("1234", "我靠啊 ${it} ${this.data}")
+            }.data?.transform()
+        }
+        map.filter { it.value == null }.map { it.key }.let {
+            refreshUserInfos(it)
+        }
+        return map
     }
 
 }

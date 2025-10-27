@@ -1,10 +1,11 @@
-package com.module.comment.ui
+package com.module.community.ui
 
-import android.view.Gravity
+import android.view.KeyEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,95 +33,62 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.dialog
-import com.helper.develop.nav.LocalNavController
-import com.helper.develop.nav.setResult
-import com.helper.develop.util.toast
-import com.module.basic.route.AppRoutes
-import com.module.basic.ui.AppTitleBar
-import com.module.basic.ui.paging.AppPagingBox
 import com.module.basic.ui.AppIcon
 import com.module.basic.ui.AppImage
-import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWidth
-import com.module.basic.ui.UpdateDialogWindow
+import com.module.basic.ui.paging.AppPagingBox
 import com.module.basic.ui.paging.itemsIndexed
+import com.module.basic.util.LocalKeyboardHeight
 import com.module.basic.util.onClick
 import com.module.basic.viewmodel.apiHandlerViewModel
-import com.module.comment.R
-import com.module.comment.viewmodel.CommentViewModel
-
-fun NavGraphBuilder.commentDialog() = dialog(
-    route = AppRoutes.Comment.static, dialogProperties = DialogProperties(
-        usePlatformDefaultWidth = false
-    )
-) {
-    UpdateDialogWindow {
-        it.gravity = Gravity.BOTTOM
-    }
-    CommentDialog()
-}
+import com.module.community.R
+import com.module.community.viewmodel.CommentViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
-internal  fun CommentDialog(viewModel: CommentViewModel = apiHandlerViewModel()) {
-    val localNav = LocalNavController.current
-    val pagingData = viewModel.pagingData
-    val context = LocalContext.current
+internal fun Comment(
+    id: String,
+    viewModel: CommentViewModel = apiHandlerViewModel(parameters = {
+        parametersOf(id)
+    }),
+    onPostComment: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(viewModel) {
         viewModel.postCommentSuccessfulFlow.collect {
-            context.toast(R.string.comment_post_successful)
-            localNav.setResult(it)
+            onPostComment()
         }
     }
-    Column(
+    val pagingData = viewModel.pagingData
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.5f)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
-            )
-            .padding(vertical = 12.dp, horizontal = 15.dp)
+            .fillMaxHeight()
+            .padding(top = 12.dp)
+            .padding(vertical = 0.dp, horizontal = 15.dp)
     ) {
         val focusRequester = remember {
             FocusRequester()
         }
-        AppTitleBar(
-            showLine = false,
-            text = stringResource(R.string.comment_comments)
-        ) {
-            AppImage(R.drawable.comment_ic_comment) {
-                viewModel.commentId(null)
-                focusRequester.requestFocus()
-            }
-        }
-        SpacerHeight(13.dp)
-        val focusManager = LocalFocusManager.current
+
         AppPagingBox(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .fillMaxHeight(1f)
+                .padding(bottom = 50.dp),
             pagingData = pagingData
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        detectTapGestures(onPress = {
-                            focusManager.clearFocus()
-                        })
-                    },
+                    .fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 40.dp),
                 verticalArrangement = Arrangement.spacedBy(13.dp)
             ) {
@@ -182,7 +150,7 @@ internal  fun CommentDialog(viewModel: CommentViewModel = apiHandlerViewModel())
                         ) {
                             AppIcon(
                                 tint = if (item.imPraise == 1) Color.Red else null,
-                                res = R.drawable.comment_ic_like,
+                                res = R.drawable.community_ic_like,
                             ) {
                                 viewModel.like(index, item)
                             }
@@ -197,18 +165,23 @@ internal  fun CommentDialog(viewModel: CommentViewModel = apiHandlerViewModel())
                 }
             }
         }
+        val keyHeight = LocalKeyboardHeight.current
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .align(alignment = Alignment.BottomStart)
                 .fillMaxWidth()
-                .height(30.dp)
+                .padding(bottom = keyHeight)
+                .height(50.dp)
+                .background(color = Color.White)
+                .padding(top = 5.dp, bottom = 15.dp)
                 .focusRequester(focusRequester)
-                .border(1.dp, Color(0xff333333), RoundedCornerShape(4.dp))
+                .border(1.dp, Color(0xff333333), RoundedCornerShape(10.dp))
                 .padding(horizontal = 15.dp)
         ) {
             if (viewModel.commentResponse != null) {
                 Text(
-                    text = "${stringResource(R.string.comment_reply)}:${viewModel.commentResponse?.nickname.orEmpty()}",
+                    text = "${stringResource(R.string.community_reply)}:${viewModel.commentResponse?.nickname.orEmpty()}",
                     fontSize = 12.sp,
                     color = Color(0xff333333)
                 )
@@ -218,6 +191,13 @@ internal  fun CommentDialog(viewModel: CommentViewModel = apiHandlerViewModel())
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(1f)
+                    .then(if (viewModel.input.isEmpty()) Modifier.onKeyEvent {
+                        if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DEL) {
+                            viewModel.clearComment()
+                            true
+                        } else
+                            false
+                    } else Modifier)
                     .wrapContentHeight(),
                 textStyle = TextStyle(
                     fontSize = 12.sp,
@@ -251,11 +231,11 @@ internal  fun CommentDialog(viewModel: CommentViewModel = apiHandlerViewModel())
                         .size(10.dp)
                 )
             } else {
-                Text(stringResource(R.string.comment_send), modifier = Modifier.onClick {
+                Text(stringResource(R.string.community_send), modifier = Modifier.onClick {
                     viewModel.postComment()
+                    focusManager.clearFocus()
                 })
             }
         }
     }
 }
-

@@ -48,11 +48,11 @@ internal class PersonCenterViewModel(
 
     val pagingData = buildOffsetPaging(viewModelScope) {
         api.personDynamicList(
-                PersonDynamicRequest(
-                    uid = _uid,
-                    page = it.key!!
-                )
-            ).checkAndGet()?.list
+            PersonDynamicRequest(
+                uid = _uid,
+                page = it.key!!
+            )
+        ).checkAndGet()?.list
     }.pagingData
 
     /**
@@ -64,16 +64,16 @@ internal class PersonCenterViewModel(
             apiRequest {
                 if (isLike) {
                     api.dynamicUnlike(
-                                        PersonDynamicLikeRequest(
-                                            zoneId = item.id.toString()
-                                        )
-                                    ).checkAndGet()
+                        PersonDynamicLikeRequest(
+                            zoneId = item.id.toString()
+                        )
+                    ).checkAndGet()
                 } else {
                     api.dynamicLike(
-                                        PersonDynamicLikeRequest(
-                                            zoneId = item.id.toString()
-                                        )
-                                    ).checkAndGet()
+                        PersonDynamicLikeRequest(
+                            zoneId = item.id.toString()
+                        )
+                    ).checkAndGet()
                 }
             }.apiResponse(null) {
                 pagingData.handle {
@@ -89,13 +89,12 @@ internal class PersonCenterViewModel(
         }
     }
 
-    fun uploadCommentNum(response: PersonDynamicResponse, count: Int) {
+    fun refresh(
+        index: Int,
+        newItem: PersonDynamicResponse
+    ) {
         pagingData.handle {
-            findIndex { it.id == response.id }?.let { index ->
-                this[index] = response.copy(
-                    commentNum = response.commentNum + count
-                )
-            }
+            set(index, newItem)
         }
     }
 

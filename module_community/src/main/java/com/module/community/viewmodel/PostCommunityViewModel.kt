@@ -51,7 +51,7 @@ internal class PostCommunityViewModel(
     private val _postCommunitySuccessfulFlow = MutableSharedFlow<Unit>()
     val postCommunitySuccessfulFlow = _postCommunitySuccessfulFlow.asSharedFlow()
     fun post() {
-        if (images.isEmpty()) {
+        if (images.isEmpty() && input.isEmpty()) {
             return
         }
         viewModelScope.launch {

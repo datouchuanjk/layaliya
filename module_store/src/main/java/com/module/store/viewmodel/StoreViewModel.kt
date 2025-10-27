@@ -2,6 +2,7 @@ package com.module.store.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.*
 import com.module.store.api.data.request.BuyOrSendRequest
 import com.module.store.api.data.response.*
@@ -71,7 +72,7 @@ internal class StoreViewModel(
                 api.buyOrSend(
                     BuyOrSendRequest(
                         goodsId =id,
-                        uid = "",
+                        uid = AppGlobal.userResponse?.id.toString(),
                     )
                 ).checkAndGet()
             }.apiResponse {

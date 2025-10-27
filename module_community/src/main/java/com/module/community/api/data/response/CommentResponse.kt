@@ -1,4 +1,4 @@
-package com.module.comment.api.data.response
+package com.module.community.api.data.response
 
 
 import androidx.annotation.Keep

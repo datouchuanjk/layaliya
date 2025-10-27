@@ -44,6 +44,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.helper.develop.nav.LocalNavController
 import com.helper.develop.nav.navigateForResult
+import com.helper.develop.util.fromJson
+import com.helper.develop.util.toJson
 import com.helper.develop.util.toast
 import com.helper.im.util.toConversationId
 import com.module.basic.route.AppRoutes
@@ -58,6 +60,7 @@ import com.module.basic.util.aspectRatio
 import com.module.basic.util.onClick
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.mine.R
+import com.module.mine.api.data.response.PersonDynamicResponse
 import com.module.mine.viewmodel.PersonCenterViewModel
 
 fun NavGraphBuilder.personCenterScreen() = composable(route = AppRoutes.PersonCenter.static) {
@@ -271,6 +274,7 @@ private fun RowScope.TopItem(level: Int, url: String? = null) {
 @Composable
 private fun Content(viewModel: PersonCenterViewModel) {
     val pagingData = viewModel.pagingData
+    val localNav = LocalNavController.current
     LazyColumn(
         contentPadding = PaddingValues(bottom = 16.dp),
         modifier = Modifier
@@ -281,6 +285,7 @@ private fun Content(viewModel: PersonCenterViewModel) {
                 shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
             )
     ) {
+
         item { UserInfo(viewModel) }
         itemsIndexed(pagingData = pagingData, key = {
             it.id
@@ -290,6 +295,13 @@ private fun Content(viewModel: PersonCenterViewModel) {
                     .fillParentMaxWidth()
                     .padding(horizontal = 16.dp)
                     .padding(top = 16.dp)
+                    .onClick{
+                        localNav.navigateForResult<String>(AppRoutes.CommunityDetail.dynamic("data" to item.toJson())){
+                            it?.fromJson<PersonDynamicResponse>()?.let { newItem ->
+                                viewModel.refresh(index, newItem)
+                            }
+                        }
+                    }
             ) {
                 Text(
                     text = item.createTime.orEmpty(),
@@ -319,7 +331,7 @@ private fun Content(viewModel: PersonCenterViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
-                    val localNav = LocalNavController.current
+
                     AppIcon(
                         res = R.drawable.mine_ic_person_center_like,
                         tint = if (item.imPraise == 1) Color.Red else null
@@ -333,13 +345,7 @@ private fun Content(viewModel: PersonCenterViewModel) {
                         color = Color(0xff333333)
                     )
                     SpacerWidth(24.dp)
-                    AppIcon(res = R.drawable.mine_ic_person_center_message) {
-                        localNav.navigateForResult<Int>(AppRoutes.Comment.dynamic("id" to item.id.toString())) {
-                            if (it != null) {
-                                viewModel.uploadCommentNum(item, it)
-                            }
-                        }
-                    }
+                    AppIcon(res = R.drawable.mine_ic_person_center_message)
                     SpacerWidth(4.dp)
                     Text(
                         text = item.commentNum.toString(),
@@ -430,12 +436,14 @@ private fun LazyItemScope.UserInfo(viewModel: PersonCenterViewModel) {
                     .background(color = Color(0xffe6e6e6))
             )
             FansItem(personResponse?.fansNum ?: 0, stringResource(R.string.mine_fans)) {
-                localNav.navigate(
-                    AppRoutes.FollowersOrFans.dynamic(
-                        "type" to 1,
-                        "uid" to viewModel.uid
+                if(viewModel.isSelf){
+                    localNav.navigate(
+                        AppRoutes.FollowersOrFans.dynamic(
+                            "type" to 1,
+                            "uid" to viewModel.uid
+                        )
                     )
-                )
+                }
             }
         }
         Row(

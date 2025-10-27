@@ -60,6 +60,7 @@ class IMMessageHandler internal constructor(
             }
         }
     }
+
     private val _receiveMessagesFlow = MutableSharedFlow<Unit>()
     val receiveMessagesFlow = _receiveMessagesFlow.asSharedFlow()
 
@@ -224,7 +225,6 @@ class IMMessageHandler internal constructor(
     }
 
 
-
     val pagingData = buildPaging(
         coroutineScope = this,
         pagingStart = PagingStart.DEFAULT,
@@ -256,7 +256,13 @@ class IMMessageHandler internal constructor(
                     users.forEach { user ->
                         this.forEachIndexed { index, item ->
                             if (user.accountId == item.senderId) {
-                                this[index] = item.copy(senderAvatar = user.avatar)
+                                this[index] =
+                                    item.copy(senderAvatar = user.avatar, senderName = user.name)
+                            } else if (user.accountId == item.receiverId) {
+                                this[index] = item.copy(
+                                    receiverAvatar = user.avatar,
+                                    receiverName = user.name
+                                )
                             }
                         }
                     }

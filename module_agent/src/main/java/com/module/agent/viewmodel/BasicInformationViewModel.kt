@@ -93,6 +93,7 @@ internal class BasicInformationViewModel(
             }.apiResponse {
                 //邀请成功的话 邀请列表需要刷新一下
                 pagingData.refresh()
+                clearInviteUserResponse()
             }
         }
     }
