@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
+/**
+ * 用户信息处理器
+ */
 class IMUserHandler internal constructor(scope: CoroutineScope) :
     Handler<V2NIMUserService>(scope), V2NIMUserListener {
 
@@ -27,14 +30,6 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     private val _userProfileChangedFlow = MutableSharedFlow<List<IMUser>>()
     val userProfileChangedFlow = _userProfileChangedFlow.asSharedFlow()
     override fun onUserProfileChanged(users: MutableList<V2NIMUser>?) {
-        logIM("onUserProfileChanged users->${users}")
-        Log.e(
-            "1234", "服务器回来了，${
-                users?.map {
-                    "id=${it.accountId} nickname=${it.name} 头像 ${it.avatar}"
-                }
-            } "
-        )
         users ?: return
         if (users.isEmpty()) return
         launch {
@@ -43,16 +38,14 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     }
 
     override fun onBlockListAdded(user: V2NIMUser?) {
-        logIM("onBlockListAdded user->${user}")
+
     }
 
     override fun onBlockListRemoved(accountId: String?) {
-        logIM("onBlockListRemoved accountId->${accountId}")
+
     }
 
-    /**
-     *有新会话 那么我会冲服务器拉一次
-     */
+
     internal fun refreshUserInfos(accountId: String?) {
         accountId ?: return
         service.getUserListFromCloud(listOf(accountId), {}, {})
@@ -69,7 +62,6 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
      * 获取本地用户信息
      */
     fun getLocalUserInfo(accountId: String?): IMUser? {
-        Log.e("1234", "我开始获取 ${accountId} 的用户信息 ")
         accountId ?: return null
         return service.getUserInfo(accountId).data?.transform().apply {
             if (this == null) {
