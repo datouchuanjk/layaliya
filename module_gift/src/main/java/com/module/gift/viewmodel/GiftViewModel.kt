@@ -4,15 +4,15 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import androidx.navigation.*
 import com.helper.develop.nav.*
-import com.helper.im.IMHelper
-import com.helper.im.data.IMUser
+import com.helper.develop.util.buildJsonObject
+import com.helper.develop.util.fromJson
 import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.*
+import com.module.gift.api.data.GiftInfo
 import com.module.gift.api.data.request.SendGiftRequest
 import com.module.gift.api.data.response.*
 import com.module.gift.api.service.*
 import kotlinx.coroutines.*
-import org.json.JSONObject
 
 internal class GiftViewModel(
     savedStateHandle: SavedStateHandle,
@@ -30,6 +30,7 @@ internal class GiftViewModel(
         val response = _giftResponse ?: return
         val list = response.list[tabIndex] ?: emptyList()
         _selectedList.addAll(list)
+        _selectedItem = null
     }
 
 
@@ -39,7 +40,17 @@ internal class GiftViewModel(
     private val _selectedList = mutableStateListOf<GiftResponse.Item>()
     val selectedList get() = _selectedList
 
+    private var _selectedItem by mutableStateOf<GiftResponse.Item?>(null)
+     val selectedItemHasSvg
+        get() = if (_selectedItem?.id == null) false else AppGlobal.getGiftSvgFileById(
+            _selectedItem?.id.toString()
+        ).run {
+            this.exists() && this.length() > 0
+        }
+    val selectedItem get() = _selectedItem
     fun selectedListItem(item: GiftResponse.Item) {
+        _selectedItem = item
+        _numIndex =0
         _selectedList.forEachIndexed { index, it ->
             if (it.id == item.id) {
                 _selectedList[index] = it.copy(isSelected = true)
@@ -70,7 +81,7 @@ internal class GiftViewModel(
         getGiftInfo()
     }
 
-    val numList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
+    val numList get() =  listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
     private var _numIndex by mutableIntStateOf(0)
     fun numIndex(index: Int) {
         _numIndex = index
@@ -79,35 +90,24 @@ internal class GiftViewModel(
     val selectedNum get() = numList[_numIndex]
     private var _sendGiftLoading by mutableStateOf(false)
     val sendGiftLoading get() = _sendGiftLoading
-    private val _roomId = savedStateHandle.get<String>("roomId").orEmpty()
-    init {
-        val a =""
-    }
-    private val _yxIds = savedStateHandle.get<String>("yxIds").orEmpty().split(",").toList()
 
-    private val _userInfos = mutableStateMapOf<String, IMUser?>()
+    private val _giftInfo = savedStateHandle.get<String>("json")?.fromJson<GiftInfo>()
 
-    val userInfos get() = _userInfos.filter { it.value != null }.map { it.value }
+    val userInfos get() = _giftInfo?.userInfo.orEmpty()
 
-    private var _currentUserInfo by mutableStateOf<IMUser?>(null)
+    private val _roomId get() = _giftInfo?.roomId ?: "0"
+
+
+    private var _currentUserInfo by mutableStateOf<GiftInfo.UserInfo?>(
+        userInfos.getOrNull(
+            0
+        )
+    )
     val currentUserInfo get() = _currentUserInfo
     fun setCurrentUserInfo(index: Int) {
         _currentUserInfo = userInfos[index]
     }
 
-    init {
-        _userInfos.putAll(IMHelper.userHandler.getLocalUserInfos(_yxIds))
-        _currentUserInfo = userInfos.getOrNull(0)
-        viewModelScope.launch {
-            IMHelper.userHandler.userProfileChangedFlow.collect {
-                it.forEach { newUser ->
-                    if (_userInfos.contains(newUser.accountId)) {
-                        _userInfos[newUser.accountId] = newUser
-                    }
-                }
-            }
-        }
-    }
 
     fun sendGift(localNav: NavHostController) {
         val giftId = selectedListItem?.id ?: return
@@ -126,16 +126,18 @@ internal class GiftViewModel(
             }.apiResponse(loading = { it, _ ->
                 _sendGiftLoading = it
             }) {
-                val jsonObject = JSONObject()
-                jsonObject.put("sendUid", AppGlobal.userResponse?.id.toString())
-                jsonObject.put("sendName", AppGlobal.userResponse?.nickname.toString())
-                jsonObject.put("sendAvatar", AppGlobal.userResponse?.avatar.toString())
-                jsonObject.put("receiveName", currentUserInfo?.name)
-                jsonObject.put("giftId", giftId.toString())
-                jsonObject.put("giftName", giftName)
-                jsonObject.put("giftCount", selectedNum)
-                jsonObject.put("floatingScreenId", floatingScreenId)
-                localNav.emitResult("send_gift_result", jsonObject.toString())
+                val json = buildJsonObject { js ->
+                    js.put("sendUid", AppGlobal.userResponse?.id.toString())
+                    js.put("sendName", AppGlobal.userResponse?.nickname.toString())
+                    js.put("sendAvatar", AppGlobal.userResponse?.avatar.toString())
+                    js.put("receiveName", currentUserInfo?.nickname.toString())
+                    js.put("receiveAvatar", currentUserInfo?.avatar.toString())
+                    js.put("giftId", giftId.toString())
+                    js.put("giftName", giftName)
+                    js.put("giftCount", selectedNum)
+                    js.put("floatingScreenId", floatingScreenId)
+                }.toString()
+                localNav.emitResult("send_gift_result", json)
             }
         }
     }

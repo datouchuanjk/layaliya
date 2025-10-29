@@ -33,6 +33,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.helper.develop.Background
 import com.helper.develop.nav.LocalNavController
+import com.helper.develop.util.buildJsonArray
+import com.helper.develop.util.toJson
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.AppPopup
@@ -40,6 +42,7 @@ import com.module.basic.ui.SpacerHeight
 import com.module.basic.util.onClick
 import com.module.chatroom.R
 import com.module.chatroom.viewmodel.ChatRoomViewModel
+import org.json.JSONObject
 import kotlin.math.min
 
 @Composable
@@ -84,10 +87,19 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         text = stringResource(R.string.room_send_gifts),
         enable = !isMysteriousPerson,
         onClick = {
+            val jsonObject = JSONObject()
+            val userInfo = buildJsonArray { ja ->
+                ja.put(JSONObject().apply {
+                    put("uid", other.id.toString())
+                    put("nickname", other.nickname.toString())
+                    put("avatar", other.avatar.toString())
+                })
+            }
+            jsonObject.put("roomId", "0")
+            jsonObject.put("userInfo", userInfo)
             localNav.navigate(
                 AppRoutes.Gift.dynamic(
-                    "yxIds" to listOf(other.id.toString()).joinToString(","),
-                    "roomId" to viewModel.roomId
+                    "json" to jsonObject.toString(),
                 )
             )
         }
@@ -185,7 +197,12 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
             null
         )
     } else {
-        listOf(followAction, mentionAction, giftAction)
+        if(isMysteriousPerson){
+            listOf( mentionAction, giftAction)
+        }else{
+            listOf(followAction, mentionAction, giftAction)
+        }
+
     }
 }
 
@@ -201,7 +218,7 @@ internal fun UserInfoPopup(
         DisposableEffect(Unit) {
             viewModel.getCurrentUserDetail(uid)
             onDispose {
-                viewModel.clearCurrentUserDetail()
+
             }
         }
         viewModel.currentUserDetail ?: return

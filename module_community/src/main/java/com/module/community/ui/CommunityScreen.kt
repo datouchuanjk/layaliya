@@ -74,19 +74,13 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
     var isRefresh by rememberSaveable {
         mutableStateOf(false)
     }
-    val totalItemsCount by remember {
-        derivedStateOf {
-            state.layoutInfo.totalItemsCount
-        }
-    }
-
     LaunchedEffect(state) {
         snapshotFlow { state.layoutInfo.totalItemsCount }
             .collect {
                 if (isRefresh) {
                     delay(500)
                     state.animateScrollToItem(0)
-                    withFrameMillis { }
+                    delay(500)
                     isRefresh = false
                 }
             }
@@ -160,7 +154,7 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                         "data" to item.toJson()
                                     )
                                 ) {
-                                    it?.fromJson<CommunityResponse>()?.let { newItem ->
+                                    it?.fromJson<CommunityResponse?>()?.let { newItem ->
                                         viewModel.refresh(index, item, newItem)
                                     }
                                 }
@@ -232,7 +226,7 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                             end.linkTo(parent.end, 15.dp)
                             width = Dimension.fillToConstraints
                         }, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            item.images?.take(3)?.forEach { image ->
+                            item.images?.take(3)?.forEachIndexed { index, image ->
                                 AppImage(
                                     model = image, modifier = Modifier
                                         .weight(1f)
@@ -240,7 +234,14 @@ internal fun CommunityScreen(viewModel: CommunityViewModel = apiHandlerViewModel
                                         .clip(
                                             RoundedCornerShape(20.dp)
                                         )
-                                )
+                                ) {
+                                    localNav.navigate(
+                                        AppRoutes.BigImage.dynamic(
+                                            "index" to index,
+                                            "images" to item.images.take(3).joinToString(",")
+                                        )
+                                    )
+                                }
                             }
                         }
                         Row(

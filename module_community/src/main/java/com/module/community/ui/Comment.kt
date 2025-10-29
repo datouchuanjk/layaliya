@@ -1,11 +1,14 @@
 package com.module.community.ui
 
+import android.util.Log
 import android.view.KeyEvent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -27,14 +30,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -47,21 +54,23 @@ import com.module.basic.ui.SpacerWidth
 import com.module.basic.ui.paging.AppPagingBox
 import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.util.LocalKeyboardHeight
+import com.module.basic.util.appBrushBackground
 import com.module.basic.util.onClick
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.community.R
 import com.module.community.viewmodel.CommentViewModel
+import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 
 @Composable
 internal fun Comment(
     id: String,
+    focusRequester: FocusRequester,
     viewModel: CommentViewModel = apiHandlerViewModel(parameters = {
         parametersOf(id)
     }),
     onPostComment: () -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
     LaunchedEffect(viewModel) {
         viewModel.postCommentSuccessfulFlow.collect {
             onPostComment()
@@ -75,15 +84,11 @@ internal fun Comment(
             .padding(top = 12.dp)
             .padding(vertical = 0.dp, horizontal = 15.dp)
     ) {
-        val focusRequester = remember {
-            FocusRequester()
-        }
 
         AppPagingBox(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(1f)
-                .padding(bottom = 50.dp),
+                .fillMaxHeight(1f),
             pagingData = pagingData
         ) {
             LazyColumn(
@@ -166,76 +171,103 @@ internal fun Comment(
             }
         }
         val keyHeight = LocalKeyboardHeight.current
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .align(alignment = Alignment.BottomStart)
-                .fillMaxWidth()
-                .padding(bottom = keyHeight)
-                .height(50.dp)
-                .background(color = Color.White)
-                .padding(top = 5.dp, bottom = 15.dp)
-                .focusRequester(focusRequester)
-                .border(1.dp, Color(0xff333333), RoundedCornerShape(10.dp))
-                .padding(horizontal = 15.dp)
-        ) {
-            if (viewModel.commentResponse != null) {
-                Text(
-                    text = "${stringResource(R.string.community_reply)}:${viewModel.commentResponse?.nickname.orEmpty()}",
-                    fontSize = 12.sp,
-                    color = Color(0xff333333)
-                )
-                SpacerWidth(4.dp)
-            }
-            BasicTextField(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .then(if (viewModel.input.isEmpty()) Modifier.onKeyEvent {
-                        if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DEL) {
-                            viewModel.clearComment()
-                            true
-                        } else
-                            false
-                    } else Modifier)
-                    .wrapContentHeight(),
-                textStyle = TextStyle(
-                    fontSize = 12.sp,
-                    color = Color(0xff333333)
-                ),
-                value = viewModel.input,
-                onValueChange = viewModel::input,
-                decorationBox = {
-                    if (viewModel.input.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.comment_please_input_comment),
-                            style = TextStyle(
-                                fontSize = 12.sp,
-                                color = Color(0xff333333)
-                            ),
-                        )
-                    }
-                    it()
-                }, maxLines = 1, keyboardActions = KeyboardActions(
-                    onSend = {
-                        viewModel.postComment()
-                    },
-                )
+        LaunchedEffect(keyHeight) {
+            Log.e("1234","key=$keyHeight")
+        }
+
+    }
+}
+@Composable
+internal fun BoxScope.Send(
+    focusRequester: FocusRequester,
+    viewModel: CommentViewModel = apiHandlerViewModel()){
+    val keyHeight = LocalKeyboardHeight.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .align(alignment = Alignment.BottomStart)
+            .fillMaxWidth()
+            .padding(horizontal = 15.dp)
+            .padding(bottom = keyHeight)
+            .height(60.dp)
+            .background(color = Color.White)
+            .padding(top = 5.dp, bottom = 15.dp)
+            .focusRequester(focusRequester)
+            .background(color = Color(0xfff5f5f5), shape = RoundedCornerShape(20.dp))
+            .padding(horizontal = 15.dp)
+    ) {
+        if (viewModel.commentResponse != null) {
+            Text(
+                text = "${stringResource(R.string.community_reply)}:${viewModel.commentResponse?.nickname.orEmpty()}",
+                fontSize = 12.sp,
+                color = Color(0xff333333)
             )
-            if (viewModel.isCommenting) {
-                CircularProgressIndicator(
-                    strokeWidth = 1.dp,
-                    color = Color(0xff333333),
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .size(10.dp)
-                )
-            } else {
-                Text(stringResource(R.string.community_send), modifier = Modifier.onClick {
+            SpacerWidth(4.dp)
+        }
+        BasicTextField(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .then(if (viewModel.input.isEmpty()) Modifier.onKeyEvent {
+                    if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DEL) {
+                        viewModel.clearComment()
+                        true
+                    } else
+                        false
+                } else Modifier)
+                .wrapContentHeight(),
+            textStyle = TextStyle(
+                fontSize = 12.sp,
+                color = Color(0xff333333)
+            ),
+            value = viewModel.input,
+            onValueChange = viewModel::input,
+            decorationBox = {
+                if (viewModel.input.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.comment_please_input_comment),
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            color = Color(0xff808080)
+                        ),
+                    )
+                }
+                it()
+            }, maxLines = 1, keyboardActions = KeyboardActions(
+                onSend = {
+                    viewModel.postComment()
+                },
+            )
+        )
+        val focusManager = LocalFocusManager.current
+        if (viewModel.isCommenting) {
+            CircularProgressIndicator(
+                strokeWidth = 1.dp,
+                color = Color(0xff333333),
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .size(10.dp)
+            )
+        } else {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .height(30.dp)
+                    .appBrushBackground(
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(horizontal = 11.dp, vertical = 3.dp)
+            ) {
+                AppImage(
+                    model = R.drawable.communityic_send,
+                    contentScale = ContentScale.Crop,
+                    contentDescription = null,
+                ){
                     viewModel.postComment()
                     focusManager.clearFocus()
-                })
+                }
             }
         }
     }
 }
+

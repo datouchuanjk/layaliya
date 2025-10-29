@@ -73,16 +73,5 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
         }
     }
 
-    fun getLocalUserInfos(accountId: List<String>): Map<String, IMUser?> {
-        val map = accountId.associateWith {
-            service.getUserInfo(it).apply {
-                Log.e("1234", "我靠啊 ${it} ${this.data}")
-            }.data?.transform()
-        }
-        map.filter { it.value == null }.map { it.key }.let {
-            refreshUserInfos(it)
-        }
-        return map
-    }
 
 }

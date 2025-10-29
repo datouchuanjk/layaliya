@@ -115,7 +115,7 @@ internal fun GiftDialog(viewModel: GiftViewModel = apiHandlerViewModel()) {
                         if (isShowPopup) {
                             AppListPopup(
                                 list = viewModel.userInfos,
-                                map = { it?.name.toString() },
+                                map = { it.nickname.toString() },
                                 onDismissRequest = {
                                     isShowPopup = false
                                 },
@@ -129,7 +129,7 @@ internal fun GiftDialog(viewModel: GiftViewModel = apiHandlerViewModel()) {
                                 }
                             )
                         }
-                        Text(viewModel.currentUserInfo?.name.orEmpty(), fontSize = 10.sp, color = Color.White)
+                        Text(viewModel.currentUserInfo?.nickname.orEmpty(), fontSize = 10.sp, color = Color.White)
                         if(viewModel.userInfos.size>1){
                             SpacerWidth(8.dp)
                             Image(
@@ -140,82 +140,84 @@ internal fun GiftDialog(viewModel: GiftViewModel = apiHandlerViewModel()) {
                         }
                     }
                     SpacerWeight(1f)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        var isShowPopup by remember {
-                            mutableStateOf(false)
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .height(28.dp)
-                                .width(60.dp)
-                                .background(
-                                    color = Color(0xff3C3A43),
-                                    shape = RoundedCornerShape(
-                                        topStart = 20.dp,
-                                        bottomStart = 20.dp
-                                    )
-                                )
-                                .onClick {
-                                    isShowPopup = true
-                                }
-                        ) {
-                            Text(
-                                "X${viewModel.selectedNum}",
-                                fontSize = 10.sp,
-                                color = Color.White
-                            )
-                            SpacerWidth(8.dp)
-                            Image(
-                                painter = painterResource(R.drawable.gift_ic_more),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null,
-                            )
-                            if (isShowPopup) {
-                                AppListPopup(
-                                    list = viewModel.numList,
-                                    map = { it.toString() },
-                                    onDismissRequest = {
-                                        isShowPopup = false
-                                    },
-                                    popupPosition = { anchorBounds: IntRect, windowSize: IntSize, popupContentSize: IntSize ->
-                                        IntOffset(
-                                            anchorBounds.left,
-                                            anchorBounds.top - popupContentSize.height - 5.dp.roundToPx()
-                                        )
-                                    }, onSelected = {
-                                        viewModel.numIndex(it)
-                                    }
-                                )
+                    if(viewModel.selectedItem!=null){
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            var isShowPopup by remember {
+                                mutableStateOf(false)
                             }
-                        }
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .height(28.dp)
-                                .width(60.dp)
-                                .appBrushBackground(
-                                    shape = RoundedCornerShape(
-                                        topEnd = 20.dp,
-                                        bottomEnd = 20.dp
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier
+                                    .height(28.dp)
+                                    .width(60.dp)
+                                    .background(
+                                        color = Color(0xff3C3A43),
+                                        shape = RoundedCornerShape(
+                                            topStart = 20.dp,
+                                            bottomStart = 20.dp
+                                        )
                                     )
-                                )
-                                .onClick {
-                                    viewModel.sendGift(localNav)
-                                }) {
-                            if (viewModel.sendGiftLoading) {
-                                CircularProgressIndicator(
-                                    strokeWidth = 1.dp,
-                                    color = Color(0xff333333),
-                                    modifier = Modifier.size(15.dp)
-                                )
-                            } else {
+                                    .onClick(!viewModel.selectedItemHasSvg) {
+                                        isShowPopup = true
+                                    }
+                            ) {
                                 Text(
-                                    stringResource(R.string.gift_send),
+                                    "X ${viewModel.selectedNum}",
                                     fontSize = 10.sp,
-                                    color = Color.White,
+                                    color = Color.White
                                 )
+                                SpacerWidth(8.dp)
+                                Image(
+                                    painter = painterResource(R.drawable.gift_ic_more),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null,
+                                )
+                                if (isShowPopup) {
+                                    AppListPopup(
+                                        list = viewModel.numList,
+                                        map = { it.toString() },
+                                        onDismissRequest = {
+                                            isShowPopup = false
+                                        },
+                                        popupPosition = { anchorBounds: IntRect, windowSize: IntSize, popupContentSize: IntSize ->
+                                            IntOffset(
+                                                anchorBounds.left,
+                                                anchorBounds.top - popupContentSize.height - 5.dp.roundToPx()
+                                            )
+                                        }, onSelected = {
+                                            viewModel.numIndex(it)
+                                        }
+                                    )
+                                }
+                            }
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .height(28.dp)
+                                    .width(60.dp)
+                                    .appBrushBackground(
+                                        shape = RoundedCornerShape(
+                                            topEnd = 20.dp,
+                                            bottomEnd = 20.dp
+                                        )
+                                    )
+                                    .onClick {
+                                        viewModel.sendGift(localNav)
+                                    }) {
+                                if (viewModel.sendGiftLoading) {
+                                    CircularProgressIndicator(
+                                        strokeWidth = 1.dp,
+                                        color = Color(0xff333333),
+                                        modifier = Modifier.size(15.dp)
+                                    )
+                                } else {
+                                    Text(
+                                        stringResource(R.string.gift_send),
+                                        fontSize = 10.sp,
+                                        color = Color.White,
+                                    )
+                                }
                             }
                         }
                     }

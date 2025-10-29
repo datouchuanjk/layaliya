@@ -32,6 +32,8 @@ import androidx.navigation.*
 import androidx.navigation.compose.*
 import coil.compose.*
 import com.helper.develop.nav.*
+import com.helper.develop.util.buildJsonArray
+import com.helper.develop.util.buildJsonObject
 import com.helper.develop.util.toJson
 import com.helper.develop.util.toast
 import com.module.basic.route.*
@@ -48,6 +50,7 @@ import com.module.chatroom.ui.popup.list.KickoutListPopup
 import com.module.chatroom.ui.popup.list.MuteListPopup
 import com.module.chatroom.viewmodel.*
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.json.JSONObject
 import kotlin.collections.joinToString
 
 fun NavGraphBuilder.chatRoomScreen() =
@@ -237,21 +240,21 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                             1 -> stateHolder.SaveableStateProvider("chat") {
                                 ChatroomTextMessage(
                                     viewModel,
-                                    viewModel.pagingData.filter { it.body == null }
+                                    viewModel.pagingData.filterToPagingData { it.body == null }
                                 )
                             }
 
                             2 -> stateHolder.SaveableStateProvider("me") {
                                 ChatroomTextMessage(
                                     viewModel,
-                                    viewModel.pagingData.filter { it.isSelf || it.receiverId == AppGlobal.userResponse?.imAccount }
+                                    viewModel.pagingData.filterToPagingData { it.isSelf || it.receiverId == AppGlobal.userResponse?.imAccount }
                                 )
                             }
                         }
                         Box {
                             AppImage(model = R.drawable.room_ic_game) {
                                 localNav.navigate(
-                                    AppRoutes.Game.dynamic(
+                                    AppRoutes.GameList.dynamic(
                                         "withChildScreen" to false,
                                         "roomId" to viewModel.roomId
                                     )
@@ -651,7 +654,7 @@ private fun ChatAction(
                         }
                     }
                 }
-                if (!viewModel.chatroomInfoResponse?.mikeInfo.isNullOrEmpty()) {
+                if (!viewModel.realMikeInfo.isNullOrEmpty()) {
                     SpacerWidth(10.dp)
                     Box(
                         modifier = Modifier
@@ -664,13 +667,23 @@ private fun ChatAction(
                             modifier = Modifier
                                 .size(30.dp)
                         ) {
-                            val yxIds = viewModel.chatroomInfoResponse?.mikeInfo?.map {
-                                it?.yxId.toString()
-                            }.orEmpty().joinToString(",")
+                            val jsonObject = JSONObject()
+                            val userInfo = buildJsonArray { ja ->
+                                viewModel.realMikeInfo?.forEach {
+                                    if(it?.uid!= AppGlobal.userResponse?.id){
+                                        ja.put(buildJsonObject { jo ->
+                                            jo.put("uid", it?.uid.toString())
+                                            jo.put("nickname", it?.nickname.toString())
+                                            jo.put("avatar", it?.avatar.toString())
+                                        })
+                                    }
+                                }
+                            }
+                            jsonObject.put("roomId", viewModel.roomId)
+                            jsonObject.put("userInfo", userInfo)
                             localNav.navigate(
                                 AppRoutes.Gift.dynamic(
-                                    "yxIds" to yxIds,
-                                    "roomId" to viewModel.roomId
+                                    "json" to jsonObject.toString(),
                                 )
                             )
                         }

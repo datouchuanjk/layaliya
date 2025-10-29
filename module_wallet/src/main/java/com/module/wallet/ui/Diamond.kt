@@ -50,7 +50,7 @@ internal fun Diamond(viewModel: DiamondViewModel = apiHandlerViewModel()) {
     val localNav = LocalNavController.current
     LaunchedEffect(viewModel) {
         viewModel.buySuccessful.collect {
-            localNav.setResult(true)
+            localNav.setResult(it)
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {

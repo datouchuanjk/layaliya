@@ -1,7 +1,9 @@
 package com.module.bag.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.helper.develop.util.toast
 import com.module.bag.api.data.request.UseBagRequest
 import com.module.basic.viewmodel.*
 import com.module.bag.api.data.response.*
@@ -9,9 +11,11 @@ import com.module.bag.api.service.BagApiService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import com.module.bag.R
 
 internal class BagViewModel(
     private val api: BagApiService,
+    private val application: Application,
 ) : BaseViewModel() {
 
     init {
@@ -62,10 +66,15 @@ internal class BagViewModel(
     private val _useSuccessfulFlow = MutableSharedFlow<Unit>()
     val useSuccessfulFlow = _useSuccessfulFlow.asSharedFlow()
     fun use() {
-        val item  = selectedListItem?:return
-        use(item.id.toString())
+        val item = selectedListItem ?: return
+        use(item.id.toString(), item.use.orEmpty())
     }
-    fun use(id: String) {
+
+    fun use(id: String, use: String) {
+        if (use == "1") {
+            application.toast(R.string.bag_already_used)
+            return
+        }
         viewModelScope.launch {
             apiRequest {
                 api.use(

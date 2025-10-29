@@ -2,9 +2,11 @@ package com.module.basic.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,7 +38,6 @@ fun <T> AppListPopup(
     popupPosition: Density.(anchorBounds: IntRect, windowSize: IntSize, popupContentSize: IntSize) -> IntOffset,
     list: List<T>,
     map: (T) -> String,
-    key: (T) -> Any = map,
     onSelected: (Int) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -63,20 +64,16 @@ fun <T> AppListPopup(
         val itemHeight = with(LocalDensity.current) {
             result.size.height.toDp()
         }
-        val maxItemCount = min(list.size, 5)
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .height(24.dp + maxItemCount * itemHeight + (maxItemCount - 1) * 12.dp)
                 .background(
                     color = Color(0xfff5f5f5),
                     shape = RoundedCornerShape(8.dp)
-                ),
-            contentPadding = PaddingValues(12.dp),
+                )
+                .padding( 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            itemsIndexed(items = list, key = { index, item ->
-                key(item)
-            }) { index, it ->
+            list.forEachIndexed{ index, it ->
                 Text(
                     textAlign = TextAlign.Center,
                     text = map(it),

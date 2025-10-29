@@ -41,6 +41,7 @@ data class IMMessage(
                     else -> getString(R.string.im_unknown_message_display)
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 getString(R.string.im_unknown_message_display)
             }
         }

@@ -24,6 +24,7 @@ internal data class BagResponse(
         val name: String?,
         val pic: String?,
         val price: String?,
+        val use: String?,
         val isSelected: Boolean = false
     )
 }

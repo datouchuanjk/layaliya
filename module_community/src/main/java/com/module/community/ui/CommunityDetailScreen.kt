@@ -18,9 +18,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
@@ -32,6 +36,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.helper.develop.nav.LocalNavController
 import com.helper.develop.nav.navigateForResult
+import com.helper.develop.nav.setResult
+import com.helper.develop.util.toJson
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.*
 import com.module.basic.ui.paging.AppPagingRefresh
@@ -49,45 +55,62 @@ fun NavGraphBuilder.communityDetailScreen() = composable(route = AppRoutes.Commu
 @Composable
 internal fun CommunityDetailScreen(viewModel: CommunityDetailViewModel = apiHandlerViewModel()) {
     val focusManager = LocalFocusManager.current
+    val hostController = LocalNavController.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.dataChangeFlow.collect {
+            hostController.setResult(it)
+        }
+    }
     Scaffold(modifier = Modifier.pointerInput(Unit) {
         detectTapGestures(onPress = {
             focusManager.clearFocus()
         })
     }, containerColor = Color.White, topBar = {
         AppTitleBar(
-            text ="Detail"
+            text = "Detail",
+            onBack = {
+
+                it?.onBackPressedDispatcher?.onBackPressed()
+            }
         )
     }) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(it)
-            ) {
-                val item = viewModel.data
-                val (icon, name, userinfo, add, content, images, action, line) = createRefs()
-                val localNav = LocalNavController.current
-                AppImage(
-                    model = item?.avatar, modifier = Modifier
-                        .constrainAs(icon) {
-                            top.linkTo(parent.top, 12.dp)
-                            start.linkTo(parent.start, 15.dp)
-                            width = Dimension.value(48.dp)
-                            height = Dimension.value(48.dp)
-                        }
-                        .clip(CircleShape)) {
-                    localNav.navigate(
-                        AppRoutes.PersonCenter.dynamic("uid" to item?.uid.toString())
-                    )
-                }
-                Text(
-                    text = item?.nickname.orEmpty(),
-                    fontSize = 20.sp,
-                    color = Color(0xff333333),
-                    modifier = Modifier.constrainAs(name) {
-                        top.linkTo(icon.top)
-                        start.linkTo(icon.end, 12.dp)
-                    })
+        Box {
+            val request = remember {
+                FocusRequester()
+            }
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 60.dp)) {
+                ConstraintLayout(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(it)
+                ) {
+                    val item = viewModel.data
+                    val (icon, name, userinfo, add, content, images, action, line) = createRefs()
+                    val localNav = LocalNavController.current
+                    AppImage(
+                        model = item?.avatar, modifier = Modifier
+                            .constrainAs(icon) {
+                                top.linkTo(parent.top, 12.dp)
+                                start.linkTo(parent.start, 15.dp)
+                                width = Dimension.value(48.dp)
+                                height = Dimension.value(48.dp)
+                            }
+                            .clip(CircleShape)) {
+                        localNav.navigate(
+                            AppRoutes.PersonCenter.dynamic("uid" to item?.uid.toString())
+                        )
+                    }
+                    Text(
+                        text = item?.nickname.orEmpty(),
+                        fontSize = 20.sp,
+                        color = Color(0xff333333),
+                        modifier = Modifier.constrainAs(name) {
+                            top.linkTo(icon.top)
+                            start.linkTo(icon.end, 12.dp)
+                        })
 //                        Text(
 //                            text = "...",
 //                            modifier = Modifier
@@ -99,97 +122,107 @@ internal fun CommunityDetailScreen(viewModel: CommunityDetailViewModel = apiHand
 //                            fontSize = 14.sp
 //                        )
 
-                if (item?.isFollow != 1) {
+                    if (item?.isFollow != 1) {
+                        Box(
+                            modifier = Modifier
+                                .constrainAs(add) {
+                                    top.linkTo(icon.top)
+                                    end.linkTo(parent.end, 12.dp)
+                                }
+                                .width(32.dp)
+                                .height(24.dp)
+                                .appBrushBackground(
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                                .onClick {
+                                    viewModel.follow()
+                                }
+                                .wrapContentSize()
+                        ) {
+                            AppImage(
+                                if (item?.isFollow == 1) R.drawable.community_ic_unfollow else R.drawable.community_ic_follow
+                            )
+                        }
+                    }
+                    Text(
+                        text = item?.content.orEmpty(),
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                        modifier = Modifier.constrainAs(content) {
+                            top.linkTo(name.bottom, 3.dp)
+                            start.linkTo(name.start)
+                        })
+                    Row(modifier = Modifier.constrainAs(images) {
+                        top.linkTo(content.bottom, 12.dp)
+                        start.linkTo(content.start)
+                        end.linkTo(parent.end, 15.dp)
+                        width = Dimension.fillToConstraints
+                    }, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        item?.images?.take(3)?.forEachIndexed { index, image ->
+                            AppImage(
+                                model = image, modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(image?.aspectRatio ?: 1f)
+                                    .clip(
+                                        RoundedCornerShape(20.dp)
+                                    )
+                            ) {
+                                localNav.navigate(
+                                    AppRoutes.BigImage.dynamic(
+                                        "index" to index,
+                                        "images" to item.images.take(3).joinToString(",")
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .constrainAs(action) {
+                                top.linkTo(images.bottom, 24.dp)
+                                end.linkTo(images.end)
+                                width = Dimension.wrapContent
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        AppIcon(
+                            tint = if (item?.imPraise == 1) Color.Red else null,
+                            res = R.drawable.community_ic_like,
+                        ) {
+                            viewModel.like()
+                        }
+                        SpacerWidth(4.dp)
+                        Text(
+                            text = item?.praiseNum.toString(),
+                            fontSize = 16.sp,
+                            color = Color(0xff333333)
+                        )
+                        SpacerWidth(24.dp)
+                        AppIcon(res = R.drawable.community_ic_comment)
+                        SpacerWidth(4.dp)
+                        Text(
+                            text = item?.commentNum.toString(),
+                            fontSize = 16.sp,
+                            color = Color(0xff333333)
+                        )
+                    }
                     Box(
                         modifier = Modifier
-                            .constrainAs(add) {
-                                top.linkTo(icon.top)
-                                end.linkTo(parent.end, 12.dp)
+                            .constrainAs(line) {
+                                top.linkTo(action.bottom, 12.dp)
+                                start.linkTo(images.start)
+                                end.linkTo(images.end)
+                                height = Dimension.value(1.dp)
+                                width = Dimension.fillToConstraints
                             }
-                            .width(32.dp)
-                            .height(24.dp)
-                            .appBrushBackground(
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .onClick {
-                                viewModel.follow()
-                            }
-                            .wrapContentSize()
-                    ) {
-                        AppImage(
-                            if (item?.isFollow == 1) R.drawable.community_ic_unfollow else R.drawable.community_ic_follow
-                        )
-                    }
+                            .background(color = Color(0xffe6e6e6)))
                 }
-                Text(
-                    text = item?.content.orEmpty(),
-                    fontSize = 20.sp,
-                    color = Color.Black,
-                    modifier = Modifier.constrainAs(content) {
-                        top.linkTo(name.bottom, 3.dp)
-                        start.linkTo(name.start)
-                    })
-                Row(modifier = Modifier.constrainAs(images) {
-                    top.linkTo(content.bottom, 12.dp)
-                    start.linkTo(content.start)
-                    end.linkTo(parent.end, 15.dp)
-                    width = Dimension.fillToConstraints
-                }, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    item?.images?.take(3)?.forEach { image ->
-                        AppImage(
-                            model = image, modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(image?.aspectRatio ?: 1f)
-                                .clip(
-                                    RoundedCornerShape(20.dp)
-                                )
-                        )
-                    }
+
+                Comment(viewModel.data?.id.toString(), request) {
+                    viewModel.refreshCommentCount()
                 }
-                Row(
-                    modifier = Modifier
-                        .constrainAs(action) {
-                            top.linkTo(images.bottom, 24.dp)
-                            end.linkTo(images.end)
-                            width = Dimension.wrapContent
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    AppIcon(
-                        tint = if (item?.imPraise == 1) Color.Red else null,
-                        res = R.drawable.community_ic_like,
-                    ) {
-                        viewModel.like()
-                    }
-                    SpacerWidth(4.dp)
-                    Text(
-                        text = item?.praiseNum.toString(),
-                        fontSize = 16.sp,
-                        color = Color(0xff333333)
-                    )
-                    SpacerWidth(24.dp)
-                    AppIcon(res = R.drawable.community_ic_comment)
-                    SpacerWidth(4.dp)
-                    Text(
-                        text = item?.commentNum.toString(),
-                        fontSize = 16.sp,
-                        color = Color(0xff333333)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .constrainAs(line) {
-                            top.linkTo(action.bottom, 12.dp)
-                            start.linkTo(images.start)
-                            end.linkTo(images.end)
-                            height = Dimension.value(1.dp)
-                            width = Dimension.fillToConstraints
-                        }
-                        .background(color = Color(0xffe6e6e6)))
             }
-            Comment(viewModel.data?.id.toString()) {
-                viewModel.refreshCommentCount()
-            }
+            Send(request)
         }
     }
 }

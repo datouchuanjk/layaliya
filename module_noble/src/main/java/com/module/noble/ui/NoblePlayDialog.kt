@@ -104,7 +104,7 @@ private fun Top(jsonObject: JSONObject) {
                 .wrapContentSize()
         ) {
             Text(
-                String.format(content, nickname,levelName),
+                content.replaceFirst("*",nickname).replaceFirst("*",levelName),
                 color = textColor,
                 fontSize = 10.sp
             )

@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.helper.develop.paging.PagingData
 import com.helper.develop.util.fromJson
+import com.helper.develop.util.getIntOrNull
+import com.helper.develop.util.getStringOrNull
 import com.helper.im.data.IMChatroomMessage
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
@@ -118,18 +120,14 @@ private fun CurrentMessage(item: IMChatroomMessage) {
 
         1037 -> {
             val jsonObject = JSONObject(body.data)
-            val sendUid = jsonObject.getString("sendUid").orEmpty()
-            val sendName = jsonObject.getString("sendName").orEmpty()
-            val sendAvatar = jsonObject.getString("sendAvatar").orEmpty()
-            val receiveUid = jsonObject.getString("receiveUid").orEmpty()
-            val receiveName = jsonObject.getString("receiveName").orEmpty()
-            val receiveAvatar = jsonObject.getString("receiveAvatar").orEmpty()
-            val giftName = jsonObject.getString("giftName").orEmpty()
-            val giftCount = jsonObject.getInt("giftCount")
+            val sendName = jsonObject.getStringOrNull("sendName").orEmpty()
+            val receiveName = jsonObject.getStringOrNull("receiveName").orEmpty()
+            val giftName = jsonObject.getStringOrNull("giftName").orEmpty()
+            val giftCount = jsonObject.getIntOrNull("giftCount")?:0
             Text(
-                text = "${sendName} send ${receiveName} ${giftName}x${giftCount}",
+                text = "$sendName send $receiveName ${giftName} x ${giftCount}",
                 fontSize = 12.sp,
-                color = Color.White
+                color = Color.White,
             )
         }
     }

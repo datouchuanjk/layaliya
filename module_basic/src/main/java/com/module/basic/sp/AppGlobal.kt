@@ -1,6 +1,5 @@
 package com.module.basic.sp
 
-import android.annotation.*
 import android.content.*
 import android.provider.*
 import android.util.*
@@ -15,6 +14,8 @@ import com.module.basic.api.data.response.*
 import com.module.basic.api.service.*
 import com.module.basic.ui.base.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.io.*
 import java.util.*
 
@@ -227,18 +228,34 @@ object AppGlobal {
         }
     }
 
+    private val _exitFlow = MutableSharedFlow<Unit>()
+    val exitFlow = _exitFlow.asSharedFlow()
+    fun exit(){
+        ProcessLifecycleOwner.get().lifecycleScope.launch {
+        _exitFlow.emit(Unit)
+    }
+    }
+    private var errorCount = 0
     fun hearBeat(api: BasicApiService) {
         ProcessLifecycleOwner.get().lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                while (true) {
+            launch {
+                withContext(Dispatchers.IO) {
                     try {
                         api.hearBeat()
+                        errorCount = 0
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        errorCount++
+                        if (errorCount >= 5) {
+                            errorCount = 0
+                            _exitFlow.emit(Unit)
+                        }
                     }
-                    delay(30 * 1000)
                 }
             }
+            delay(30 * 1000)
+            hearBeat(api)
         }
+
     }
 }

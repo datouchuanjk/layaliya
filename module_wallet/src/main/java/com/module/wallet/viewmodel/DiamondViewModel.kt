@@ -30,7 +30,7 @@ class DiamondViewModel(
 ) : BaseViewModel() {
 
 
-    val fromGame = savedStateHandle.get<Boolean>("fromGame")
+    val fromGame = savedStateHandle.get<Boolean>("fromGame")?:false
     val userInfo get() = AppGlobal.userResponse
     private var _payHelper: PayHelper? = null
     fun selected(response: DiamondListResponse) {
@@ -76,7 +76,7 @@ class DiamondViewModel(
         }
     }
 
-    private val _buySuccessful = MutableSharedFlow<Unit>()
+    private val _buySuccessful = MutableSharedFlow<Boolean>()
      val buySuccessful = _buySuccessful.asSharedFlow()
     private fun verify(orderNum: String, purchaseToken: String) {
         viewModelScope.launch {
@@ -105,7 +105,7 @@ class DiamondViewModel(
                     "出现toast 购买成功"
                 )
                 application.toast(R.string.wallet_buy_successful)
-                _buySuccessful.emit(Unit)
+                _buySuccessful.emit(fromGame)
                 Log.e(
                     "PayHelper",
                     "异步调用消费接口，可能报错 但是不影响 token=${purchaseToken} "

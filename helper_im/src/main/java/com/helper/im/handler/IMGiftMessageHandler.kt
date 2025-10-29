@@ -25,7 +25,7 @@ class IMGiftMessageHandler internal constructor(
     scope: CoroutineScope,
 ) : Handler<V2NIMMessageService>(scope), V2NIMMessageListener {
 
-    private val _receiveMessagesFlow = MutableSharedFlow<String>()
+    private val _receiveMessagesFlow = MutableSharedFlow< Pair<Boolean, String>>()
     val receiveMessagesFlow = _receiveMessagesFlow.asSharedFlow()
     override fun onReceiveMessages(messages: MutableList<V2NIMMessage>?) {
         messages ?: return
@@ -56,7 +56,7 @@ class IMGiftMessageHandler internal constructor(
             val imMessage = message.transform()
             val body = imMessage.body
             if (body is IMGiftBody) {
-                _receiveMessagesFlow.emit(body.string)
+                _receiveMessagesFlow.emit(imMessage.isSelf to body.string)
             }
         }
     }

@@ -1,11 +1,10 @@
 package com.module.game.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.SharedPreferences
 import android.util.Log
 import android.view.*
 import android.webkit.*
-import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
@@ -30,6 +29,7 @@ fun NavGraphBuilder.gameScreen() = composable(
     GameScreen()
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
     val localNav = LocalNavController.current
@@ -69,19 +69,20 @@ internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
                     JS(
                         webView = this,
                         context = it as Activity,
-                        withChildScreen = viewModel.withChildScreen,
                         localNav = localNav,
                         localBack = localBack
                     ), "LingxianAndroid"
                 )
-                val gameUrl = "https://www.doubao.com/chat/"
+                val gameUrl = viewModel.url
                 val newGameUrl = gameUrl.toUri().buildUpon()
                     .appendQueryParameter("uid", AppGlobal.userResponse?.id.toString())
                     .appendQueryParameter("token", viewModel.token)
                     .appendQueryParameter("lang", "en-US")
                     .appendQueryParameter("roomId", viewModel.roomId ?: "0")
                     .build().toString()
-                loadUrl(newGameUrl)
+                loadUrl(newGameUrl.apply {
+                    Log.e("1234","游戏地址是${this}")
+                })
             }
         }
     )
@@ -91,7 +92,6 @@ internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
 class JS(
     val webView: WebView,
     val context: Activity,
-    val withChildScreen: Boolean,
     val localNav: NavHostController,
     val localBack: OnBackPressedDispatcherOwner?
 ) {
@@ -101,17 +101,10 @@ class JS(
      */
     @JavascriptInterface
     fun closeGame() {
-        Log.e("Game", "closeGame被调用")
         context.runOnUiThread {
             if (webView.canGoBack()) {
-                Log.e("Game", "有上一级界面，回到上级")
                 webView.goBack()
             } else {
-                if (withChildScreen) {
-                    Log.e("Game", "没有上级界面，关闭界面，但是当前页面是子界面，直接return")
-                    return@runOnUiThread
-                }
-                Log.e("Game", "没有上级界面，关闭界面S")
                 localBack?.onBackPressedDispatcher?.onBackPressed()
             }
         }

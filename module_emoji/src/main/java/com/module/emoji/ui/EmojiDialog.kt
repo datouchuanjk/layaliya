@@ -82,25 +82,10 @@ internal fun EmojiDialog(viewModel: EmojiViewModel = apiHandlerViewModel()) {
                         shape = RoundedCornerShape(topEnd = 20.dp, topStart = 20.dp)
                     )
             ) {
-                AppTabRow(
-                    modifier = Modifier
-                        .padding(horizontal = 15.dp)
-                        .padding(top = 12.dp),
-                    tabs = stringArrayResource(R.array.emoji_tab),
-                    unselectedTextStyle = TextStyle(
-                        color = Color(0xff999999),
-                        fontSize = 20.sp
-                    ),
-                    selectedTextStyle = TextStyle(
-                        color = Color.White,
-                        fontSize = 20.sp
-                    ),
-                    selectedIndex = viewModel.index,
-                    onIndexChanged = viewModel::index
-                )
-                SpacerHeight(24.dp)
+
                 val state = rememberLazyGridState()
                 LazyVerticalGrid(
+                    contentPadding = PaddingValues(vertical = 15.dp),
                     state = state,
                     modifier = Modifier
                         .fillMaxWidth()

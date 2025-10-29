@@ -30,11 +30,12 @@ class PagingData<T> internal constructor(
         return list[index]
     }
 
+    fun  isEmpty() = list.isEmpty()
     fun peek(index: Int): T {
         return list[index]
     }
 
-    fun filter(predicate: (T) -> Boolean): PagingData<T> {
+    fun filterToPagingData(predicate: (T) -> Boolean): PagingData<T> {
         return PagingData(
             list = list.filter(predicate).toMutableList(),
             onRefresh = onRefresh,
@@ -59,5 +60,8 @@ class PagingData<T> internal constructor(
 
     fun find(predicate: (T) -> Boolean): T? {
         return list.find(predicate)
+    }
+    fun filter(predicate: (T) -> Boolean): List<T> {
+        return list.filter (predicate)
     }
 }

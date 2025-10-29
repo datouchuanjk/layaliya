@@ -42,25 +42,39 @@ internal fun GiftPlayDialog() {
     val localBack = LocalOnBackPressedDispatcherOwner.current
     val localNav = LocalNavController.current
     val json = localNav.currentBackStackEntry!!.savedStateHandle.get<String>("json").orEmpty()
+    val isShowSvg =
+        localNav.currentBackStackEntry!!.savedStateHandle.get<Boolean>("isShowSvg") ?: true
     val jsonObject = JSONObject(json)
     val giftId = jsonObject.getString("giftId").orEmpty()
     val svgFile = AppGlobal.getGiftSvgFileById(giftId)
+    val floatingScreenId = jsonObject.getIntOrNull("floatingScreenId")
+
     Box(modifier = Modifier.fillMaxSize()) {
         if (!svgFile.exists() || svgFile.length() <= 0L) {
-            UpdateDialogWindow {
-                it.dimAmount =0f
-            }
-            LaunchedEffect(Unit) {
-                delay(3000)
-                localBack?.onBackPressedDispatcher?.onBackPressed()
+            if (floatingScreenId == 0) {
+                LaunchedEffect(Unit) {
+                    localBack?.onBackPressedDispatcher?.onBackPressed()
+                }
+            } else {
+                LaunchedEffect(Unit) {
+                    delay(3000)
+                    localBack?.onBackPressedDispatcher?.onBackPressed()
+                }
             }
         } else {
-            AppSVGA(
-                loops = 1,
-                modifier = Modifier.fillMaxSize(),
-                file = svgFile,
-            ) {
-                localBack?.onBackPressedDispatcher?.onBackPressed()
+            if (isShowSvg) {
+                AppSVGA(
+                    loops = 1,
+                    modifier = Modifier.fillMaxSize(),
+                    file = svgFile,
+                ) {
+                    localBack?.onBackPressedDispatcher?.onBackPressed()
+                }
+            } else {
+                LaunchedEffect(Unit) {
+                    delay(3000)
+                    localBack?.onBackPressedDispatcher?.onBackPressed()
+                }
             }
         }
         Top(jsonObject)

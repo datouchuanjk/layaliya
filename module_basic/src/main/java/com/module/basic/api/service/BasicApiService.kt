@@ -1,6 +1,7 @@
 package com.module.basic.api.service
 
 import com.module.basic.api.data.request.BaseRequest
+import com.module.basic.api.data.request.TokenRequest
 import com.module.basic.api.data.request.UidRequest
 import com.module.basic.api.data.response.BaseResponse
 import com.module.basic.api.data.response.ConfigResponse
@@ -44,4 +45,9 @@ interface BasicApiService {
      */
     @POST("search/user")
     suspend fun searchUser(@Body request: UidRequest): BaseResponse<SearchUserResponse>
+    @POST("login/auto-login")
+    suspend fun autoLogin(@Body request: TokenRequest): BaseResponse<Unit>
+
+
+
 }

@@ -12,20 +12,18 @@ import com.module.game.api.service.GameApiService
 import kotlinx.coroutines.launch
 
 
-internal class GameViewModel(
+internal class GameListViewModel(
     private val api: GameApiService,
     saveHandler: SavedStateHandle,
-    share: SharedPreferences,
 ) : BaseViewModel() {
 
     val roomId = saveHandler.get<String?>("roomId")
 
     //是否作为子界面嵌套 如果是 那么不能退出界面
-    val token = share.getToken()
+    val withChildScreen = saveHandler.get<Boolean>("withChildScreen") ?: false
 
-    val url = saveHandler.get<String>("url").orEmpty()
+    val pagingData = buildOffsetPaging(viewModelScope) {
+        api.getGameList().checkAndGet()?.list
+    }.pagingData
 
-    val agentId = saveHandler.get<String>("agentId").orEmpty()
-
-    val type = saveHandler.get<String>("type").orEmpty()
 }

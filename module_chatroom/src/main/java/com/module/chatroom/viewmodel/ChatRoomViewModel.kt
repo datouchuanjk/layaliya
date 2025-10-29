@@ -66,6 +66,15 @@ internal class ChatRoomViewModel(
         }
     }
 
+
+    init {
+        viewModelScope.launch {
+            AppGlobal.exitFlow.collect {
+                exitRoom()
+            }
+        }
+    }
+
     /**
      * 房间id
      */
@@ -133,7 +142,10 @@ internal class ChatRoomViewModel(
         }
     }
 
-
+    /**
+     * 调整礼物的
+     */
+    val realMikeInfo get() =  _chatroomInfoResponse?.mikeInfo?.filter { it?.uid!=null&& it.uid !=0&&it.uid!= AppGlobal.userResponse?.id }
     /**
      *  获取房间信息
      */
@@ -156,7 +168,7 @@ internal class ChatRoomViewModel(
 
     val receiveGiftFlow = chatroomHandler.receiveGiftFlow
 
-  private  var _isRefreshing by mutableStateOf(false)
+    private var _isRefreshing by mutableStateOf(false)
     val isRoomRefreshing get() = _isRefreshing
     fun initRoom(isRefresh: Boolean = false) {
         viewModelScope.launch {
@@ -180,6 +192,7 @@ internal class ChatRoomViewModel(
                 val currentTimeMillis = System.currentTimeMillis()
                 if (currentTimeMillis - lastJoinTimeMillis > 5 * 60 * 1000) {
                     chatroomHandler.sendJoinCurrentMessage(
+                        AppGlobal.userResponse?.imAccount,
                         _chatroomInfoResponse?.notice?.toJson().orEmpty()
                     )
                     sp.edit {

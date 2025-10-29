@@ -1,6 +1,6 @@
 package com.module.chat.ui
 
-import android.util.*
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,8 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -32,25 +29,22 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.helper.develop.nav.*
-import com.helper.develop.util.CustomActivityResultContracts
-import com.helper.develop.util.copyAsFile
-import com.helper.develop.util.launchImageOnly
+import com.helper.develop.util.buildJsonArray
+import com.helper.develop.util.toJson
 import com.helper.im.data.IMGiftBody
 import com.helper.im.data.IMImageBody
 import com.helper.im.data.IMInvitationBody
 import com.helper.im.data.IMTextBody
 import com.helper.im.data.IMUnknownBody
-import com.module.basic.constant.AppConstant.AUTHORITY
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppBottomPickVisualSelected
 import com.module.basic.ui.AppImage
@@ -63,9 +57,12 @@ import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.basic.util.onClick
 import com.module.chat.R
 import com.module.chat.viewmodel.ChatViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.File
 
 
@@ -101,9 +98,19 @@ internal fun ChatScreen(viewModel: ChatViewModel = apiHandlerViewModel()) {
             ChatAction(
                 viewModel = viewModel,
                 onGift = {
+                    val jsonObject = JSONObject()
+                    val userInfo = buildJsonArray { ja ->
+                        ja.put(JSONObject().apply {
+                            put("uid", userInfo?.uid.toString())
+                            put("nickname", userInfo?.name.toString())
+                            put("avatar", userInfo?.avatar.toString())
+                        })
+                    }
+                    jsonObject.put("roomId", "0")
+                    jsonObject.put("userInfo", userInfo)
                     localNav.navigate(
                         AppRoutes.Gift.dynamic(
-                            "yxIds" to listOf(viewModel.targetId).joinToString(","),
+                            "json" to jsonObject.toString(),
                         )
                     )
                 },
@@ -125,22 +132,22 @@ private fun ColumnScope.ChatList(
             mutableStateOf(false)
         }
         val scope = rememberCoroutineScope()
-        LaunchedEffect(viewModel) {
-            viewModel.receiveMessagesFlow.collect {
-                if (it) {
-                    withFrameMillis {}
-                    viewModel.lazyState.animateScrollToItem(0)
-                } else {
-                    isShowScrollToBottomButton = true
-                }
-            }
-        }
-
         LaunchedEffect(viewModel.lazyState) {
-            snapshotFlow { viewModel.lazyState.firstVisibleItemIndex }
-                .filter { it == 0 }
-                .collectLatest {
-                    isShowScrollToBottomButton = false
+            snapshotFlow { viewModel.lazyState.layoutInfo.totalItemsCount }
+                .filter {
+                    it>0 &&!viewModel.pagingData.isEmpty()
+                }
+                .distinctUntilChanged()
+                .collect {
+                    Log.e("1234","我的长度变化了哦")
+                    withFrameMillis {  }
+                    val iMMessage = viewModel.pagingData.peek(0)
+                    Log.e("1234","消息内容是 ${iMMessage.text} isSelf=${iMMessage.isSelf}")
+                    if (iMMessage.isSelf) {
+                        viewModel.lazyState.animateScrollToItem(0)
+                    } else if(viewModel.lazyState.canScrollBackward){
+                        isShowScrollToBottomButton =true
+                    }
                 }
         }
         val focusManager = LocalFocusManager.current
@@ -165,13 +172,19 @@ private fun ColumnScope.ChatList(
                 notLoadingContent = null
             ) { _, item ->
                 viewModel.sendP2PMessageReceipt(item)
-                when (val body = item.body) {
+                when (item.body) {
                     is IMTextBody -> {
                         TextMessageItem(item)
                     }
 
                     is IMImageBody -> {
-                        ImageMessageItem(item)
+                        ImageMessageItem(item) {
+                            pagingDate.filter { it.body is IMImageBody }
+                                .map { it.body as IMImageBody }
+                                .mapNotNull { it.url }
+                                .asReversed()
+
+                        }
                     }
 
                     is IMGiftBody -> {
@@ -247,6 +260,10 @@ private fun ChatAction(
                         .padding(horizontal = 20.dp),
                     value = viewModel.input,
                     onValueChange = viewModel::input,
+                    textStyle = TextStyle(
+                        fontSize = 12.sp,
+                        color = Color(0xff333333)
+                    ),
                     decorationBox = {
                         if (viewModel.input.isEmpty()) {
                             Text(

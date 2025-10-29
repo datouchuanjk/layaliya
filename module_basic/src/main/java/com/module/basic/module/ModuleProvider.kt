@@ -23,6 +23,7 @@ val basicModule = module {
     single {
         Retrofit.Builder()
             .baseUrl("https://api.layaliya.com/api/")
+//            .baseUrl("http://192.168.2.18:8787/api/")
             .client(
                 OkHttpClient.Builder()
                     .addInterceptor(LogInterceptor(get<SharedPreferences>()))

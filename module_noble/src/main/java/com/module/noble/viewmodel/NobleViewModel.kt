@@ -26,11 +26,12 @@ internal class NobleViewModel(
 
     val nobleLevel get() = AppGlobal.userResponse?.nobleLevel ?: 0
 
+
     /**
      * 当前选中的
      */
     private var _selectedIndex by mutableIntStateOf(if (nobleLevel > 0) nobleLevel - 1 else 0)
-
+    val  selectedIndex get()= _selectedIndex
     val nobleExpireTime by mutableStateOf(
         if (nobleLevel> 0) AppGlobal.userResponse?.nobleExpireTime else null
     )

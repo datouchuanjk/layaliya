@@ -93,3 +93,12 @@ fun JSONObject.getJSONArrayOrNull(key: String): JSONArray? {
         null
     }
 }
+
+fun buildJsonObject(block: (JSONObject) -> Unit):JSONObject  {
+    return JSONObject().apply(block)
+}
+
+fun buildJsonArray(block: (JSONArray) -> Unit):JSONArray {
+    return JSONArray().apply(block)
+}
+

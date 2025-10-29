@@ -30,6 +30,7 @@ import com.helper.develop.nav.navigateAndPopAll
 import com.helper.develop.util.toast
 import com.helper.develop.util.versionName
 import com.module.basic.route.AppRoutes
+import com.module.basic.sp.AppGlobal
 import com.module.basic.sp.clearToken
 import com.module.basic.ui.AppMoreIcon
 import com.module.basic.ui.SpacerHeight
@@ -113,11 +114,8 @@ internal fun SettingScreen(viewModel: SettingViewModel = apiHandlerViewModel()) 
                 }
             }
             SpacerHeight(12.dp)
-            val localNav = LocalNavController.current
-            val sp = get<SharedPreferences>()
             LoginOut {
-                sp.clearToken()
-                localNav.navigateAndPopAll(AppRoutes.Login.static)
+                AppGlobal.exit()
             }
             SpacerHeight(12.dp)
         }

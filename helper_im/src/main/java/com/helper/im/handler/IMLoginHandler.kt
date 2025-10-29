@@ -1,6 +1,5 @@
 package com.helper.im.handler
 
-import com.helper.im.IMHelper
 import com.helper.im.util.logIM
 import com.helper.im.transform
 import com.netease.nimlib.sdk.v2.V2NIMError
@@ -15,11 +14,15 @@ import com.netease.nimlib.sdk.v2.auth.enums.V2NIMLoginStatus
 import com.netease.nimlib.sdk.v2.auth.model.V2NIMKickedOfflineDetail
 import com.netease.nimlib.sdk.v2.auth.model.V2NIMLoginClient
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class IMLoginHandler internal constructor(scope: CoroutineScope) : Handler<V2NIMLoginService>(scope), V2NIMLoginListener,
+class IMLoginHandler internal constructor(scope: CoroutineScope) :
+    Handler<V2NIMLoginService>(scope), V2NIMLoginListener,
     V2NIMLoginDetailListener {
 
     override fun onLoginStatus(status: V2NIMLoginStatus?) {
@@ -30,8 +33,13 @@ class IMLoginHandler internal constructor(scope: CoroutineScope) : Handler<V2NIM
         logIM("onLoginFailed error->${error}")
     }
 
+    private val _onKickedOffline = MutableSharedFlow<Unit>()
+    val  onKickedOffline = _onKickedOffline.asSharedFlow()
     override fun onKickedOffline(detail: V2NIMKickedOfflineDetail?) {
         logIM("onKickedOffline detail->${detail}")
+    launch {
+        _onKickedOffline.emit(Unit)
+    }
     }
 
     override fun onLoginClientChanged(
@@ -88,6 +96,14 @@ class IMLoginHandler internal constructor(scope: CoroutineScope) : Handler<V2NIM
                     continuation.resumeWithException(it.transform())
                 }
             )
+        }
+    }
+
+    fun logout() {
+        try {
+            service.logout({}, {})
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

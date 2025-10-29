@@ -164,6 +164,7 @@ private fun Item(
                         model = item.cover,
                         modifier = Modifier
                             .size(60.dp)
+                            .clip(RoundedCornerShape(8.dp))
                             .constrainAs(image) {
                                 start.linkTo(parent.start)
                                 top.linkTo(parent.top)

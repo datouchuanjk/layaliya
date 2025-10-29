@@ -5,7 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.helper.im.IMHelper
+import com.module.basic.api.data.request.TokenRequest
 import com.module.basic.api.service.BasicApiService
 import com.module.basic.sp.AppGlobal
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -27,9 +30,10 @@ abstract class BaseViewModel : ViewModel() {
     private var _loading by mutableStateOf(false)
     internal val loading get() = _loading
 
-    protected fun  handleLoading(isLoading:Boolean){
-        _loading  = isLoading
+    protected fun handleLoading(isLoading: Boolean) {
+        _loading = isLoading
     }
+
     fun <T> apiRequest(
         request: suspend () -> T,
     ) = flow {
@@ -55,6 +59,7 @@ abstract class BaseViewModel : ViewModel() {
             }
         }.catch {
             catch?.invoke(this, it) {
+                Log.e("1234","错误日志;${it.message}")
                 _errorFlow.emit(it)
             }
         }
@@ -62,20 +67,23 @@ abstract class BaseViewModel : ViewModel() {
 
 
     suspend fun check(basicApi: BasicApiService, mustIsComplete: Boolean = false): Boolean {
-        Log.e("1234","check1")
+        Log.e("1234", "check1")
         val userResponse = basicApi.user().checkAndGet()?.apply {
             AppGlobal.userResponse(this)
         } ?: throw NullPointerException("userinfo is null")
-        Log.e("1234","check2")
+        Log.e("1234", "check2")
         basicApi.config().checkAndGet()?.apply {
             AppGlobal.configResponse(this)
         } ?: throw NullPointerException("config is null")
-        Log.e("1234","check3")
+        Log.e("1234", "check3")
         AppGlobal.hearBeat(basicApi)
         AppGlobal.preloadGift()
         AppGlobal.preloadEmoji()
         val isComplete = userResponse.isComplete == "1"
-        Log.e("1234","isComplete=${isComplete} imAccount=${ userResponse.imAccount} imToken=${ userResponse.imToken}")
+        Log.e(
+            "1234",
+            "isComplete=${isComplete} imAccount=${userResponse.imAccount} imToken=${userResponse.imToken}"
+        )
         if (isComplete) {
             val imAccount = userResponse.imAccount ?: throw NullPointerException("account is null")
             val imToken = userResponse.imToken ?: throw NullPointerException("token is null")
@@ -88,5 +96,7 @@ abstract class BaseViewModel : ViewModel() {
             return false
         }
     }
+
+
 }
 

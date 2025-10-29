@@ -66,8 +66,17 @@ object AppRoutes {
             defaultValue = ""
         }.build()
 
-    val CommunityDetail= NavRouter.Builder("CommunityDetail")
+    val CommunityDetail = NavRouter.Builder("CommunityDetail")
         .argument("data") {
+            type = NavType.StringType
+            defaultValue = ""
+        }.build()
+    val BigImage = NavRouter.Builder("BigImage")
+        .argument("index") {
+            type = NavType.IntType
+            defaultValue = 0
+        }
+        .argument("images") {
             type = NavType.StringType
             defaultValue = ""
         }.build()
@@ -76,7 +85,9 @@ object AppRoutes {
     val Bag = NavRouter.Builder("Bag").build()
     val CharmLevel = NavRouter.Builder("CharmLevel").build()
     val WealthLevel = NavRouter.Builder("WealthLevel").build()
-    val Noble = NavRouter.Builder("Noble").build()
+    val Noble = NavRouter.Builder("Noble")
+        .build()
+    val Explain = NavRouter.Builder("Explain").build()
     val NobleHistory = NavRouter.Builder("NobleHistory")
         .argument("name") {
             type = NavType.StringType
@@ -107,10 +118,28 @@ object AppRoutes {
         .build()
     val Admin = NavRouter.Builder("Admin").build()
     val BD = NavRouter.Builder("BD").build()
-    val Game = NavRouter.Builder("Game")
+    val GameList = NavRouter.Builder("GameList")
         .argument("withChildScreen") {
             type = NavType.BoolType
             defaultValue = true
+        }
+        .argument("roomId") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .build()
+    val Game = NavRouter.Builder("Game")
+        .argument("url") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .argument("type") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .argument("agentId") {
+            type = NavType.StringType
+            nullable = true
         }
         .argument("roomId") {
             type = NavType.StringType
@@ -133,14 +162,9 @@ object AppRoutes {
         }
         .build()
     val Gift = NavRouter.Builder("Gift")
-        .argument("roomId") {
+        .argument("json") {
             type = NavType.StringType
-            defaultValue = "0"
-        }
-        .argument("yxIds") {
-            type = NavType.StringType
-            nullable = true
-            defaultValue = null
+            defaultValue = ""
         }
         .build()
 
@@ -149,6 +173,10 @@ object AppRoutes {
             type = NavType.StringType
             defaultValue = ""
         }
+        .argument("isShowSvg") {
+            type = NavType.BoolType
+            defaultValue = true
+        }
         .build()
     val NoblePlay = NavRouter.Builder("NoblePlay")
         .argument("json") {
@@ -156,10 +184,7 @@ object AppRoutes {
             defaultValue = ""
         }
         .build()
-    val Comment = NavRouter.Builder("Comment")
-        .argument("id") {
-            type = NavType.StringType
-        }.build()
+
 
     val PersonEdit = NavRouter.Builder("PersonEdit")
         .argument("fromComplete") {

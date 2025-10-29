@@ -6,11 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.helper.develop.util.fromJson
+import com.helper.develop.util.toJson
 import com.module.basic.api.data.request.*
 import com.module.basic.viewmodel.BaseViewModel
 import com.module.community.api.data.request.CommunityLikeRequest
 import com.module.community.api.data.response.CommunityResponse
 import com.module.community.api.service.CommunityApiService
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 internal class CommunityDetailViewModel(
@@ -22,6 +25,10 @@ internal class CommunityDetailViewModel(
     var data by mutableStateOf(
         savedStateHandle.get<String>("data")?.fromJson<CommunityResponse>()
     )
+
+
+    private val _dataChangeFlow = MutableSharedFlow<String>()
+    val dataChangeFlow = _dataChangeFlow.asSharedFlow()
 
     /**
      * 点赞
@@ -49,6 +56,7 @@ internal class CommunityDetailViewModel(
                     imPraise = if (isLike) 0 else 1,
                     praiseNum = if (isLike) item.praiseNum - 1 else item.praiseNum + 1
                 )
+                _dataChangeFlow.emit(data?.toJson().orEmpty())
             }
         }
     }
@@ -67,6 +75,7 @@ internal class CommunityDetailViewModel(
                 data = data?.copy(
                     isFollow = if (isFollow) 0 else 1,
                 )
+                _dataChangeFlow.emit(data?.toJson().orEmpty())
             }
         }
     }
@@ -75,5 +84,8 @@ internal class CommunityDetailViewModel(
         data = data?.copy(
             commentNum = data?.commentNum?.plus(1) ?: 0
         )
+        viewModelScope.launch {
+            _dataChangeFlow.emit(data?.toJson().orEmpty())
+        }
     }
 }

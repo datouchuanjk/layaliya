@@ -42,7 +42,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -73,7 +72,7 @@ import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.basic.util.onClick
 import com.module.noble.viewmodel.NobleViewModel
 import com.module.noble.R
-import com.module.noble.ui.dialog.ExplainDialog
+import com.module.noble.ui.dialog.ExplainScreen
 import com.module.noble.ui.dialog.GiveToWhoDialog
 import kotlinx.coroutines.launch
 
@@ -86,7 +85,7 @@ fun NavGraphBuilder.nobleScreen() = composable(route = AppRoutes.Noble.static) {
 
 @Composable
 internal fun NobleScreen(viewModel: NobleViewModel = apiHandlerViewModel()) {
-    val bannerState = rememberPagerState {
+    val bannerState = rememberPagerState(viewModel.selectedIndex) {
         viewModel.nobleList.count()
     }
     LaunchedEffect(bannerState) {
@@ -331,15 +330,7 @@ private fun VipBanner(
     state: PagerState,
     viewModel: NobleViewModel,
 ) {
-    var isShowExplainDialog by remember {
-        mutableStateOf(false)
-    }
-    ExplainDialog(
-        isShow = isShowExplainDialog,
-        onDismissRequest = {
-            isShowExplainDialog = false
-        }
-    )
+   val localNav = LocalNavController.current
     Banner(
         modifier = Modifier
             .fillMaxWidth()
@@ -383,7 +374,7 @@ private fun VipBanner(
                         modifier = Modifier
                             .align(alignment = Alignment.BottomStart)
                             .onClick {
-                                isShowExplainDialog = true
+                                localNav.navigate(AppRoutes.Explain.static)
                             }
                             .padding(bottom = 22.dp, start = 14.dp),
                     ) {

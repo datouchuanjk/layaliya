@@ -3,6 +3,7 @@ package com.helper.im.handler
 import android.util.Log
 import com.helper.develop.paging.LoadResult
 import com.helper.develop.paging.buildPaging
+import com.helper.develop.util.getStringOrNull
 import com.helper.im.*
 import com.helper.im.data.IMChatroomMessage
 import com.helper.im.data.IMChatroomMessageBody
@@ -205,10 +206,11 @@ class IMChatroomHandler(
         }
     }
 
-    suspend fun sendJoinCurrentMessage(text: String) {
+    suspend fun sendJoinCurrentMessage(imAccount:String?,text: String) {
         val jsonObject = JSONObject().apply {
             put("code", 1003)
             put("data", JSONObject().apply {
+                put("yxId",imAccount.orEmpty() )
                 put("notice", JSONObject(text))
             })
         }
@@ -314,6 +316,8 @@ class IMChatroomHandler(
                 //有人进入
                 launch {
                     val notice = data.getString("notice")
+                    val yxId = data.getStringOrNull("yxId")
+                    IMHelper.userHandler.refreshUserInfos(yxId)
                     _userJoinFlow.emit(notice)
                     //同时也加入消息体
                     allPagingData.handle {
@@ -349,12 +353,17 @@ class IMChatroomHandler(
 
 
     override fun onChatroomStatus(status: V2NIMChatroomStatus?, error: V2NIMError?) {}
-    override fun onChatroomEntered() {}
-    override fun onChatroomExited(error: V2NIMError?) {}
+    override fun onChatroomEntered() {
+        val a ="1"
+    }
+    override fun onChatroomExited(error: V2NIMError?) {
+        val a ="1"
+    }
     override fun onChatroomMemberEnter(member: V2NIMChatroomMember?) {
         IMHelper.userHandler.refreshUserInfos(member?.accountId)
     }
-    override fun onChatroomMemberExit(accountId: String?) {}
+    override fun onChatroomMemberExit(accountId: String?) {
+    }
 
     override fun onChatroomMemberRoleUpdated(
         previousRole: V2NIMChatroomMemberRole?,

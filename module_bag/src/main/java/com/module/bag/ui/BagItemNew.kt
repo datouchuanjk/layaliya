@@ -88,7 +88,7 @@ private fun Item(item: BagResponse.Item,viewModel: BagViewModel) {
                 .appBrushBackground(shape = RoundedCornerShape(12.dp))
                 .padding(vertical = 7.dp)
                 .onClick{
-                    viewModel.use(item.id.toString())
+                    viewModel.use(item.id.toString(),item.use.orEmpty())
                 }
                 .wrapContentWidth(),
             text = stringResource(R.string.bag_use_now),

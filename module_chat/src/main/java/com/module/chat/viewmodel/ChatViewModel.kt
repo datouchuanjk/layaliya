@@ -35,9 +35,7 @@ internal class ChatViewModel(
 
     val pagingData = messageHandler.pagingData
     val lazyState = LazyListState(0, 0)
-    val receiveMessagesFlow = messageHandler.receiveMessagesFlow.map {
-        lazyState.firstVisibleItemIndex == 0
-    }
+
 
     val userInfo = messageHandler.userInfo.asStateFlow()
 

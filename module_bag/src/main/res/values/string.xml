@@ -4,4 +4,5 @@
     <string name="bag_use">Use</string>
     <string name="bag_use_now">Use Now</string>
     <string name="bag_use_successful">Use successful</string>
+    <string name="bag_already_used">You have already used this</string>
 </resources>

@@ -194,7 +194,7 @@ private fun RowScope.FansItem(count: Int, name: String, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .weight(1f)
-            .onClick {
+            .onClick() {
                 onClick()
             }, horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -295,8 +295,8 @@ private fun Content(viewModel: PersonCenterViewModel) {
                     .fillParentMaxWidth()
                     .padding(horizontal = 16.dp)
                     .padding(top = 16.dp)
-                    .onClick{
-                        localNav.navigateForResult<String>(AppRoutes.CommunityDetail.dynamic("data" to item.toJson())){
+                    .onClick {
+                        localNav.navigateForResult<String>(AppRoutes.CommunityDetail.dynamic("data" to item.toJson())) {
                             it?.fromJson<PersonDynamicResponse>()?.let { newItem ->
                                 viewModel.refresh(index, newItem)
                             }
@@ -422,12 +422,16 @@ private fun LazyItemScope.UserInfo(viewModel: PersonCenterViewModel) {
         }, verticalAlignment = Alignment.CenterVertically) {
             val localNav = LocalNavController.current
             FansItem(personResponse?.followNum ?: 0, stringResource(R.string.mine_followers)) {
-                localNav.navigate(
-                    AppRoutes.FollowersOrFans.dynamic(
-                        "type" to 0,
-                        "uid" to viewModel.uid
-                    )
-                )
+                if (viewModel.isSelf) {
+                    localNav.navigateForResult<Unit>(
+                        AppRoutes.FollowersOrFans.dynamic(
+                            "type" to 0,
+                            "uid" to viewModel.uid
+                        )
+                    ) {
+                        viewModel.getPersonInfo()
+                    }
+                }
             }
             Box(
                 modifier = Modifier
@@ -436,13 +440,15 @@ private fun LazyItemScope.UserInfo(viewModel: PersonCenterViewModel) {
                     .background(color = Color(0xffe6e6e6))
             )
             FansItem(personResponse?.fansNum ?: 0, stringResource(R.string.mine_fans)) {
-                if(viewModel.isSelf){
-                    localNav.navigate(
+                if (viewModel.isSelf) {
+                    localNav.navigateForResult<Unit>(
                         AppRoutes.FollowersOrFans.dynamic(
                             "type" to 1,
                             "uid" to viewModel.uid
                         )
-                    )
+                    ) {
+                        viewModel.getPersonInfo()
+                    }
                 }
             }
         }

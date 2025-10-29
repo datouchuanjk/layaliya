@@ -1,5 +1,7 @@
 package com.helper.develop.nav
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.*
 import androidx.savedstate.*
@@ -20,27 +22,6 @@ fun NavHostController.navigateTo(route: String) {
     }
 }
 
-fun <T> NavHostController.collectResult(block: (T?) -> Unit) {
-    val key = "POP_RESULT"
-    val lastBackStackEntry = currentBackStackEntry
-    lastBackStackEntry?.lifecycleScope?.launch {
-        currentBackStackEntryFlow.filter {
-            it == lastBackStackEntry
-        }.take(1)
-            .map {
-                it.savedStateHandle
-            }.collect {
-                try {
-                    val result = it.get<T>(key)
-                    it.remove<T>(key)
-                    block(result)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    block(null)
-                }
-            }
-    }
-}
 
 fun <T> NavHostController.navigateForResult(route: String, block: (T?) -> Unit) {
     val lastBackStackEntry = currentBackStackEntry
@@ -101,7 +82,7 @@ suspend fun NavHostController.waitPopBackStack(route: String) {
                 arguments: SavedState?
             ) {
                 if (destination.route != route) {
-                    removeOnDestinationChangedListener (this)
+                    removeOnDestinationChangedListener(this)
                     cancellable.resume(Unit)
                 }
             }
@@ -125,3 +106,28 @@ fun NavHostController.navigateAndPopAll(route: String) {
     }
 }
 
+val NavBackStackEntry.isDialog: Boolean get() = destination.navigatorName == "dialog"
+
+val NavHostController.currentRoute get() = currentBackStackEntry?.destination?.route
+
+
+val NavHostController.currentComposableRoute: String?
+    @SuppressLint("RestrictedApi")
+    get() {
+        // 遍历导航栈（通过迭代器，避免直接访问 value）
+        try {
+            for (entry in currentBackStack.value.reversed()) {
+                if (!entry.isDialog) {
+                    return entry.destination.route
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return if (currentBackStackEntry?.isDialog == true) {
+                previousBackStackEntry?.destination?.route
+            } else {
+                currentBackStackEntry?.destination?.route
+            }
+        }
+        return currentRoute
+    }

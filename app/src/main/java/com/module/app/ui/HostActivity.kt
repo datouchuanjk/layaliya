@@ -2,6 +2,7 @@ package com.module.app.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -31,6 +32,9 @@ import com.module.agent.ui.coinMerchantScreen
 import com.module.bag.ui.*
 import com.module.basic.constant.AppConstant
 import com.module.basic.route.AppRoutes
+import com.module.basic.sp.AppGlobal
+import com.module.basic.sp.clearToken
+import com.module.basic.ui.base.bigImageScreen
 import com.module.basic.ui.base.webViewScreen
 import com.module.basic.util.LocalKeyboardHeight
 import com.module.charm.ui.*
@@ -48,14 +52,15 @@ import com.module.chatroom.ui.chatroomReportDialog
 import com.module.chatroom.ui.chatroomUserListDialog
 import com.module.community.ui.communityDetailScreen
 import com.module.emoji.ui.emojiDialog
+import com.module.game.ui.gameListScreen
 import com.module.game.ui.gameScreen
 import com.module.gift.ui.*
+import com.module.noble.ui.dialog.explainScreen
 import com.module.noble.ui.noblePlayDialog
 import com.module.room.ui.roomCreateCheckDialog
 import com.module.setting.ui.*
 import com.module.store.ui.*
 import com.module.wallet.ui.walletScreen
-import com.module.wallet.util.PayHelper
 import com.module.wealth.ui.*
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.get
@@ -70,14 +75,37 @@ class HostActivity : ComponentActivity() {
         handleIntent(intent)
         enableEdgeToEdge()
         initNotification()
+        val sp = get<SharedPreferences>()
         IMHelper.initV2(application)
+        lifecycleScope.launch {
+            AppGlobal.exitFlow.collect {
+                IMHelper.loginHandler.logout()
+                sp.clearToken()
+                val localNav = _navController ?: return@collect
+                localNav.navigateAndPopAll(AppRoutes.Login.static)
+            }
+        }
+        lifecycleScope.launch {
+            IMHelper.loginHandler.onKickedOffline.collect {
+                AppGlobal.exit()
+            }
+        }
+
         lifecycleScope.launch {
             IMHelper.giftMessageHandler.receiveMessagesFlow.collect {
                 val localNav = _navController ?: return@collect
+                if (localNav.currentDestination?.route == AppRoutes.Game.static) {
+                    return@collect
+                }
+                val isShowSvg = if (it.first) {
+                    localNav.currentComposableRoute == AppRoutes.Chat.static
+                } else {
+                    localNav.currentComposableRoute == AppRoutes.Chat.static
+                }
                 localNav.waitPopBackStack(AppRoutes.GiftPlay.static)
                 localNav.navigate(
                     AppRoutes.GiftPlay.dynamic(
-                        "json" to it
+                        "json" to it.second, "isShowSvg" to isShowSvg
                     )
                 )
             }
@@ -85,6 +113,9 @@ class HostActivity : ComponentActivity() {
         lifecycleScope.launch {
             IMHelper.notificationMessageHandler.receiveMessagesFlow.collect {
                 val localNav = _navController ?: return@collect
+                if (localNav.currentDestination?.route == AppRoutes.Game.static) {
+                    return@collect
+                }
                 localNav.waitPopBackStack(AppRoutes.NoblePlay.static)
                 localNav.navigate(
                     AppRoutes.NoblePlay.dynamic(
@@ -109,6 +140,7 @@ class HostActivity : ComponentActivity() {
                         startDestination = AppRoutes.Launcher.static
                     ) {
                         launcherScreen()
+                        bigImageScreen()
                         mainScreen()
                         loginScreen()
                         myRoomScreen()
@@ -141,8 +173,10 @@ class HostActivity : ComponentActivity() {
                         chatroomEnterCheckDialog()
                         giftPlayDialog()
                         noblePlayDialog()
+                        gameListScreen()
                         gameScreen()
                         webViewScreen()
+                        explainScreen()
                     }
                 }
             }
