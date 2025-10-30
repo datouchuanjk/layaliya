@@ -1,9 +1,12 @@
 package com.helper.im.data
 
 import androidx.annotation.Keep
+import com.helper.develop.util.getBooleanOrNull
+import com.helper.develop.util.getStringOrNull
 import com.helper.im.IMHelper
 import com.helper.im.util.format
 import com.netease.nimlib.sdk.v2.chatroom.model.V2NIMChatroomMessage
+import org.json.JSONObject
 
 fun V2NIMChatroomMessage.transform(body: IMChatroomMessageBody? = null) =
     IMChatroomMessage(this, body = body)
@@ -19,11 +22,24 @@ data class IMChatroomMessage(
     val text: String? = v2NIMChatroomMessage.text,
     val senderId: String = v2NIMChatroomMessage.senderId,
     val isSelf: Boolean = v2NIMChatroomMessage.isSelf,
-    val receiverId: String? = v2NIMChatroomMessage.serverExtension,
-    val receiverName : String? =  IMHelper.userHandler.getLocalUserInfo(receiverId)?.name,
+    private val serverExtension: JSONObject? = try {
+        JSONObject(v2NIMChatroomMessage.serverExtension)
+    } catch (_: Exception) {
+        null
+    },
+    val receiverId: String? = serverExtension?.getStringOrNull("to"),
+    val receiverName: String? = IMHelper.userHandler.getLocalUserInfo(receiverId)?.name,
+
+    val senderIsMysteriousPerson: Boolean = serverExtension?.getBooleanOrNull("senderIsMysteriousPerson")
+        ?: false,
+    val receiverIsMysteriousPerson: Boolean = serverExtension?.getBooleanOrNull("receiverIsMysteriousPerson")
+        ?: false,
     val createTime: Long = v2NIMChatroomMessage.createTime,
     val body: IMChatroomMessageBody?
-)
+) {
+
+
+}
 
 data class IMChatroomMessageBody(
     val code: Int,

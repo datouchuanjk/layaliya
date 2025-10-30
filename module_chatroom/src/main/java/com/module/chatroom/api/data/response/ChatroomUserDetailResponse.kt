@@ -28,7 +28,9 @@ internal  data class ChatroomUserDetailResponse(
     @SerializedName("is_mysterious_person")
     val isMysteriousPerson:Int?,
 ){
-    val isMaster get() = role == 1
-    val isAdmin get() = role == 2
-    val isMasterOrAdmin get() =  isMaster || isAdmin
+    val isMaster get() = role == 1 && isMysteriousPerson != 1
+    val isAdmin get() = role == 2 && isMysteriousPerson != 1
+    val isMasterOrAdmin get() = isMaster || isAdmin
+
+    val routeLevel get() = if(isMysteriousPerson==1)4 else if (isMaster) 3 else if (isAdmin) 2 else 1
 }

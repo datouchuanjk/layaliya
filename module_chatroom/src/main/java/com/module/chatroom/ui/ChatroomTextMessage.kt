@@ -3,12 +3,10 @@ package com.module.chatroom.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,11 +16,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.helper.develop.paging.PagingData
@@ -34,6 +32,7 @@ import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.SpacerWidth
 import com.module.basic.ui.paging.items
+import com.module.chatroom.R
 import com.module.chatroom.api.data.response.ChatroomInfoResponse
 import com.module.chatroom.viewmodel.ChatRoomViewModel
 import org.json.JSONObject
@@ -79,23 +78,46 @@ internal fun RowScope.ChatroomTextMessage(
 @Composable
 private fun TextMessage(item: IMChatroomMessage) {
     Row {
-        AppImage(
-            model = item.senderAvatar,
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-        )
+        if (item.senderIsMysteriousPerson) {
+            AppImage(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(color = Color(0xffD9D9D9)),
+                model = R.drawable.room_ic_no_body_avatar
+            )
+        } else {
+            AppImage(
+                model = item.senderAvatar,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+            )
+        }
+
         SpacerWidth(11.dp)
         Column {
-            Text(item.senderName.orEmpty(), fontSize = 14.sp, color = Color.White)
-            SpacerHeight(4.dp)
-          val receiverName  = remember(item.receiverName){
-              item.receiverName
-          }?.run {
-              "@ $this"
-          }.orEmpty()
             Text(
-                "$receiverName ${item.text.orEmpty()}",
+                if (item.senderIsMysteriousPerson) stringResource(R.string.room_no_body_nickname) else item.senderName.orEmpty(),
+                fontSize = 14.sp,
+                color = Color.White
+            )
+            SpacerHeight(4.dp)
+
+            Text(
+                "${
+                    if (item.receiverIsMysteriousPerson) {
+                        stringResource(R.string.room_no_body_nickname)
+                    } else {
+                        item.receiverName
+                    }.run {
+                        if (this.isNullOrEmpty()) {
+                            ""
+                        } else {
+                            "@ $this"
+                        }
+                    }
+                } ${item.text.orEmpty()}",
                 fontSize = 14.sp,
                 color = Color.White,
                 modifier = Modifier
@@ -123,7 +145,7 @@ private fun CurrentMessage(item: IMChatroomMessage) {
             val sendName = jsonObject.getStringOrNull("sendName").orEmpty()
             val receiveName = jsonObject.getStringOrNull("receiveName").orEmpty()
             val giftName = jsonObject.getStringOrNull("giftName").orEmpty()
-            val giftCount = jsonObject.getIntOrNull("giftCount")?:0
+            val giftCount = jsonObject.getIntOrNull("giftCount") ?: 0
             Text(
                 text = "$sendName send $receiveName ${giftName} x ${giftCount}",
                 fontSize = 12.sp,

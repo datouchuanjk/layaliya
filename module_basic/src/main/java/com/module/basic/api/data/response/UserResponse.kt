@@ -55,5 +55,13 @@ data class UserResponse(
     @SerializedName("im_token")
     val imToken: String?,
     @SerializedName("is_complete")
-    val isComplete: String
+    val isComplete: String,
+    @SerializedName("wealth_next_level_exp")
+  val  wealthNextLevelExp: String?,
+    @SerializedName("wealth_exp_ratio")
+  val  wealthExpRatio : Float?,
+    @SerializedName("charm_next_level_exp")
+    val  charmNextLevelExp: String?,
+    @SerializedName("charm_exp_ratio")
+    val  charmExpRatio : Float?
 )

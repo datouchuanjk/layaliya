@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.helper.develop.Background
 import com.helper.develop.nav.LocalNavController
 import com.helper.develop.util.buildJsonArray
-import com.helper.develop.util.toJson
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.AppPopup
@@ -55,7 +52,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
     val otherIsInSeat = viewModel.currentUserMikeInfo != null
     val localNav = LocalNavController.current
     val isMysteriousPerson = other.isMysteriousPerson == 1
-    val myIsHeight = self.isMaster || (self.isAdmin && !other.isMasterOrAdmin)
+    val myIsHeight = self.routeLevel > other.routeLevel
     val followAction = PopupAction(
         image = if (isMysteriousPerson) painterResource(R.drawable.room_ic_action_gray_follow) else if (otherIsFollow)
             painterResource(R.drawable.room_ic_action_unfollow)
@@ -105,7 +102,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         }
     )
     val muteAction = PopupAction(
-        image = if (!myIsHeight) painterResource(R.drawable.room_ic_action_gray_close_mute) else painterResource(
+        image = painterResource(
             R.drawable.room_ic_action_close_mute
         ),
         text = stringResource(R.string.room_mute),
@@ -113,8 +110,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         onClick = viewModel::closeCurrentUserSeat
     )
     val seatAction = PopupAction(
-        image = if (!myIsHeight)
-            painterResource(R.drawable.room_ic_action_gray_seat) else if (otherIsInSeat)
+        image = if (otherIsInSeat)
             painterResource(R.drawable.room_ic_action_down_seat)
         else
             painterResource(R.drawable.room_ic_action_up_seat),
@@ -131,8 +127,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         }
     )
     val silenceAction = PopupAction(
-        image = if (!myIsHeight)
-            painterResource(R.drawable.room_ic_action_gray_silence) else if (otherIsSilence) painterResource(
+        image =  if (otherIsSilence) painterResource(
             R.drawable.room_ic_action_unsilence
         ) else painterResource(
             R.drawable.room_ic_action_silence
@@ -150,7 +145,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
         }
     )
     val adminAction = PopupAction(
-        image = if (isMysteriousPerson) painterResource(R.drawable.room_ic_action_gray_admin) else if (otherIsAdmin) painterResource(
+        if (otherIsAdmin) painterResource(
             R.drawable.room_ic_action_unadmin
         ) else painterResource(
             R.drawable.room_ic_action_add_admin
@@ -174,7 +169,9 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
             viewModel.kickout()
         }
     )
-    return if (self.isMaster) {
+    return if (isMysteriousPerson) {
+        listOf(followAction, mentionAction, giftAction)
+    } else if (self.isMaster && myIsHeight) {
         listOf(
             followAction,
             mentionAction,
@@ -185,7 +182,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
             adminAction,
             outAction
         )
-    } else if (self.isAdmin && !other.isMaster) {
+    } else if (self.isAdmin && myIsHeight) {
         listOf(
             followAction,
             mentionAction,
@@ -197,12 +194,7 @@ private fun getItems(viewModel: ChatRoomViewModel, onSilence: () -> Unit): List<
             null
         )
     } else {
-        if(isMysteriousPerson){
-            listOf( mentionAction, giftAction)
-        }else{
-            listOf(followAction, mentionAction, giftAction)
-        }
-
+        listOf(followAction, mentionAction, giftAction)
     }
 }
 

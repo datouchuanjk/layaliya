@@ -70,7 +70,7 @@ class IMChatroomHandler(
                                     senderAvatar = user.avatar,
                                     senderName = user.name
                                 )
-                            }else  if (user.accountId == item.receiverId) {
+                            } else if (user.accountId == item.receiverId) {
                                 this[index] = item.copy(
                                     receiverName = user.name,
                                 )
@@ -124,9 +124,9 @@ class IMChatroomHandler(
     }
 
     fun exit() {
+        launch {
         _chatroomClient.exit()
         V2NIMChatroomClient.destroyInstance(_chatroomClient.instanceId)
-        launch {
             _outFlow.emit(false)
         }
     }
@@ -147,9 +147,9 @@ class IMChatroomHandler(
             }, {})
         }
         delay(5000)
-        val item =JSONObject(string)
+        val item = JSONObject(string)
         item.remove("emojiId")
-         jsonObject = JSONObject().apply {
+        jsonObject = JSONObject().apply {
             put("code", 1036)
             put("data", JSONObject().apply {
                 put("emoji", item)
@@ -193,11 +193,18 @@ class IMChatroomHandler(
     }
 
 
-    suspend fun sendTextMessage(text: String, toAccId: String? = null) {
-        if(text.isEmpty())return
+    suspend fun sendTextMessage(
+        senderIsMysteriousPerson: Boolean,
+        receiverIsMysteriousPerson: Boolean, text: String, toAccId: String? = null
+    ) {
+        if (text.isEmpty()) return
         suspendCancellableCoroutine { b ->
             val message = V2NIMChatroomMessageCreator.createTextMessage(text)
-            message.serverExtension = toAccId
+            message.serverExtension = JSONObject().apply {
+                put("senderIsMysteriousPerson", senderIsMysteriousPerson)
+                put("receiverIsMysteriousPerson", receiverIsMysteriousPerson)
+                put("to", toAccId)
+            }.toString()
             _chatroomService?.sendMessage(message, null, {
                 b.resume(Unit)
             }, {
@@ -206,11 +213,11 @@ class IMChatroomHandler(
         }
     }
 
-    suspend fun sendJoinCurrentMessage(imAccount:String?,text: String) {
+    suspend fun sendJoinCurrentMessage(imAccount: String?, text: String) {
         val jsonObject = JSONObject().apply {
             put("code", 1003)
             put("data", JSONObject().apply {
-                put("yxId",imAccount.orEmpty() )
+                put("yxId", imAccount.orEmpty())
                 put("notice", JSONObject(text))
             })
         }
@@ -276,17 +283,19 @@ class IMChatroomHandler(
                     _mikeInfoChangeFlow.emit(data.getString("mike_info"))
                 }
             }
+
             1036 -> {
                 //收到礼物
                 launch {
-                    Log.e("1234","我收到了表情 自定义消息收到 发送给房间")
+                    Log.e("1234", "我收到了表情 自定义消息收到 发送给房间")
                     _receiveEmojiFlow.emit(data.getString("emoji"))
                 }
             }
+
             1037 -> {
                 //收到礼物
                 launch {
-                    Log.e("1234","我收到了礼物 自定义消息收到 发送给房间")
+                    Log.e("1234", "我收到了礼物 自定义消息收到 发送给房间")
                     val gift = data.getString("gift")
                     _receiveGiftFlow.emit(gift)
                     allPagingData.handle {
@@ -354,14 +363,17 @@ class IMChatroomHandler(
 
     override fun onChatroomStatus(status: V2NIMChatroomStatus?, error: V2NIMError?) {}
     override fun onChatroomEntered() {
-        val a ="1"
+        val a = "1"
     }
+
     override fun onChatroomExited(error: V2NIMError?) {
-        val a ="1"
+        val a = "1"
     }
+
     override fun onChatroomMemberEnter(member: V2NIMChatroomMember?) {
         IMHelper.userHandler.refreshUserInfos(member?.accountId)
     }
+
     override fun onChatroomMemberExit(accountId: String?) {
     }
 

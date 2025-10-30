@@ -6,11 +6,14 @@ import android.util.Log
 import android.view.*
 import android.webkit.*
 import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.viewinterop.*
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import androidx.navigation.*
 import androidx.navigation.compose.*
@@ -18,6 +21,7 @@ import com.helper.develop.nav.LocalNavController
 import com.helper.develop.nav.navigateForResult
 import com.module.basic.route.*
 import com.module.basic.sp.AppGlobal
+import com.module.basic.ui.UpdateDialogWindow
 import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.game.viewmodel.GameViewModel
 
@@ -29,11 +33,25 @@ fun NavGraphBuilder.gameScreen() = composable(
     GameScreen()
 }
 
+fun NavGraphBuilder.gameDialog() = dialog(
+    route = AppRoutes.GameDialog.static,
+    arguments = AppRoutes.GameDialog.arguments,
+    dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+) {
+    val height = LocalWindowInfo.current.containerSize.height * 0.7f
+    UpdateDialogWindow {
+        it.gravity = Gravity.BOTTOM
+        it.height = height.toInt()
+    }
+    GameScreen()
+}
+
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
     val localNav = LocalNavController.current
     val localBack = LocalOnBackPressedDispatcherOwner.current
+    val localActivity = LocalActivity.current!!
     AndroidView(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +86,7 @@ internal fun GameScreen(viewModel: GameViewModel = apiHandlerViewModel()) {
                 addJavascriptInterface(
                     JS(
                         webView = this,
-                        context = it as Activity,
+                        context = localActivity,
                         localNav = localNav,
                         localBack = localBack
                     ), "LingxianAndroid"

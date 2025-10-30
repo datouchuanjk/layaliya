@@ -38,9 +38,10 @@ data class ChatroomInfoResponse(
         val rtcUid: String?,
         val type: Int?,
         val uuid: Int?,
+        @SerializedName("hot_val")
         val hotVal: String?,
-    ){
-        val displayUserNum get() = if((userNum?:0)>999) "999+" else  userNum.toString()
+    ) {
+        val displayUserNum get() = if ((userNum ?: 0) > 999) "999+" else userNum.toString()
     }
 
     @Keep
@@ -64,6 +65,7 @@ data class ChatroomInfoResponse(
         val tips: String?,
         val car: String?
     )
+
     @Keep
     data class UserInfo(
         val role: Int?, //(0用户、1房主、2管理)
@@ -76,10 +78,12 @@ data class ChatroomInfoResponse(
         @SerializedName("room_member_id")
         val roomMemberId: Int?,
         @SerializedName("is_mysterious_person")
-        val isMysteriousPerson:Int?,
+        val isMysteriousPerson: Int?,
     ) {
-        val isMaster get() = role == 1
-        val isAdmin get() = role == 2
+        val isMaster get() = role == 1 && isMysteriousPerson != 1
+        val isAdmin get() = role == 2 && isMysteriousPerson != 1
         val isMasterOrAdmin get() = isMaster || isAdmin
+
+        val routeLevel get() = if(isMysteriousPerson==1)4 else if (isMaster) 3 else if (isAdmin) 2 else 1
     }
 }

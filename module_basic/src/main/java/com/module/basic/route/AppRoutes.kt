@@ -119,16 +119,31 @@ object AppRoutes {
     val Admin = NavRouter.Builder("Admin").build()
     val BD = NavRouter.Builder("BD").build()
     val GameList = NavRouter.Builder("GameList")
-        .argument("withChildScreen") {
-            type = NavType.BoolType
-            defaultValue = true
-        }
         .argument("roomId") {
             type = NavType.StringType
             nullable = true
         }
         .build()
     val Game = NavRouter.Builder("Game")
+        .argument("url") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .argument("type") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .argument("agentId") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .argument("roomId") {
+            type = NavType.StringType
+            nullable = true
+        }
+        .build()
+
+    val GameDialog = NavRouter.Builder("GameDialog")
         .argument("url") {
             type = NavType.StringType
             nullable = true

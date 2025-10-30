@@ -52,6 +52,7 @@ import com.module.chatroom.ui.chatroomReportDialog
 import com.module.chatroom.ui.chatroomUserListDialog
 import com.module.community.ui.communityDetailScreen
 import com.module.emoji.ui.emojiDialog
+import com.module.game.ui.gameDialog
 import com.module.game.ui.gameListScreen
 import com.module.game.ui.gameScreen
 import com.module.gift.ui.*
@@ -175,6 +176,7 @@ class HostActivity : ComponentActivity() {
                         noblePlayDialog()
                         gameListScreen()
                         gameScreen()
+                        gameDialog()
                         webViewScreen()
                         explainScreen()
                     }

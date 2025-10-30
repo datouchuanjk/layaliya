@@ -51,7 +51,6 @@ import com.module.chatroom.ui.popup.list.MuteListPopup
 import com.module.chatroom.viewmodel.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.json.JSONObject
-import kotlin.collections.joinToString
 
 fun NavGraphBuilder.chatRoomScreen() =
     composable(route = AppRoutes.Chatroom.static, arguments = AppRoutes.Chatroom.arguments) {
@@ -91,6 +90,10 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 localBack?.onBackPressedDispatcher?.onBackPressed()
             }
         }
+        BackHandler(isBack) {
+            isBack = false
+            viewModel.exitRoom()
+        }
         LaunchedEffect(Unit) {
             viewModel.receiveGiftFlow.collect {
                 localNav.waitPopBackStack(AppRoutes.GiftPlay.static)
@@ -120,10 +123,7 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 }
         }
 
-        BackHandler(isBack) {
-            isBack = false
-            viewModel.exitRoom()
-        }
+
         var isShowFailedDialog by remember {
             mutableStateOf(false)
         }
@@ -255,7 +255,6 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                             AppImage(model = R.drawable.room_ic_game) {
                                 localNav.navigate(
                                     AppRoutes.GameList.dynamic(
-                                        "withChildScreen" to false,
                                         "roomId" to viewModel.roomId
                                     )
                                 )
@@ -445,6 +444,7 @@ private fun ChatRoomInfo(viewModel: ChatRoomViewModel, onShowSilencePickerDialog
             )
             SpacerWidth(4.dp)
             Text(
+
                 viewModel.chatroomInfoResponse?.roomInfo?.hotVal.toString(),
                 fontSize = 14.sp,
                 color = Color.White
@@ -552,11 +552,12 @@ private fun MessageTab(selectedIndex: Int, onTabChanged: (Int) -> Unit) {
 private fun ChatAction(
     viewModel: ChatRoomViewModel,
 ) {
+    val localFocus = LocalFocusManager.current
     var isFocused by remember {
         mutableStateOf(false)
     }
     var isShowInput by remember {
-        mutableStateOf(true)
+        mutableStateOf(false)
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -564,12 +565,15 @@ private fun ChatAction(
             .padding(vertical = 10.dp)
     ) {
         if (isShowInput) {
-            Input(viewModel, onHiddenInput = {
-                isShowInput = false
-                isFocused = false
-            }, onFocusChanged = {
-                isFocused = it
-            })
+            Input(
+                viewModel,
+                onFocusChanged = {
+                    isFocused = it
+                    if (!it) {
+                        localFocus.clearFocus()
+                    }
+                    isShowInput = it
+                })
         } else {
             Box(
                 modifier = Modifier
@@ -582,7 +586,12 @@ private fun ChatAction(
                     modifier = Modifier
                         .size(30.dp)
                 ) {
-                    isShowInput = true
+                    if (isFocused) {
+                        localFocus.clearFocus()
+                        isShowInput = false
+                    } else {
+                        isShowInput = true
+                    }
                 }
             }
             SpacerWeight(1f)
@@ -670,7 +679,7 @@ private fun ChatAction(
                             val jsonObject = JSONObject()
                             val userInfo = buildJsonArray { ja ->
                                 viewModel.realMikeInfo?.forEach {
-                                    if(it?.uid!= AppGlobal.userResponse?.id){
+                                    if (it?.uid != AppGlobal.userResponse?.id) {
                                         ja.put(buildJsonObject { jo ->
                                             jo.put("uid", it?.uid.toString())
                                             jo.put("nickname", it?.nickname.toString())
@@ -697,7 +706,6 @@ private fun ChatAction(
 @Composable
 private fun RowScope.Input(
     viewModel: ChatRoomViewModel,
-    onHiddenInput: () -> Unit,
     onFocusChanged: (Boolean) -> Unit
 ) {
     Row(
@@ -717,30 +725,28 @@ private fun RowScope.Input(
                 .fillMaxHeight()
                 .aspectRatio(1f)
         ) {
-            onHiddenInput()
+            onFocusChanged(false)
         }
         SpacerWidth(4.dp)
         if (viewModel.toNickname.isNotEmpty()) {
             Text(
                 modifier = Modifier,
-                text = "@${viewModel.toNickname.trim()}",
+                text = "@${
+                    if (viewModel.receiverIsMysteriousPerson) {
+                        stringResource(R.string.room_no_body_nickname)
+                    } else {
+                        viewModel.toNickname
+                    }
+                }",
                 style = TextStyle(fontSize = 12.sp, color = Color.White)
             )
         }
         BasicTextField(
+            cursorBrush = SolidColor(Color.White),
             value = viewModel.input,
             onValueChange = {
                 viewModel.input(it)
             },
-//            decorationBox = {
-//                if (viewModel.input.isEmpty() && viewModel.toNickname.trim().isEmpty()) {
-//                    Text(
-//                        stringResource(R.string.room_send_a_message),
-//                        style = TextStyle(fontSize = 12.sp, color = Color.White)
-//                    )
-//                }
-//                it()
-//            },
             textStyle = TextStyle(fontSize = 12.sp, color = Color.White),
             modifier = Modifier
                 .focusRequester(viewModel.focusRequester)
@@ -774,6 +780,10 @@ private fun RowScope.Input(
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
             )
+
+        }
+        LaunchedEffect(Unit) {
+            viewModel.focusRequester.requestFocus()
         }
     }
 }

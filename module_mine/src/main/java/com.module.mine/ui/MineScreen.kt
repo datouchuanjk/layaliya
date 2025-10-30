@@ -437,7 +437,7 @@ private fun RowScope.CharmLevel(userInfo: UserResponse?) {
             color3 = Color(0xffA937FE),
             color4 = Color(0xffF475FF),
             level = userInfo?.charmLevel ?: 0,
-            progress = (userInfo?.charmExp ?: 0) / 100f
+            progress = (userInfo?.charmExpRatio ?: 0F)
         )
     }
 }
@@ -483,7 +483,7 @@ private fun RowScope.WealthLevel(userInfo: UserResponse?) {
             color3 = Color(0xffFF8669),
             color4 = Color(0xffFF4070),
             level = userInfo?.wealthLevel ?: 0,
-            progress = (userInfo?.wealthExp ?: 0) / 100f
+            progress = (userInfo?.wealthExpRatio ?: 0F)
         )
     }
 }
@@ -588,7 +588,7 @@ private fun CircleProgress(
             )
         }
         Text(
-            text = "${(progress * 100).roundToInt()}%",
+            text = "${(progress).roundToInt()}%",
             fontSize = 12.sp,
             color = color3,
             modifier = Modifier.align(alignment = Alignment.Center)

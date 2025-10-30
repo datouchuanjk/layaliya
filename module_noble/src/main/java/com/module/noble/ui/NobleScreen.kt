@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -60,6 +61,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.helper.develop.Background
 import com.helper.develop.banner.Banner
 import com.helper.develop.nav.LocalNavController
+import com.helper.develop.util.YMD
 import com.helper.develop.util.padToMultiple
 import com.helper.develop.util.toast
 import com.module.basic.route.AppRoutes
@@ -75,6 +77,7 @@ import com.module.noble.R
 import com.module.noble.ui.dialog.ExplainScreen
 import com.module.noble.ui.dialog.GiveToWhoDialog
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 /**
  * 贵族界面
@@ -330,7 +333,7 @@ private fun VipBanner(
     state: PagerState,
     viewModel: NobleViewModel,
 ) {
-   val localNav = LocalNavController.current
+    val localNav = LocalNavController.current
     Banner(
         modifier = Modifier
             .fillMaxWidth()
@@ -359,16 +362,17 @@ private fun VipBanner(
                                 brush = item.textColor
                             )
                         )
-                        if (viewModel.nobleExpireTime != null) {
-                            Text(
-                                modifier = Modifier.padding(start = 14.dp),
-                                text = "Expiration Date: ${viewModel.nobleExpireTime}",
-                                style = TextStyle(
-                                    fontSize = 10.sp,
-                                    color = item.secondTextColor
-                                )
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 14.dp),
+                            text = if (item.nobleExpireTime.isNullOrEmpty()) "" else "Expiration Date: ${
+                                item.nobleExpireTime
+                            }",
+                            style = TextStyle(
+                                fontSize = 10.sp,
+                                color = item.secondTextColor
                             )
-                        }
+                        )
                     }
                     Row(
                         modifier = Modifier

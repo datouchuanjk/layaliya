@@ -83,6 +83,9 @@ internal class ChatRoomViewModel(
     //是否可以用神秘人进去
     private val isMysteriousPerson = savedStateHandle.get<Boolean>("isMysteriousPerson") ?: false
 
+
+    private var senderIsMysteriousPerson = isMysteriousPerson
+
     private val chatroomHandler = IMHelper.chatroomHandler(viewModelScope)
     private val rtcHandler = IMHelper.rtcHandler(application, viewModelScope)
 
@@ -113,9 +116,12 @@ internal class ChatRoomViewModel(
      */
     private var _toNickname by mutableStateOf("")
     private var _toAccId by mutableStateOf("")
+    private var _toIsMysteriousPerson by mutableStateOf(false)
     val toNickname get() = _toNickname
+    val receiverIsMysteriousPerson get() = _toIsMysteriousPerson
     fun toNickname() {
         _toNickname = currentUserDetail?.nickname.orEmpty()
+        _toIsMysteriousPerson = currentUserDetail?.isMysteriousPerson == 1
         _toAccId = currentUserDetail?.yunxinAccid.orEmpty()
         focusRequester.requestFocus()
     }
@@ -123,6 +129,7 @@ internal class ChatRoomViewModel(
     fun clearToNickname() {
         _toNickname = ""
         _toAccId = ""
+        _toIsMysteriousPerson = false
     }
 
     /**
@@ -135,9 +142,14 @@ internal class ChatRoomViewModel(
         }
         viewModelScope.launch {
             apiRequest {
-                chatroomHandler.sendTextMessage(input, _toAccId)
+                chatroomHandler.sendTextMessage(
+                    senderIsMysteriousPerson = senderIsMysteriousPerson,
+                    receiverIsMysteriousPerson = receiverIsMysteriousPerson,
+                    input, _toAccId
+                )
             }.apiResponse(loading = null) {
                 _input = ""
+                clearToNickname()
             }
         }
     }
@@ -145,7 +157,8 @@ internal class ChatRoomViewModel(
     /**
      * 调整礼物的
      */
-    val realMikeInfo get() =  _chatroomInfoResponse?.mikeInfo?.filter { it?.uid!=null&& it.uid !=0&&it.uid!= AppGlobal.userResponse?.id }
+    val realMikeInfo get() = _chatroomInfoResponse?.mikeInfo?.filter { it?.uid != null && it.uid != 0 && it.uid != AppGlobal.userResponse?.id }
+
     /**
      *  获取房间信息
      */
@@ -179,6 +192,7 @@ internal class ChatRoomViewModel(
                 _chatroomInfoResponse?.userInfo?.let {
                     handleSilence(if (it.isMuted == 1) it.mutedLastTime?.toLong() ?: 0L else 0L)
                 }
+                senderIsMysteriousPerson = _chatroomInfoResponse?.userInfo?.isMysteriousPerson == 1
                 val yunxinRoomId = _chatroomInfoResponse?.roomInfo?.yunxinRoomId
                     ?: throw NullPointerException("roomId is empty")
                 chatroomHandler.enter(
@@ -190,7 +204,7 @@ internal class ChatRoomViewModel(
                 val key = "${AppGlobal.userResponse?.id}_lastJoinTime_${roomId}" //包含用户id和房间id 防止串号
                 val lastJoinTimeMillis = sp.getLong(key, 0L)
                 val currentTimeMillis = System.currentTimeMillis()
-                if (currentTimeMillis - lastJoinTimeMillis > 5 * 60 * 1000) {
+                if (currentTimeMillis - lastJoinTimeMillis > 5 * 60 * 1000&&!isRefresh) {
                     chatroomHandler.sendJoinCurrentMessage(
                         AppGlobal.userResponse?.imAccount,
                         _chatroomInfoResponse?.notice?.toJson().orEmpty()
@@ -279,7 +293,9 @@ internal class ChatRoomViewModel(
         viewModelScope.launch {
             chatroomHandler.roomInfoChangeFlow.collect {
                 it.fromJson<ChatroomInfoResponse.RoomInfo>()?.let { roomInfo ->
-                    _chatroomInfoResponse = _chatroomInfoResponse?.copy(roomInfo = roomInfo)
+                    _chatroomInfoResponse = _chatroomInfoResponse?.copy(
+                        roomInfo = chatroomInfoResponse?.roomInfo?.copy(name = roomInfo.name)
+                    )
                 }
             }
         }
@@ -486,6 +502,7 @@ internal class ChatRoomViewModel(
                 api.upSeat(
                     ChatroomSeatRequest(seatId = seatId, roomId = roomId)
                 ).checkAndGet()
+                senderIsMysteriousPerson = false
                 refreshMikeInfos()
             }.apiResponse()
         }
