@@ -230,18 +230,28 @@ object AppGlobal {
 
     private val _exitFlow = MutableSharedFlow<Unit>()
     val exitFlow = _exitFlow.asSharedFlow()
-    fun exit(){
+    fun exit() {
         ProcessLifecycleOwner.get().lifecycleScope.launch {
-        _exitFlow.emit(Unit)
+            _exitFlow.emit(Unit)
+        }
     }
-    }
+
     private var errorCount = 0
+    private var hearBeatJob: Job? = null
     fun hearBeat(api: BasicApiService) {
-        ProcessLifecycleOwner.get().lifecycleScope.launch {
+        hearBeatJob?.cancel()
+        hearBeatJob = ProcessLifecycleOwner.get().lifecycleScope.launch {
             launch {
                 withContext(Dispatchers.IO) {
                     try {
-                        api.hearBeat()
+                        val result = api.hearBeat()
+                        if (!result.isSuccessful) {
+                            if (result.code in arrayOf(1, 2)) {
+                                exit()
+                                hearBeatJob?.cancel()
+                                hearBeatJob = null
+                            }
+                        }
                         errorCount = 0
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -249,6 +259,8 @@ object AppGlobal {
                         if (errorCount >= 5) {
                             errorCount = 0
                             _exitFlow.emit(Unit)
+                            hearBeatJob?.cancel()
+                            hearBeatJob = null
                         }
                     }
                 }

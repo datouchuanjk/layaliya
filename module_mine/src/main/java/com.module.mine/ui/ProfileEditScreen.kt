@@ -138,7 +138,6 @@ private fun Avatar(viewModel: ProfileEditViewModel) {
 private fun Nickname(viewModel: ProfileEditViewModel) {
     Item(stringResource(R.string.mine_nickname)) {
         BasicTextField(
-
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(align = Alignment.End),
@@ -150,6 +149,7 @@ private fun Nickname(viewModel: ProfileEditViewModel) {
             decorationBox = {
                     if (viewModel.nickname.isNullOrEmpty()) {
                         Text(
+                            modifier = Modifier.fillMaxWidth().wrapContentWidth( Alignment.End),
                             text = stringResource(R.string.mine_please_input),
                             fontSize = 16.sp,
                             color = Color(0xff999999)
@@ -178,6 +178,7 @@ private fun Introduce(viewModel: ProfileEditViewModel) {
             decorationBox = {
                 if (viewModel.introduce.isNullOrEmpty()) {
                     Text(
+                        modifier = Modifier.fillMaxWidth().wrapContentWidth( Alignment.End),
                         text = stringResource(R.string.mine_please_input),
                         fontSize = 16.sp,
                         color = Color(0xff999999)

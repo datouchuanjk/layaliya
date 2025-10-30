@@ -21,6 +21,7 @@ import com.helper.develop.nav.LocalNavController
 import com.helper.develop.nav.popToOrNavigate
 import com.module.basic.api.ApiException
 import com.module.basic.route.AppRoutes
+import com.module.basic.sp.AppGlobal
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
@@ -69,8 +70,8 @@ internal fun <T : BaseViewModel> T.withApiHandler(): T =
         val context: Context = LocalContext.current
         LaunchedEffect(this) {
             errorFlow.collect {
-                if (it is ApiException && it.code == 1) {
-                    localNav.popToOrNavigate(AppRoutes.Login.static)
+                if (it is ApiException && it.code in arrayOf(1,2)) {
+                    AppGlobal.exit()
                 } else {
                     if (it.message.isNullOrEmpty()) {
                         return@collect

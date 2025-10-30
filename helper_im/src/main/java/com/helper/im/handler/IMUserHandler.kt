@@ -46,7 +46,7 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     }
 
 
-    internal fun refreshUserInfos(accountId: String?) {
+     fun refreshUserInfos(accountId: String?) {
         accountId ?: return
         service.getUserListFromCloud(listOf(accountId), {}, {})
     }
@@ -54,7 +54,7 @@ class IMUserHandler internal constructor(scope: CoroutineScope) :
     /**
      * 更新一次
      */
-    internal fun refreshUserInfos(accountIds: List<String>) {
+     fun refreshUserInfos(accountIds: List<String>) {
         service.getUserListFromCloud(accountIds, {}, {})
     }
 

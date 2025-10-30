@@ -1,8 +1,10 @@
 package com.module.basic.api.data.response
 
+import androidx.annotation.Keep
 import com.module.basic.api.*
 
 
+@Keep
 class BaseResponse<T>(
     val code: Int = 0,
     val message: String = "",

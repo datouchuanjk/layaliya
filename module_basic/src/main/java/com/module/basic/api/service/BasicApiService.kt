@@ -38,7 +38,7 @@ interface BasicApiService {
      * 心跳
      */
     @POST("heartbeat/index")
-    suspend fun hearBeat(@Body request: BaseRequest = BaseRequest()): Any
+    suspend fun hearBeat(@Body request: BaseRequest = BaseRequest()): BaseResponse<Unit>
 
     /**
      * 查找用户

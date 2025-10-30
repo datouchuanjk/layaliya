@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.helper.develop.util.findIndex
+import com.helper.im.IMHelper
 import com.module.basic.api.data.request.UidRequest
 import com.module.basic.sp.AppGlobal
 import com.module.basic.util.buildOffsetPaging
@@ -38,6 +39,7 @@ internal class PersonCenterViewModel(
                 api.personInfo(UidRequest(_uid)).checkAndGet()
             }.apiResponse {
                 _personResponse = it
+                IMHelper.userHandler.refreshUserInfos(it?.imAccount)
             }
         }
     }

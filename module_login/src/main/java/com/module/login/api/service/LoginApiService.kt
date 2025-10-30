@@ -1,5 +1,6 @@
 package com.module.login.api.service
 
+import androidx.annotation.Keep
 import com.module.basic.api.data.request.BaseRequest
 import com.module.basic.api.data.response.BaseResponse
 import com.module.login.api.data.request.GoogleLoginRequest
@@ -7,6 +8,7 @@ import com.module.login.api.data.response.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+@Keep
 internal interface LoginApiService {
 
     /**

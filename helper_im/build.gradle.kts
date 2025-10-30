@@ -33,5 +33,4 @@ dependencies {
     api("com.netease.nimlib:lucene:10.9.52")
     //音频
     api("com.netease.yunxin:nertc-audio:5.8.5001")
-    api("com.netease.yunxin:nertc-audio:5.8.5001")
 }

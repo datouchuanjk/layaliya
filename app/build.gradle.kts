@@ -31,10 +31,20 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true // 启用代码压缩（混淆的前提）
+            isShrinkResources = true // 移除未使用的资源（可选，配合代码压缩）
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
         debug {
-            isMinifyEnabled = false
+            isMinifyEnabled = true // 启用代码压缩（混淆的前提）
+            isShrinkResources = true // 移除未使用的资源（可选，配合代码压缩）
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("Online")
         }
     }

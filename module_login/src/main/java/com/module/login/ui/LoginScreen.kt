@@ -177,7 +177,7 @@ internal fun LoginScreen(viewModel: LoginViewModel = apiHandlerViewModel()) {
 
                         3 -> localNav.navigate(
                             AppRoutes.WebView.dynamic(
-                                "title" to "Privacy Policy", "url" to "https://www.baidu.com"
+                                "title" to "Privacy Policy", "url" to "https://www.layaliya.com/privacy-policy.html  "
                             )
                         )
                     }

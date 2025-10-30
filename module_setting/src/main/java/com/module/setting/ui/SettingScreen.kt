@@ -82,7 +82,8 @@ internal fun SettingScreen(viewModel: SettingViewModel = apiHandlerViewModel()) 
                 Item(stringResource(R.string.setting_privacy_policy)) { title ->
                     localNav.navigate(
                         AppRoutes.WebView.dynamic(
-                            "title" to title, "url" to "https://www.baidu.com"
+                            "title" to title,
+                            "url" to "https://www.layaliya.com/privacy-policy.html"
                         )
                     )
                 }
