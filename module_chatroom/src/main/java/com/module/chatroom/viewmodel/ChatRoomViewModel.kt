@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
@@ -110,6 +111,7 @@ internal class ChatRoomViewModel(
     }
 
     val focusRequester = FocusRequester()
+    var isInputFocused by mutableStateOf(false)
 
     /**
      * 发送给谁呢？
@@ -123,7 +125,7 @@ internal class ChatRoomViewModel(
         _toNickname = currentUserDetail?.nickname.orEmpty()
         _toIsMysteriousPerson = currentUserDetail?.isMysteriousPerson == 1
         _toAccId = currentUserDetail?.yunxinAccid.orEmpty()
-        focusRequester.requestFocus()
+        isInputFocused = true
     }
 
     fun clearToNickname() {
@@ -204,7 +206,7 @@ internal class ChatRoomViewModel(
                 val key = "${AppGlobal.userResponse?.id}_lastJoinTime_${roomId}" //包含用户id和房间id 防止串号
                 val lastJoinTimeMillis = sp.getLong(key, 0L)
                 val currentTimeMillis = System.currentTimeMillis()
-                if (currentTimeMillis - lastJoinTimeMillis > 5 * 60 * 1000&&!isRefresh) {
+                if (currentTimeMillis - lastJoinTimeMillis > 5 * 60 * 1000 && !isRefresh) {
                     chatroomHandler.sendJoinCurrentMessage(
                         AppGlobal.userResponse?.imAccount,
                         _chatroomInfoResponse?.notice?.toJson().orEmpty()

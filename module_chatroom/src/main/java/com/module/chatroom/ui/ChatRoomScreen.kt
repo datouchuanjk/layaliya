@@ -552,28 +552,13 @@ private fun MessageTab(selectedIndex: Int, onTabChanged: (Int) -> Unit) {
 private fun ChatAction(
     viewModel: ChatRoomViewModel,
 ) {
-    val localFocus = LocalFocusManager.current
-    var isFocused by remember {
-        mutableStateOf(false)
-    }
-    var isShowInput by remember {
-        mutableStateOf(false)
-    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(vertical = 10.dp)
     ) {
-        if (isShowInput) {
-            Input(
-                viewModel,
-                onFocusChanged = {
-                    isFocused = it
-                    if (!it) {
-                        localFocus.clearFocus()
-                    }
-                    isShowInput = it
-                })
+        if (viewModel.isInputFocused) {
+            Input(viewModel)
         } else {
             Box(
                 modifier = Modifier
@@ -586,18 +571,14 @@ private fun ChatAction(
                     modifier = Modifier
                         .size(30.dp)
                 ) {
-                    if (isFocused) {
-                        localFocus.clearFocus()
-                        isShowInput = false
-                    } else {
-                        isShowInput = true
-                    }
+                    viewModel.focusRequester.requestFocus() //这个时候根本就没有Input 所以无效
+                    viewModel.isInputFocused = true
                 }
             }
             SpacerWeight(1f)
         }
 
-        AnimatedVisibility(!isFocused) {
+        AnimatedVisibility(!viewModel.isInputFocused) {
             val localNav = LocalNavController.current
             Row {
                 SpacerWidth(10.dp)
@@ -706,8 +687,8 @@ private fun ChatAction(
 @Composable
 private fun RowScope.Input(
     viewModel: ChatRoomViewModel,
-    onFocusChanged: (Boolean) -> Unit
 ) {
+    val localFocusManager = LocalFocusManager.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -725,7 +706,7 @@ private fun RowScope.Input(
                 .fillMaxHeight()
                 .aspectRatio(1f)
         ) {
-            onFocusChanged(false)
+            localFocusManager.clearFocus()
         }
         SpacerWidth(4.dp)
         if (viewModel.toNickname.isNotEmpty()) {
@@ -751,7 +732,7 @@ private fun RowScope.Input(
             modifier = Modifier
                 .focusRequester(viewModel.focusRequester)
                 .onFocusChanged {
-                    onFocusChanged(it.isFocused)
+                    viewModel.isInputFocused = it.isFocused
                 }
                 .then(if (viewModel.input.isEmpty()) Modifier.onKeyEvent {
                     if (it.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_DEL) {
