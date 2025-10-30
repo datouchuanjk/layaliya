@@ -39,12 +39,7 @@ android {
             )
         }
         debug {
-            isMinifyEnabled = true // 启用代码压缩（混淆的前提）
-            isShrinkResources = true // 移除未使用的资源（可选，配合代码压缩）
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = false // 启用代码压缩（混淆的前提）
             signingConfig = signingConfigs.getByName("Online")
         }
     }

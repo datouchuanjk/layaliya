@@ -36,7 +36,6 @@ import com.module.basic.sp.AppGlobal
 import com.module.basic.sp.clearToken
 import com.module.basic.ui.base.bigImageScreen
 import com.module.basic.ui.base.webViewScreen
-import com.module.basic.util.LocalKeyboardHeight
 import com.module.charm.ui.*
 import com.module.chat.ui.chatScreen
 import com.module.community.ui.postCommunityScreen
@@ -129,9 +128,7 @@ class HostActivity : ComponentActivity() {
         setContent {
             val localKeyboardHeight by KeyboardHeightFlow.collectAsState()
             NavControllerLocalProvider { navController ->
-                CompositionLocalProvider(LocalKeyboardHeight provides with(LocalDensity.current) {
-                    localKeyboardHeight.toDp()
-                }) {
+
                     _navController = navController
                     NavHost(
                         modifier = Modifier
@@ -180,7 +177,6 @@ class HostActivity : ComponentActivity() {
                         webViewScreen()
                         explainScreen()
                     }
-                }
             }
         }
     }

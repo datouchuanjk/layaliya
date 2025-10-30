@@ -1,5 +1,6 @@
 package com.module.chatroom.ui
 
+import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -9,6 +10,7 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.*
 import androidx.compose.foundation.text.*
 import androidx.compose.material3.*
@@ -110,20 +112,17 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 viewModel.handleEmoji(it)
             }
         }
-
         LaunchedEffect(Unit) {
             localNav.collectResult<String>("send_gift_result") {
                 viewModel.handleGift(it)
             }
         }
-
         LaunchedEffect(Unit) {
             viewModel.closeCurrentUserSeatFlow
                 .collect {
                     localContext.toast(R.string.room_close_successful)
                 }
         }
-
 
         var isShowFailedDialog by remember {
             mutableStateOf(false)
@@ -149,11 +148,15 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
             message = "System is Failed please retry"
         )
         val localFocus = LocalFocusManager.current
-
+       val isShowIme =  WindowInsets.ime.getBottom(LocalDensity.current)>0
+        LaunchedEffect(isShowIme) {
+            if(!isShowIme&& viewModel.isInputFocused){
+                localFocus.clearFocus()
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
-
                 .onClick {
                     localFocus.clearFocus()
                 }
@@ -165,7 +168,6 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                     .fillMaxSize()
             )
             viewModel.chatroomInfoResponse ?: return@Box
-            val isShowKeyboard = LocalKeyboardHeight.current > 0.dp
             PullToRefreshBox(
                 modifier = Modifier.fillMaxSize(),
                 isRefreshing = viewModel.isRoomRefreshing,
@@ -176,10 +178,9 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
                         .padding(innerPadding)
-                        .padding(bottom = LocalKeyboardHeight.current)
                         .padding(horizontal = 15.dp)
+                        .imePadding()
                 ) {
                     var isShowSilenceDialog by remember {
                         mutableStateOf(false)
@@ -210,7 +211,7 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                         isShowSilenceDialog = true
                     }
                     SpacerHeight(12.dp)
-                    AnimatedVisibility(visible = !isShowKeyboard) {
+                    AnimatedVisibility(visible = !viewModel.isInputFocused) {
                         Mic(viewModel) {
                             isShowSilenceDialog = true
                         }
@@ -553,14 +554,43 @@ private fun MessageTab(selectedIndex: Int, onTabChanged: (Int) -> Unit) {
 private fun ChatAction(
     viewModel: ChatRoomViewModel,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
         modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 10.dp)
     ) {
-        if (viewModel.isInputFocused) {
-            Input(viewModel)
-        } else {
+        val localNav = LocalNavController.current
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentWidth(align = Alignment.End)
+        ) {
+            if (viewModel.myMikeInfo != null && viewModel.myMikeInfoOffset != null) {
+                Box(
+                    modifier = Modifier
+                        .background(color = Color.White.copy(0.2f), shape = CircleShape)
+                        .size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AppImage(
+                        model = R.drawable.room_ic_chat_ej,
+                        modifier = Modifier
+                            .size(30.dp)
+                    ) {
+                        val rect = viewModel.myMikeInfoOffset!!
+                        localNav.navigate(
+                            AppRoutes.Emoji.dynamic(
+                                "x" to rect.left,
+                                "y" to rect.top,
+                                "w" to rect.width,
+                                "h" to rect.height,
+                            )
+                        )
+                    }
+                }
+            }
+            SpacerWidth(10.dp)
             Box(
                 modifier = Modifier
                     .background(color = Color.White.copy(0.2f), shape = CircleShape)
@@ -568,44 +598,16 @@ private fun ChatAction(
                 contentAlignment = Alignment.Center
             ) {
                 AppImage(
-                    model = R.drawable.room_ic_chat_message,
-                    modifier = Modifier
-                        .size(30.dp)
+                    model = if (viewModel.myMikeInfo != null)
+                        R.drawable.room_ic_action_down_seat
+                    else
+                        R.drawable.room_ic_action_up_seat,
+                    modifier = Modifier.size(25.dp)
                 ) {
-                    viewModel.isInputFocused = true
+                    viewModel.quickUpOrDownSeat()
                 }
             }
-            SpacerWeight(1f)
-        }
-
-        AnimatedVisibility(!viewModel.isInputFocused) {
-            val localNav = LocalNavController.current
-            Row {
-                SpacerWidth(10.dp)
-                if (viewModel.myMikeInfo != null && viewModel.myMikeInfoOffset != null) {
-                    Box(
-                        modifier = Modifier
-                            .background(color = Color.White.copy(0.2f), shape = CircleShape)
-                            .size(40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AppImage(
-                            model = R.drawable.room_ic_chat_ej,
-                            modifier = Modifier
-                                .size(30.dp)
-                        ) {
-                            val rect = viewModel.myMikeInfoOffset!!
-                            localNav.navigate(
-                                AppRoutes.Emoji.dynamic(
-                                    "x" to rect.left,
-                                    "y" to rect.top,
-                                    "w" to rect.width,
-                                    "h" to rect.height,
-                                )
-                            )
-                        }
-                    }
-                }
+            if (viewModel.myMikeInfo != null) {
                 SpacerWidth(10.dp)
                 Box(
                     modifier = Modifier
@@ -614,89 +616,68 @@ private fun ChatAction(
                     contentAlignment = Alignment.Center
                 ) {
                     AppImage(
-                        model = if (viewModel.myMikeInfo != null)
-                            R.drawable.room_ic_action_down_seat
-                        else
-                            R.drawable.room_ic_action_up_seat,
-                        modifier = Modifier.size(25.dp)
-                    ) {
-                        viewModel.quickUpOrDownSeat()
-                    }
-                }
-                if (viewModel.myMikeInfo != null) {
-                    SpacerWidth(10.dp)
-                    Box(
+                        model = if (viewModel.myIsOpenMike) R.drawable.room_ic_chat_close_seat else R.drawable.room_ic_chat_open_seat,
                         modifier = Modifier
-                            .background(color = Color.White.copy(0.2f), shape = CircleShape)
-                            .size(40.dp),
-                        contentAlignment = Alignment.Center
+                            .size(30.dp)
                     ) {
-                        AppImage(
-                            model = if (viewModel.myIsOpenMike) R.drawable.room_ic_chat_close_seat else R.drawable.room_ic_chat_open_seat,
-                            modifier = Modifier
-                                .size(30.dp)
-                        ) {
-                            if (viewModel.myIsOpenMike) {
-                                viewModel.closeSeat()
-                            } else {
-                                viewModel.openSeat()
-                            }
-                        }
-                    }
-                }
-                if (!viewModel.realMikeInfo.isNullOrEmpty()) {
-                    SpacerWidth(10.dp)
-                    Box(
-                        modifier = Modifier
-                            .background(color = Color.White.copy(0.2f), shape = CircleShape)
-                            .size(40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AppImage(
-                            model = R.drawable.room_ic_action_send_gift,
-                            modifier = Modifier
-                                .size(30.dp)
-                        ) {
-                            val jsonObject = JSONObject()
-                            val userInfo = buildJsonArray { ja ->
-                                viewModel.realMikeInfo?.forEach {
-                                    if (it?.uid != AppGlobal.userResponse?.id) {
-                                        ja.put(buildJsonObject { jo ->
-                                            jo.put("uid", it?.uid.toString())
-                                            jo.put("nickname", it?.nickname.toString())
-                                            jo.put("avatar", it?.avatar.toString())
-                                        })
-                                    }
-                                }
-                            }
-                            jsonObject.put("roomId", viewModel.roomId)
-                            jsonObject.put("userInfo", userInfo)
-                            localNav.navigate(
-                                AppRoutes.Gift.dynamic(
-                                    "json" to jsonObject.toString(),
-                                )
-                            )
+                        if (viewModel.myIsOpenMike) {
+                            viewModel.closeSeat()
+                        } else {
+                            viewModel.openSeat()
                         }
                     }
                 }
             }
+            if (!viewModel.realMikeInfo.isNullOrEmpty()) {
+                SpacerWidth(10.dp)
+                Box(
+                    modifier = Modifier
+                        .background(color = Color.White.copy(0.2f), shape = CircleShape)
+                        .size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AppImage(
+                        model = R.drawable.room_ic_action_send_gift,
+                        modifier = Modifier
+                            .size(30.dp)
+                    ) {
+                        val jsonObject = JSONObject()
+                        val userInfo = buildJsonArray { ja ->
+                            viewModel.realMikeInfo?.forEach {
+                                if (it?.uid != AppGlobal.userResponse?.id) {
+                                    ja.put(buildJsonObject { jo ->
+                                        jo.put("uid", it?.uid.toString())
+                                        jo.put("nickname", it?.nickname.toString())
+                                        jo.put("avatar", it?.avatar.toString())
+                                    })
+                                }
+                            }
+                        }
+                        jsonObject.put("roomId", viewModel.roomId)
+                        jsonObject.put("userInfo", userInfo)
+                        localNav.navigate(
+                            AppRoutes.Gift.dynamic(
+                                "json" to jsonObject.toString(),
+                            )
+                        )
+                    }
+                }
+            }
         }
+        SpacerHeight(8.dp)
+        Input(viewModel)
     }
 }
 
 @Composable
-private fun RowScope.Input(
+private fun Input(
     viewModel: ChatRoomViewModel,
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.focusRequester.requestFocus()
-    }
-    val localFocusManager = LocalFocusManager.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .height(40.dp)
-            .weight(1f)
+            .fillMaxWidth()
             .background(
                 color = Color.White.copy(0.2f),
                 shape = RoundedCornerShape(20.dp)
@@ -708,9 +689,7 @@ private fun RowScope.Input(
             modifier = Modifier
                 .fillMaxHeight()
                 .aspectRatio(1f)
-        ) {
-            localFocusManager.clearFocus()
-        }
+        )
         SpacerWidth(4.dp)
         if (viewModel.toNickname.isNotEmpty()) {
             Text(
