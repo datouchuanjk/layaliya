@@ -49,6 +49,7 @@ import com.module.chatroom.ui.popup.list.AdminListPopup
 import com.module.chatroom.ui.popup.list.KickoutListPopup
 import com.module.chatroom.ui.popup.list.MuteListPopup
 import com.module.chatroom.viewmodel.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.json.JSONObject
 
@@ -571,7 +572,6 @@ private fun ChatAction(
                     modifier = Modifier
                         .size(30.dp)
                 ) {
-                    viewModel.focusRequester.requestFocus() //这个时候根本就没有Input 所以无效
                     viewModel.isInputFocused = true
                 }
             }
@@ -688,6 +688,9 @@ private fun ChatAction(
 private fun RowScope.Input(
     viewModel: ChatRoomViewModel,
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.focusRequester.requestFocus()
+    }
     val localFocusManager = LocalFocusManager.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -762,9 +765,6 @@ private fun RowScope.Input(
                 contentDescription = null,
             )
 
-        }
-        LaunchedEffect(Unit) {
-            viewModel.focusRequester.requestFocus()
         }
     }
 }

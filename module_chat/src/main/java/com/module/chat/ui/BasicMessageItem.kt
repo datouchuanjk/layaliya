@@ -88,12 +88,12 @@ private fun ChatState(sendingState: Int, isRead: Boolean) {
         when (sendingState) {
             0 -> {}
             1 -> {
-                if (isRead) {
-                    AppImage(
-                        model = R.drawable.chat_ic_read,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+//                if (isRead) {
+//                    AppImage(
+//                        model = R.drawable.chat_ic_read,
+//                        modifier = Modifier.fillMaxSize()
+//                    )
+//                }
             }
 
             2 -> {
