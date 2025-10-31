@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
 import com.helper.develop.nav.LocalNavController
-import com.helper.develop.nav.navigateTo
+import com.helper.develop.nav.navigateAndPopCurrent
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.UpdateDialogWindow
 import com.module.basic.viewmodel.apiHandlerViewModel
@@ -27,7 +27,7 @@ internal fun RoomCreateCheckDialog(viewModel: RoomCheckViewModel = apiHandlerVie
                 if (it == null) {
                     localNav.popBackStack()
                 } else {
-                    localNav.navigateTo(
+                    localNav.navigateAndPopCurrent(
                         AppRoutes.CreateOrEditRoom.dynamic(
                             "type" to it.type,
                             "roomInfo" to it.roomInfo

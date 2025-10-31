@@ -27,6 +27,7 @@ import com.netease.nimlib.sdk.v2.message.V2NIMMessageService
 import com.netease.nimlib.sdk.v2.message.V2NIMP2PMessageReadReceipt
 import com.netease.nimlib.sdk.v2.message.V2NIMTeamMessageReadReceipt
 import com.netease.nimlib.sdk.v2.message.enums.V2NIMMessageQueryDirection
+import com.netease.nimlib.sdk.v2.message.enums.V2NIMMessageSendingState
 import com.netease.nimlib.sdk.v2.message.option.V2NIMMessageListOption
 import com.netease.nimlib.sdk.v2.utils.*
 import kotlinx.coroutines.*
@@ -44,10 +45,6 @@ class IMMessageHandler internal constructor(
     private val conversationId: String,
 ) : Handler<V2NIMMessageService>(scope), V2NIMMessageListener {
 
-    init {
-//        IMHelper.conversationHandler.clearUnreadCountById(conversationId)
-//        IMHelper.conversationHandler.setCurrentConversation(conversationId)
-    }
 
     init {
         register {
@@ -61,8 +58,8 @@ class IMMessageHandler internal constructor(
         }
     }
 
-    private val _receiveMessagesFlow = MutableSharedFlow<Unit>()
-    val receiveMessagesFlow = _receiveMessagesFlow.asSharedFlow()
+    private val _receiveGiftMessagesFlow = MutableSharedFlow<String>()
+    val receiveGiftMessagesFlow = _receiveGiftMessagesFlow.asSharedFlow()
 
     val userInfo = MutableStateFlow<IMUser?>(null)
 
@@ -71,13 +68,6 @@ class IMMessageHandler internal constructor(
     init {
         launch {
             IMHelper.userHandler.userProfileChangedFlow.collect {
-                Log.e(
-                    "1234", "聊天界面收到了 用户信息更新回调 ${
-                        it.map {
-                            "id=${it.accountId} nickname=${it.name} 头像 ${it.avatar}"
-                        }
-                    }} 目前聊天对象的id是${targetId} 确定更新"
-                )
                 it.forEach {
                     if (it.accountId == targetId) {
                         userInfo.value = it
@@ -102,12 +92,14 @@ class IMMessageHandler internal constructor(
         messages ?: return
         if (messages.isEmpty()) return
         launch {
-            _receiveMessagesFlow.emit(Unit)
             IMHelper.conversationHandler.clearUnreadCountById(conversationId)
             pagingData.handle {
                 addAll(
                     0,
                     messages.filter { it.conversationId == conversationId }.map { it.transform() })
+            }
+            messages.forEach {
+                handleMessage(it)
             }
         }
     }
@@ -132,6 +124,7 @@ class IMMessageHandler internal constructor(
                     }
                 }
         }
+
     }
 
     /**
@@ -207,6 +200,20 @@ class IMMessageHandler internal constructor(
                 add(0, message.transform())
             } else {
                 this[index] = message.transform()
+            }
+        }
+
+        if (message.sendingState == V2NIMMessageSendingState.V2NIM_MESSAGE_SENDING_STATE_SUCCEEDED) {
+            handleMessage(message)
+        }
+    }
+
+    private fun handleMessage(message: V2NIMMessage) {
+        launch {
+            val imMessage = message.transform()
+            val body = imMessage.body
+            if (body is IMGiftBody) {
+                _receiveGiftMessagesFlow.emit(body.string)
             }
         }
     }

@@ -98,7 +98,7 @@ internal class GiftViewModel(
     private val _roomId get() = _giftInfo?.roomId ?: "0"
 
 
-    private var _currentUserInfo by mutableStateOf<GiftInfo.UserInfo?>(
+    private var _currentUserInfo by mutableStateOf(
         userInfos.getOrNull(
             0
         )
@@ -137,7 +137,7 @@ internal class GiftViewModel(
                     js.put("giftCount", selectedNum)
                     js.put("floatingScreenId", floatingScreenId)
                 }.toString()
-                localNav.emitResult("send_gift_result", json)
+                localNav.emitResultTo(key="send_gift_result", value = json)
                 localNav.popBackStack()
             }
         }

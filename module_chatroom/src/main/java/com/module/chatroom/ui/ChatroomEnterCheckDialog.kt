@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.dialog
 import com.helper.develop.nav.LocalNavController
-import com.helper.develop.nav.navigateTo
+import com.helper.develop.nav.navigateAndPopCurrent
 import com.module.basic.route.AppRoutes
 import com.module.basic.sp.getHiddenIdentity
 import com.module.basic.ui.UpdateDialogWindow
@@ -49,7 +49,7 @@ internal fun ChatroomEnterCheckDialog(viewModel: ChatroomEnterCheckViewModel = a
         ActivityResultContracts.RequestPermission()
     ) {
         if (it) {
-            localNav.navigateTo(
+            localNav.navigateAndPopCurrent(
                 AppRoutes.Chatroom.dynamic(
                     "roomId" to viewModel.roomId,
                     "isMysteriousPerson" to isMysteriousPerson,

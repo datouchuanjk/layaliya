@@ -78,7 +78,7 @@ internal fun CreateOrEditRoomScreen(viewModel: CreateOrEditRoomViewModel = apiHa
     LaunchedEffect(Unit) {
         viewModel.roomCreateSuccessful
             .collect {
-                localNav.navigateTo(
+                localNav.navigateAndPopCurrent(
                     AppRoutes.ChatroomEnterCheck.dynamic(
                         "roomId" to it
                     )

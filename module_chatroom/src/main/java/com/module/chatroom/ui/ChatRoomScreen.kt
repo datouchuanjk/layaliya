@@ -1,6 +1,5 @@
 package com.module.chatroom.ui
 
-import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -51,7 +50,6 @@ import com.module.chatroom.ui.popup.list.AdminListPopup
 import com.module.chatroom.ui.popup.list.KickoutListPopup
 import com.module.chatroom.ui.popup.list.MuteListPopup
 import com.module.chatroom.viewmodel.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.json.JSONObject
 
@@ -102,7 +100,7 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                 if (localNav.currentDestination?.route == AppRoutes.Game.static) {
                     return@collect
                 }
-                localNav.waitPopBackStack(AppRoutes.GiftPlay.static)
+
                 localNav.navigate(
                     AppRoutes.GiftPlay.dynamic(
                         "json" to it, "isShowSvg" to true
@@ -110,12 +108,12 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
             }
         }
         LaunchedEffect(Unit) {
-            localNav.collectResult<String>("send_emoji_result") {
+            localNav.collectResultFrom<String>(key="send_emoji_result") {
                 viewModel.handleEmoji(it)
             }
         }
         LaunchedEffect(Unit) {
-            localNav.collectResult<String>("send_gift_result") {
+            localNav.collectResultFrom<String>(key = "send_gift_result") {
                 viewModel.handleGift(it)
             }
         }
@@ -125,7 +123,6 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
                     localContext.toast(R.string.room_close_successful)
                 }
         }
-
         var isShowFailedDialog by remember {
             mutableStateOf(false)
         }

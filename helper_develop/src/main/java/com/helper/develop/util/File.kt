@@ -80,5 +80,7 @@ fun File.toProviderUri(
 ): Uri? = FileProvider.getUriForFile(context, authority, this)
 
 
+val File.isEmpty: Boolean get() = !exists() && length() <= 0L
+
 
 

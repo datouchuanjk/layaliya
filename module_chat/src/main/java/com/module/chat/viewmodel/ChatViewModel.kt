@@ -1,7 +1,6 @@
 package com.module.chat.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import com.module.basic.viewmodel.BaseViewModel
 import com.module.chat.R
 import com.module.chat.api.data.request.AcceptInviteRequest
 import com.module.chat.api.service.*
-import com.netease.nimlib.sdk.v2.message.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.File
@@ -32,14 +30,13 @@ internal class ChatViewModel(
         conversationId = conversationId,
     )
 
+    val receiveGiftMessagesFlow = messageHandler.receiveGiftMessagesFlow
 
     val pagingData = messageHandler.pagingData
     val lazyState = LazyListState(0, 0)
 
 
     val userInfo = messageHandler.userInfo.asStateFlow()
-
-    val targetId: String? get() = messageHandler.targetId
 
     /**
      * 输入的文本
@@ -80,7 +77,8 @@ internal class ChatViewModel(
     }
 
 
-    fun handleGift(string: String) {
+    fun handleGift(string: String?) {
+        string ?: return
         viewModelScope.launch {
             messageHandler.sendGiftMessage(string)
         }
@@ -89,7 +87,7 @@ internal class ChatViewModel(
     /**
      * 同意
      */
-    fun acceptInvite(id:String) {
+    fun acceptInvite(id: String) {
         viewModelScope.launch {
             apiRequest {
                 api.acceptInvite(AcceptInviteRequest(id)).checkAndGet()

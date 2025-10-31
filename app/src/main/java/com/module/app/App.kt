@@ -1,6 +1,7 @@
 package com.module.app
 
 import com.module.agent.module.agentModule
+import com.module.app.viewmodel.HostViewModel
 import com.module.app.viewmodel.LauncherViewModel
 import com.module.bag.module.*
 import com.module.basic.module.basicModule
@@ -37,6 +38,9 @@ class App : BaseApplication() {
                 module {
                     viewModel {
                         LauncherViewModel(get(), get())
+                    }
+                    viewModel {
+                        HostViewModel()
                     }
                 },
                 basicModule,

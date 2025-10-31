@@ -13,11 +13,8 @@ import com.helper.develop.nav.*
 import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.BaseViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.io.File
 
 class EmojiViewModel(
     savedStateHandle: SavedStateHandle
@@ -57,7 +54,7 @@ class EmojiViewModel(
                 val jsonObject = JSONObject()
                 jsonObject.put("emojiId", item.first)
                 jsonObject.put("uid", AppGlobal.userResponse?.id.toString())
-                localNav.emitResult("send_emoji_result", jsonObject.toString())
+                localNav.emitResultTo(key ="send_emoji_result", value =  jsonObject.toString())
                 delay(500)
                 animationRectList.remove(item)
             }

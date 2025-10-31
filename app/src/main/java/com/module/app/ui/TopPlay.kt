@@ -1,4 +1,4 @@
-package com.module.noble.ui
+package com.module.app.ui
 
 import androidx.activity.compose.*
 import androidx.compose.animation.core.*
@@ -14,9 +14,6 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
-import androidx.navigation.*
-import androidx.navigation.compose.*
 import com.helper.develop.nav.*
 import com.helper.develop.util.getStringOrNull
 import com.module.basic.route.*
@@ -27,30 +24,12 @@ import kotlinx.coroutines.delay
 import org.json.JSONObject
 
 
-fun NavGraphBuilder.noblePlayDialog() = dialog(
-    route = AppRoutes.NoblePlay.static,
-    arguments = AppRoutes.NoblePlay.arguments, dialogProperties = DialogProperties(
-        usePlatformDefaultWidth = false
-    )
-) {
-    UpdateDialogWindow {
-        it.dimAmount = 0f
-    }
-    NoblePlayDialog()
-}
-
 @Composable
-internal fun NoblePlayDialog() {
-    val localBack = LocalOnBackPressedDispatcherOwner.current
-    val localNav = LocalNavController.current
-    val json = localNav.currentBackStackEntry!!.savedStateHandle.get<String>("json").orEmpty()
-    val jsonObject = JSONObject(json)
-    Box(modifier = Modifier.fillMaxSize()) {
-        Top(jsonObject)
-    }
+internal fun TopPlay(json: String, block: () -> Unit) {
+    Top(JSONObject(json))
     LaunchedEffect(Unit) {
         delay(3000)
-        localBack?.onBackPressedDispatcher?.onBackPressed()
+        block()
     }
 }
 

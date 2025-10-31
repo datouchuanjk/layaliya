@@ -39,7 +39,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.helper.develop.nav.*
 import com.helper.develop.util.buildJsonArray
-import com.helper.develop.util.toJson
 import com.helper.im.data.IMGiftBody
 import com.helper.im.data.IMImageBody
 import com.helper.im.data.IMInvitationBody
@@ -57,8 +56,6 @@ import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.basic.util.onClick
 import com.module.chat.R
 import com.module.chat.viewmodel.ChatViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -77,8 +74,20 @@ fun NavGraphBuilder.chatScreen() = composable(
 internal fun ChatScreen(viewModel: ChatViewModel = apiHandlerViewModel()) {
     val localNav = LocalNavController.current
     LaunchedEffect(Unit) {
-        localNav.collectResult<String>("send_gift_result") {
+        localNav.collectResultFrom<String>(
+            route = AppRoutes.Gift.static,
+            key = "send_gift_result"
+        ) {
             viewModel.handleGift(it)
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.receiveGiftMessagesFlow.collect {
+            localNav.navigateAndWaitPop(
+                AppRoutes.GiftPlay.dynamic(
+                    "json" to it
+                )
+            )
         }
     }
     val userInfo by viewModel.userInfo.collectAsState()
@@ -135,18 +144,18 @@ private fun ColumnScope.ChatList(
         LaunchedEffect(viewModel.lazyState) {
             snapshotFlow { viewModel.lazyState.layoutInfo.totalItemsCount }
                 .filter {
-                    it>0 &&!viewModel.pagingData.isEmpty()
+                    it > 0 && !viewModel.pagingData.isEmpty()
                 }
                 .distinctUntilChanged()
                 .collect {
-                    Log.e("1234","我的长度变化了哦")
-                    withFrameMillis {  }
+                    Log.e("1234", "我的长度变化了哦")
+                    withFrameMillis { }
                     val iMMessage = viewModel.pagingData.peek(0)
-                    Log.e("1234","消息内容是 ${iMMessage.text} isSelf=${iMMessage.isSelf}")
+                    Log.e("1234", "消息内容是 ${iMMessage.text} isSelf=${iMMessage.isSelf}")
                     if (iMMessage.isSelf) {
                         viewModel.lazyState.animateScrollToItem(0)
-                    } else if(viewModel.lazyState.canScrollBackward){
-                        isShowScrollToBottomButton =true
+                    } else if (viewModel.lazyState.canScrollBackward) {
+                        isShowScrollToBottomButton = true
                     }
                 }
         }

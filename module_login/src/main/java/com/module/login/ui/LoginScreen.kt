@@ -1,11 +1,8 @@
 package com.module.login.ui
 
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -57,13 +54,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.helper.develop.nav.LocalNavController
-import com.helper.develop.nav.navigateTo
-import com.helper.develop.util.toJson
+import com.helper.develop.nav.navigateAndPopCurrent
 import com.helper.develop.util.toast
 import com.module.basic.route.AppRoutes
 import com.module.basic.ui.*
@@ -126,9 +121,9 @@ internal fun LoginScreen(viewModel: LoginViewModel = apiHandlerViewModel()) {
             LaunchedEffect(Unit) {
                 viewModel.loginResultFlow.collect {
                     if (it)
-                        hostController.navigateTo(AppRoutes.Main.static)
+                        hostController.navigateAndPopCurrent(AppRoutes.Main.static)
                     else {
-                        hostController.navigateTo(
+                        hostController.navigateAndPopCurrent(
                             AppRoutes.PersonEdit.dynamic(
                                 "fromComplete" to true
                             )

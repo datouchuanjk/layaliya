@@ -34,7 +34,7 @@ fun LauncherScreen(viewModel: LauncherViewModel = apiHandlerViewModel()) {
     LaunchedEffect(Unit) {
         viewModel.routeFlow
             .collect{
-                localNav.navigateTo(it)
+                localNav.navigateAndPopCurrent(it)
             }
     }
     LaunchedEffect(Unit) {

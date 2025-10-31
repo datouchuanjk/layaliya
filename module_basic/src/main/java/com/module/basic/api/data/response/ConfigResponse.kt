@@ -1,18 +1,9 @@
 package com.module.basic.api.data.response
 
 
-import android.content.Context
 import android.util.Log
 import com.google.gson.annotations.SerializedName
 import androidx.annotation.Keep
-import com.helper.develop.util.downloadToFile
-import com.helper.develop.util.ensureExists
-import com.helper.develop.util.extension
-import com.helper.develop.util.fromTypeJson
-import com.helper.develop.util.getAttr
-import com.helper.develop.util.setAttr
-import com.module.basic.sp.AppGlobal
-import java.io.File
 
 /**
  * 配置信息

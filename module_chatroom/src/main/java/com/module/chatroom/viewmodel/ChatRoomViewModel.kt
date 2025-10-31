@@ -55,13 +55,15 @@ internal class ChatRoomViewModel(
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
-    fun handleEmoji(emojiId: String) {
+    fun handleEmoji(emojiId: String?) {
+        emojiId?:return
         viewModelScope.launch {
             chatroomHandler.sendEmoji(emojiId)
         }
     }
 
-    fun handleGift(string: String) {
+    fun handleGift(string: String?) {
+        string?:return
         viewModelScope.launch {
             chatroomHandler.sendGift(string)
         }

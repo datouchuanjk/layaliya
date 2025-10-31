@@ -8,19 +8,23 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.helper.develop.nav.*
 import com.helper.develop.util.CustomActivityResultContracts
-import com.helper.develop.util.KeyboardHeightFlow
 import com.helper.develop.util.createDensityContext
 import com.helper.develop.util.createNotificationChannel
 import com.helper.im.IMHelper
@@ -29,13 +33,16 @@ import com.module.agent.ui.agentScreen
 import com.module.agent.ui.bdScreen
 import com.module.agent.ui.coinDetailScreen
 import com.module.agent.ui.coinMerchantScreen
+import com.module.app.viewmodel.HostViewModel
 import com.module.bag.ui.*
 import com.module.basic.constant.AppConstant
 import com.module.basic.route.AppRoutes
 import com.module.basic.sp.AppGlobal
 import com.module.basic.sp.clearToken
+import com.module.basic.ui.SpacerHeight
 import com.module.basic.ui.base.bigImageScreen
 import com.module.basic.ui.base.webViewScreen
+import com.module.basic.viewmodel.apiHandlerViewModel
 import com.module.charm.ui.*
 import com.module.chat.ui.chatScreen
 import com.module.community.ui.postCommunityScreen
@@ -56,7 +63,6 @@ import com.module.game.ui.gameListScreen
 import com.module.game.ui.gameScreen
 import com.module.gift.ui.*
 import com.module.noble.ui.dialog.explainScreen
-import com.module.noble.ui.noblePlayDialog
 import com.module.room.ui.roomCreateCheckDialog
 import com.module.setting.ui.*
 import com.module.store.ui.*
@@ -74,7 +80,6 @@ class HostActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         handleIntent(intent)
         enableEdgeToEdge()
-        initNotification()
         val sp = get<SharedPreferences>()
         IMHelper.initV2(application)
         lifecycleScope.launch {
@@ -91,45 +96,18 @@ class HostActivity : ComponentActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            IMHelper.giftMessageHandler.receiveMessagesFlow.collect {
-                val localNav = _navController ?: return@collect
-                if (localNav.currentDestination?.route == AppRoutes.Game.static) {
-                    return@collect
-                }
-                val isShowSvg = localNav.currentComposableRoute == AppRoutes.Chat.static
-                localNav.waitPopBackStack(AppRoutes.GiftPlay.static)
-                localNav.navigate(
-                    AppRoutes.GiftPlay.dynamic(
-                        "json" to it, "isShowSvg" to isShowSvg
-                    )
-                )
-            }
-        }
-        lifecycleScope.launch {
-            IMHelper.notificationMessageHandler.receiveMessagesFlow.collect {
-                val localNav = _navController ?: return@collect
-                if (localNav.currentDestination?.route == AppRoutes.Game.static) {
-                    return@collect
-                }
-                localNav.waitPopBackStack(AppRoutes.NoblePlay.static)
-                localNav.navigate(
-                    AppRoutes.NoblePlay.dynamic(
-                        "json" to it
-                    )
-                )
-            }
-        }
-
         setContent {
-            val localKeyboardHeight by KeyboardHeightFlow.collectAsState()
             NavControllerLocalProvider { navController ->
-
-                    _navController = navController
+                val viewModel: HostViewModel = apiHandlerViewModel()
+                _navController = navController
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding(),
+                ) {
                     NavHost(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .navigationBarsPadding(),
+                            .fillMaxSize(),
                         navController = navController,
                         startDestination = AppRoutes.Launcher.static
                     ) {
@@ -166,13 +144,38 @@ class HostActivity : ComponentActivity() {
                         roomCreateCheckDialog()
                         chatroomEnterCheckDialog()
                         giftPlayDialog()
-                        noblePlayDialog()
                         gameListScreen()
                         gameScreen()
                         gameDialog()
                         webViewScreen()
                         explainScreen()
                     }
+                    Column(
+                        modifier = Modifier.statusBarsPadding()
+                    ) {
+                        viewModel.top1?.let {
+                            key(it) {
+                                TopPlay(it) {
+                                    viewModel.top1 = viewModel.get()
+                                }
+                            }
+                        }
+                        viewModel.top2?.let {
+                            key(it) {
+                                TopPlay(it) {
+                                    viewModel.top2 = viewModel.get()
+                                }
+                            }
+                        }
+                        viewModel.top3?.let {
+                            key(it) {
+                                TopPlay(it) {
+                                    viewModel.top3 = viewModel.get()
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -204,7 +207,6 @@ class HostActivity : ComponentActivity() {
      * 处理通知栏渠道与权限
      */
     private fun initNotification() {
-        return
         createNotificationChannel(AppConstant.CHANNEL_ID)
         registerForActivityResult(
             CustomActivityResultContracts.RequestNotificationPermission()

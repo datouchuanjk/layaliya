@@ -115,7 +115,7 @@ internal fun GiftDialog(viewModel: GiftViewModel = apiHandlerViewModel()) {
                         if (isShowPopup) {
                             AppListPopup(
                                 list = viewModel.userInfos,
-                                map = { it.nickname.toString() },
+                                map = { it.nickname },
                                 onDismissRequest = {
                                     isShowPopup = false
                                 },

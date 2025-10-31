@@ -10,6 +10,15 @@ val Calendar.YMD: String
         append("-")
         append(dayOfMonth.toString().padStart(2, '0'))
     }
+
+val Calendar.HMS: String
+    get() = buildString {
+        append(hourOfDay.toString().padStart(2, '0'))
+        append("-")
+        append((minute+1).toString().padStart(2, '0'))
+        append("-")
+        append(second.toString().padStart(2, '0'))
+    }
 var Calendar.year: Int
     get() = get(Calendar.YEAR)
     set(value) {

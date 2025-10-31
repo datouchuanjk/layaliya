@@ -47,7 +47,6 @@ object IMHelper : CoroutineScope by MainScope() {
     /**
      * 全局单例
      */
-    val giftMessageHandler by lazy { IMGiftMessageHandler(this) }
     val notificationMessageHandler by lazy { IMNotificationMessageHandler(this) }
 
 
