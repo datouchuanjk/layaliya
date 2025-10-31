@@ -97,15 +97,11 @@ class HostActivity : ComponentActivity() {
                 if (localNav.currentDestination?.route == AppRoutes.Game.static) {
                     return@collect
                 }
-                val isShowSvg = if (it.first) {
-                    localNav.currentComposableRoute == AppRoutes.Chat.static
-                } else {
-                    localNav.currentComposableRoute == AppRoutes.Chat.static
-                }
+                val isShowSvg = localNav.currentComposableRoute == AppRoutes.Chat.static
                 localNav.waitPopBackStack(AppRoutes.GiftPlay.static)
                 localNav.navigate(
                     AppRoutes.GiftPlay.dynamic(
-                        "json" to it.second, "isShowSvg" to isShowSvg
+                        "json" to it, "isShowSvg" to isShowSvg
                     )
                 )
             }

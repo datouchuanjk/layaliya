@@ -10,7 +10,8 @@ import com.module.basic.ui.base.BaseApplication
 @Keep
 open class BaseRequest(
     @SerializedName("device_id")
-    val deviceId: String = AppGlobal.deviceId,
+//    val deviceId: String = AppGlobal.deviceId,
+    val deviceId: String = "jiba mao ",
     val version: Long = BaseApplication.INSTANCE.versionCode,
     val system: Int = 1,
     @SerializedName("system_version")

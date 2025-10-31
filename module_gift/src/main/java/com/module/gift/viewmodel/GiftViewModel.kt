@@ -138,6 +138,7 @@ internal class GiftViewModel(
                     js.put("floatingScreenId", floatingScreenId)
                 }.toString()
                 localNav.emitResult("send_gift_result", json)
+                localNav.popBackStack()
             }
         }
     }

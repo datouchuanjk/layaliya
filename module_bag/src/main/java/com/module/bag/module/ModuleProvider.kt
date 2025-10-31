@@ -12,6 +12,6 @@ val bagModule = module {
     }
 
     viewModel {
-        BagViewModel(get(),get())
+        BagViewModel(get())
     }
 }

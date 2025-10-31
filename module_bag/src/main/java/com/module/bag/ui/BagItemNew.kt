@@ -26,6 +26,7 @@ import com.module.bag.api.data.response.BagResponse
 import com.module.bag.viewmodel.BagViewModel
 import com.module.basic.ui.AppImage
 import com.module.basic.ui.SpacerHeight
+import com.module.basic.ui.paging.itemsIndexed
 import com.module.basic.util.appBrushBackground
 import com.module.basic.util.onClick
 
@@ -41,17 +42,15 @@ internal fun BagItemNew(viewModel: BagViewModel) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(items = viewModel.selectedList, key = {
-            it.id
-        }) {
-            Item(it,viewModel)
+        itemsIndexed(items = viewModel.selectedList, key = { index, it -> it.id }) { index, it ->
+            Item(index,it, viewModel)
         }
     }
 }
 
 
 @Composable
-private fun Item(item: BagResponse.Item,viewModel: BagViewModel) {
+private fun Item(index:Int,item: BagResponse.Item, viewModel: BagViewModel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .background(
@@ -62,7 +61,8 @@ private fun Item(item: BagResponse.Item,viewModel: BagViewModel) {
                     ),
                 ), shape = RoundedCornerShape(16.dp)
             )
-            .padding(vertical = 13.dp)) {
+            .padding(vertical = 13.dp)
+    ) {
         AppImage(
             model = item.pic,
             modifier = Modifier.size(120.dp)
@@ -85,15 +85,28 @@ private fun Item(item: BagResponse.Item,viewModel: BagViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp)
-                .appBrushBackground(shape = RoundedCornerShape(12.dp))
+                .then(
+                    if (item.use == "1") {
+                        Modifier.background(
+                            color = Color(0xfff5f5f5),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    } else {
+                        Modifier.appBrushBackground(shape = RoundedCornerShape(12.dp))
+                    }
+                )
                 .padding(vertical = 7.dp)
-                .onClick{
-                    viewModel.use(item.id.toString(),item.use.orEmpty())
+                .onClick(item.use != "1") {
+                    viewModel.use(index,item)
                 }
                 .wrapContentWidth(),
-            text = stringResource(R.string.bag_use_now),
+            text = if (item.use == "1") {
+                stringResource(R.string.bag_using)
+            } else {
+                stringResource(R.string.bag_use_now)
+            },
             fontSize = 14.sp,
-            color = Color.White
+            color = if (item.use == "1") Color(0xff999999) else Color.White
         )
     }
 }

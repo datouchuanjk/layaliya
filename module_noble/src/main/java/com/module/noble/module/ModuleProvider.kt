@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 
 val nobleModule = module {
     viewModel {
-        NobleViewModel(get())
+        NobleViewModel(get(),get())
     }
 
     viewModel {

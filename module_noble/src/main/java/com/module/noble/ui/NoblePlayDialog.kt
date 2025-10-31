@@ -21,6 +21,7 @@ import com.helper.develop.nav.*
 import com.helper.develop.util.getStringOrNull
 import com.module.basic.route.*
 import com.module.basic.ui.*
+import com.module.basic.util.onClick
 import com.module.noble.R
 import kotlinx.coroutines.delay
 import org.json.JSONObject
@@ -33,7 +34,7 @@ fun NavGraphBuilder.noblePlayDialog() = dialog(
     )
 ) {
     UpdateDialogWindow {
-        it.dimAmount =0f
+        it.dimAmount = 0f
     }
     NoblePlayDialog()
 }
@@ -55,6 +56,7 @@ internal fun NoblePlayDialog() {
 
 @Composable
 private fun Top(jsonObject: JSONObject) {
+    val localNav = LocalNavController.current
     val content = jsonObject.getStringOrNull("content").orEmpty()
     val icon = jsonObject.getStringOrNull("icon").orEmpty()
     val nickname = jsonObject.getStringOrNull("nickname").orEmpty()
@@ -93,6 +95,9 @@ private fun Top(jsonObject: JSONObject) {
                 contentScale = ContentScale.Crop
             )
             .height(height)
+            .onClick {
+                localNav.navigate(AppRoutes.Noble.static)
+            }
     ) {
         Box(modifier = Modifier.height(42.dp))
         Row(
@@ -104,7 +109,7 @@ private fun Top(jsonObject: JSONObject) {
                 .wrapContentSize()
         ) {
             Text(
-                content.replaceFirst("*",nickname).replaceFirst("*",levelName),
+                content.replaceFirst("*", nickname).replaceFirst("*", levelName),
                 color = textColor,
                 fontSize = 10.sp
             )

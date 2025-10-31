@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import com.helper.develop.util.YMD
+import com.module.basic.api.service.BasicApiService
 import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.BaseViewModel
 import com.module.noble.api.data.request.BuyNobleRequest
@@ -15,9 +17,11 @@ import com.module.noble.api.service.NobleApiService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 internal class NobleViewModel(
-    private val api: NobleApiService
+    private val api: NobleApiService,
+    private val basicApi: BasicApiService,
 ) : BaseViewModel() {
 
     init {
@@ -26,15 +30,16 @@ internal class NobleViewModel(
 
     val nobleLevel get() = AppGlobal.userResponse?.nobleLevel ?: 0
 
+    val nobleExpireTime get() = AppGlobal.userResponse?.nobleExpireTime ?.let {
+        Calendar.getInstance().apply { timeInMillis = it*1000 }
+    }?.YMD
 
     /**
      * 当前选中的
      */
     private var _selectedIndex by mutableIntStateOf(if (nobleLevel > 0) nobleLevel - 1 else 0)
-    val  selectedIndex get()= _selectedIndex
-    val nobleExpireTime by mutableStateOf(
-        if (nobleLevel> 0) AppGlobal.userResponse?.nobleExpireTime else null
-    )
+    val selectedIndex get() = _selectedIndex
+
 
     fun selectedIndex(index: Int) {
         _selectedIndex = index
@@ -74,8 +79,11 @@ internal class NobleViewModel(
                         level = level
                     )
                 ).checkAndGet()
+                basicApi.user().checkAndGet()
             }.apiResponse {
+                AppGlobal.userResponse(it)
                 _buyFlow.emit(Unit)
+
             }
         }
     }

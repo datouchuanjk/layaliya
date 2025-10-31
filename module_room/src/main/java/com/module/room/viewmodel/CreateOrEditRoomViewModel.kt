@@ -1,7 +1,5 @@
 package com.module.room.viewmodel
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,13 +13,12 @@ import com.module.basic.util.UploadUtils
 import com.module.basic.viewmodel.BaseViewModel
 import com.module.room.R
 import com.module.room.api.data.request.RoomCreateOrEditRequest
-import com.module.room.api.data.request.RoomInfo
+import com.module.room.api.data.response.CreateRoomResponse
 import com.module.room.api.service.RoomApiService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.io.File
 
 internal class CreateOrEditRoomViewModel(
@@ -30,17 +27,17 @@ internal class CreateOrEditRoomViewModel(
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel() {
 
-    val isEdit = savedStateHandle.get<Boolean>("isEdit") ?: false
 
     /**
      * 获取修改的房间信息
      */
-    private val _roomInfo = savedStateHandle.get<String>("roomInfo")?.fromJson<RoomInfo>()
+    val roomInfo = savedStateHandle.get<String>("roomInfo")?.fromJson<CreateRoomResponse.RoomInfo>()
+    val type = savedStateHandle.get<Int>("type")?:0
 
     /**
      * 名字
      */
-    private var _name by mutableStateOf(_roomInfo?.name.orEmpty())
+    private var _name by mutableStateOf(roomInfo?.name.orEmpty())
     val name get() = _name
     fun name(name: String) {
         _name = name
@@ -49,7 +46,7 @@ internal class CreateOrEditRoomViewModel(
     /**
      * 描述
      */
-    private var _announcement by mutableStateOf(_roomInfo?.introduce.orEmpty())
+    private var _announcement by mutableStateOf(roomInfo?.introduce.orEmpty())
     val announcement get() = _announcement
     fun announcement(name: String) {
         _announcement = name
@@ -58,7 +55,7 @@ internal class CreateOrEditRoomViewModel(
     /**
      * 国家
      */
-    private var _country by mutableStateOf(AppGlobal.getCountryByCode(_roomInfo?.countryCode))
+    private var _country by mutableStateOf(AppGlobal.getCountryByCode(roomInfo?.countryCode))
     val country get() = _country
     fun country(value: ConfigResponse.Country) {
         _country = value
@@ -68,7 +65,7 @@ internal class CreateOrEditRoomViewModel(
      * 房间类型
      */
     val roomTypeList = AppGlobal.configResponse?.roomType ?: emptyList()
-    private var _roomType by mutableStateOf(AppGlobal.getRoomTypeById(_roomInfo?.type))
+    private var _roomType by mutableStateOf(AppGlobal.getRoomTypeById(roomInfo?.type))
     val roomType get() = _roomType
     fun roomType(value: ConfigResponse.RoomType) {
         _roomType = value
@@ -77,7 +74,7 @@ internal class CreateOrEditRoomViewModel(
     /**
      * 语言类型
      */
-    private var _language by mutableStateOf(AppGlobal.getLanguageByCode(_roomInfo?.language))
+    private var _language by mutableStateOf(AppGlobal.getLanguageByCode(roomInfo?.language))
     val language get() = _language
     fun language(value: ConfigResponse.Language) {
         _language = value
@@ -102,13 +99,13 @@ internal class CreateOrEditRoomViewModel(
         MicNum(R.drawable.room_ic_mic_20, Color(0xffE49A17), "20-VIP", 5, 20),
         MicNum(R.drawable.room_ic_mic_13, Color(0xffE49A17), "Stage-VIP", 6, 13)
     )
-    private var _micNum by mutableStateOf<MicNum?>(numList.find { it.count == _roomInfo?.mikeNum })
+    private var _micNum by mutableStateOf<MicNum?>(numList.find { it.count == roomInfo?.mikeNum })
     val micNum get() = _micNum
     fun micNum(micNum: MicNum) {
         _micNum = micNum
     }
 
-    private var _cover by mutableStateOf(_roomInfo?.cover)
+    private var _cover by mutableStateOf(roomInfo?.cover)
     val cover get() = _cover
     fun cover(file: File) {
         viewModelScope.launch {
@@ -128,8 +125,7 @@ internal class CreateOrEditRoomViewModel(
     fun roomCreate() {
         viewModelScope.launch {
             apiRequest {
-                val type = api.roomCheck().checkAndGet()!!.type
-                if (_roomInfo == null) {
+                if (roomInfo == null) {
                     val result = api.roomCreate(
                         RoomCreateOrEditRequest(
                             init = type,

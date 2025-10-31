@@ -2,6 +2,7 @@ package com.module.room.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.module.basic.viewmodel.BaseViewModel
+import com.module.room.api.data.response.RoomCheckResponse
 import com.module.room.api.service.RoomApiService
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -12,7 +13,7 @@ internal class RoomCheckViewModel(
 ) : BaseViewModel() {
 
 
-    private val _checkResultfulFlow = MutableSharedFlow<Boolean>()
+    private val _checkResultfulFlow = MutableSharedFlow<RoomCheckResponse?>()
     val checkResultfulFlow = _checkResultfulFlow.asSharedFlow()
 
     private fun check() {
@@ -22,10 +23,10 @@ internal class RoomCheckViewModel(
             }.apiResponse(
                 catch = { _, b->
                     b()
-                    _checkResultfulFlow.emit(false)
+                    _checkResultfulFlow.emit(null)
                 }
             ) {
-                _checkResultfulFlow.emit(true)
+                _checkResultfulFlow.emit(it)
             }
         }
     }

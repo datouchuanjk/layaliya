@@ -46,9 +46,9 @@ object AppRoutes {
         }.build()
     val RoomCreateCheck = NavRouter.Builder("RoomCreateCheck").build()
     val CreateOrEditRoom = NavRouter.Builder("createOrEditRoom")
-        .argument("isEdit") {
-            type = NavType.BoolType
-            defaultValue = false
+        .argument("type") {
+            type = NavType.IntType
+            defaultValue = 0
         }
         .argument("roomInfo") {
             type = NavType.StringType
@@ -183,16 +183,7 @@ object AppRoutes {
         }
         .build()
 
-    val GiftPlay = NavRouter.Builder("GiftPlay")
-        .argument("json") {
-            type = NavType.StringType
-            defaultValue = ""
-        }
-        .argument("isShowSvg") {
-            type = NavType.BoolType
-            defaultValue = true
-        }
-        .build()
+    val GiftPlay = NavRouter.Builder("GiftPlay").build()
     val NoblePlay = NavRouter.Builder("NoblePlay")
         .argument("json") {
             type = NavType.StringType

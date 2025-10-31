@@ -142,18 +142,18 @@ private fun Top(jsonObject: JSONObject) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(sendName, color = textColor, fontSize = 10.sp)
-                    SpacerWidth(8.dp)
-                    Text(
-                        "UID:${sendUid}",
-                        fontSize = 8.sp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .background(
-                                color = Color.White.copy(0.2f),
-                                shape = RoundedCornerShape(7.dp)
-                            )
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
-                    )
+//                    SpacerWidth(8.dp)
+//                    Text(
+//                        "UID:${sendUid}",
+//                        fontSize = 8.sp,
+//                        color = Color.White,
+//                        modifier = Modifier
+//                            .background(
+//                                color = Color.White.copy(0.2f),
+//                                shape = RoundedCornerShape(7.dp)
+//                            )
+//                            .padding(horizontal = 4.dp, vertical = 2.dp)
+//                    )
                 }
                 SpacerHeight(4.dp)
                 Row {

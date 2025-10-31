@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,7 +55,7 @@ internal fun BagItem(viewModel: BagViewModel) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(items = viewModel.selectedList,key= {
+            items(items = viewModel.selectedList, key = {
                 it.id
             }) {
                 Box(
@@ -64,7 +65,7 @@ internal fun BagItem(viewModel: BagViewModel) {
                                 painter = painterResource(R.drawable.bag_bg_selected_item),
                                 contentScale = ContentScale.Crop
                             ) else Modifier.background(
-                                color = Color.White,
+                                Color.White,
                                 shape = RoundedCornerShape(12.dp)
                             )
                         )
@@ -74,14 +75,16 @@ internal fun BagItem(viewModel: BagViewModel) {
                 }
             }
         }
-        if(viewModel.selectedListItem!=null){
+        if (viewModel.selectedListItem != null) {
             Buy(viewModel)
         }
     }
 }
+
 @Composable
 private fun Buy(viewModel: BagViewModel) {
-
+    val selectedListItem = viewModel.selectedListItem
+    val use = selectedListItem?.use == "1"
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -110,22 +113,40 @@ private fun Buy(viewModel: BagViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xffFF76BD),
-                            Color(0xffFF4070),
+                .width(100.dp)
+                .then(
+                    if (use) {
+                        Modifier.background(
+                            color = Color(0xfff5f5f5) ,
+                            shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
+                        ).border(
+                            width = 1.dp,
+                            color = Color(0xff333333) ,
+                            shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
                         )
-                    ), shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
-                ).onClick{
+                    } else {
+                        Modifier.background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color(0xffFF76BD),
+                                    Color(0xffFF4070),
+                                )
+                            ), shape = RoundedCornerShape(topEnd = 25.dp, bottomEnd = 25.dp)
+                        )
+                    }
+                )
+                .onClick(!use){
                     viewModel.use()
-                }
+                } .wrapContentSize()
         ) {
             Text(
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 12.dp),
-                text = stringResource(R.string.bag_use),
+                text =if (use) {
+                    stringResource(R.string.bag_using)
+                } else {
+                    stringResource(R.string.bag_use_now)
+                },
                 fontSize = 20.sp,
-                color = Color.White
+                color = if (use ) Color(0xff999999) else Color.White
             )
         }
     }
@@ -147,7 +168,8 @@ private fun Item(item: BagResponse.Item, onSelected: (BagResponse.Item) -> Unit)
                 .background(
                     color = Color(0xffFBBB49),
                     shape = RoundedCornerShape(10.dp)
-                ).padding(start = 20.dp)
+                )
+                .padding(start = 20.dp)
                 .wrapContentSize()
         )
         Image(

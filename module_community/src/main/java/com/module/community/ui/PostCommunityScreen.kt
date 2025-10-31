@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -123,13 +124,27 @@ internal fun PostCommunityScreen(viewModel: PostCommunityViewModel = apiHandlerV
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(items = viewModel.images) { item ->
-                        AppImage(
-                            item,
-                            modifier = Modifier
+                        Box(
+                            Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(120f / 140)
-                                .clip(RoundedCornerShape(8.dp))
-                        )
+                        ) {
+                            AppImage(
+                                item,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(8.dp))
+                            )
+                            AppImage(
+                                model = R.drawable.community_ic_delete,
+                                modifier = Modifier
+                                    .align(alignment = Alignment.TopEnd)
+                                    .padding(top = 5.dp, end = 5.dp)
+                                    .size(20.dp)
+                            ) {
+                                viewModel.deleteImage(item)
+                            }
+                        }
                     }
                     if (viewModel.isShowAddImage) {
                         item {
@@ -159,9 +174,11 @@ internal fun PostCommunityScreen(viewModel: PostCommunityViewModel = apiHandlerV
             }
             SpacerHeight(24.dp)
             Text(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
                 text = buildAnnotatedString {
-                    append( "1.It is forbidden to publish fraudulent advertisements and vulgar content.")
+                    append("1.It is forbidden to publish fraudulent advertisements and vulgar content.")
                     appendLine()
                     append("2.Personal attacks, insults, and hate speech are prohibited.")
                     appendLine()

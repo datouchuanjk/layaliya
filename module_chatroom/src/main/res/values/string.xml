@@ -58,8 +58,8 @@
     <string name="room_upload_photos" >Upload photos</string>
     <string name="room_report_successful" >Report Successful</string>
     <string name="room_not_empty_seat" >Not empty seat</string>
-    <string name="room_up_seat" >Up seat</string>
-    <string name="room_down_seat" >Down seat</string>
+    <string name="room_up_seat" >Take seat</string>
+    <string name="room_down_seat" >Leave seat</string>
     <string name="room_must_up_seat_before_you_open_or_close" >Must up seat before you open or close</string>
     <string name="room_set_as_admin">You have been set as an administrator</string>
     <string name="room_removed_from_admin">Your administrator privileges have been removed</string>

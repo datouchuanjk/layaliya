@@ -125,12 +125,13 @@ class IMChatroomHandler(
 
     fun exit() {
         launch {
-        _chatroomClient.exit()
-        V2NIMChatroomClient.destroyInstance(_chatroomClient.instanceId)
+            _chatroomClient.exit()
+            V2NIMChatroomClient.destroyInstance(_chatroomClient.instanceId)
             _outFlow.emit(false)
         }
     }
 
+    var emojiJob: Job? = null
     suspend fun sendEmoji(string: String) {
         var jsonObject = JSONObject().apply {
             put("code", 1036)
@@ -146,22 +147,26 @@ class IMChatroomHandler(
                 b.resumeWithException(it.transform())
             }, {})
         }
-        delay(5000)
-        val item = JSONObject(string)
-        item.remove("emojiId")
-        jsonObject = JSONObject().apply {
-            put("code", 1036)
-            put("data", JSONObject().apply {
-                put("emoji", item)
-            })
-        }
-        suspendCancellableCoroutine { b ->
-            val message = V2NIMChatroomMessageCreator.createCustomMessage(jsonObject.toString())
-            _chatroomService?.sendMessage(message, null, {
-                b.resume(Unit)
-            }, {
-                b.resumeWithException(it.transform())
-            }, {})
+
+        emojiJob?.cancel()
+        emojiJob = launch {
+            delay(5000)
+            val item = JSONObject(string)
+            item.remove("emojiId")
+            jsonObject = JSONObject().apply {
+                put("code", 1036)
+                put("data", JSONObject().apply {
+                    put("emoji", item)
+                })
+            }
+            suspendCancellableCoroutine { b ->
+                val message = V2NIMChatroomMessageCreator.createCustomMessage(jsonObject.toString())
+                _chatroomService?.sendMessage(message, null, {
+                    b.resume(Unit)
+                }, {
+                    b.resumeWithException(it.transform())
+                }, {})
+            }
         }
     }
 

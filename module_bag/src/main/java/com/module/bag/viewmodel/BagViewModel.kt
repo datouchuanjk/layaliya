@@ -3,6 +3,7 @@ package com.module.bag.viewmodel
 import android.app.Application
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
+import com.helper.develop.util.findIndex
 import com.helper.develop.util.toast
 import com.module.bag.api.data.request.UseBagRequest
 import com.module.basic.viewmodel.*
@@ -11,11 +12,9 @@ import com.module.bag.api.service.BagApiService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import com.module.bag.R
 
 internal class BagViewModel(
     private val api: BagApiService,
-    private val application: Application,
 ) : BaseViewModel() {
 
     init {
@@ -51,6 +50,7 @@ internal class BagViewModel(
     }
 
     val selectedListItem get() = _selectedList.find { it.isSelected }
+    val selectedListItemIndex get() = _selectedList.findIndex { it.isSelected }
 
     private fun bagInfo() {
         viewModelScope.launch {
@@ -67,23 +67,27 @@ internal class BagViewModel(
     val useSuccessfulFlow = _useSuccessfulFlow.asSharedFlow()
     fun use() {
         val item = selectedListItem ?: return
-        use(item.id.toString(), item.use.orEmpty())
+        val index = selectedListItemIndex ?: return
+        use(index, item)
     }
 
-    fun use(id: String, use: String) {
-        if (use == "1") {
-            application.toast(R.string.bag_already_used)
-            return
-        }
+    fun use(index: Int, item: BagResponse.Item) {
         viewModelScope.launch {
             apiRequest {
                 api.use(
                     UseBagRequest(
-                        propId = id
+                        propId = item.id.toString()
                     )
                 ).checkAndGet()
             }.apiResponse {
                 _useSuccessfulFlow.emit(Unit)
+                _selectedList[index] = item.copy(use = "1")
+                val list = _storeResponse?.list.orEmpty().toMutableMap()
+                val tabIndex = tabs.getOrNull(index)?.index ?: return@apiResponse
+                list[tabIndex] = selectedList
+                _storeResponse = _storeResponse?.copy(
+                    list = list
+                )
             }
         }
     }

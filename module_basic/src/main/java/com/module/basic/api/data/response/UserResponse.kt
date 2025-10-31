@@ -36,7 +36,7 @@ data class UserResponse(
     val isSuper: Int?,
     val nickname: String?,
     @SerializedName("noble_expire_time")
-    val nobleExpireTime: Int?,
+    val nobleExpireTime: Long?,
     @SerializedName("noble_level")
     val nobleLevel: Int?,
     @SerializedName("room_info")

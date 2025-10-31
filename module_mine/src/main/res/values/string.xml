@@ -31,7 +31,7 @@
     <string name="mine_introduce">Introduce</string>
     <string name="mine_please_input">please input</string>
     <string name="mine_birthday">Birthday</string>
-    <string name="mine_sex">Sex</string>
+    <string name="mine_sex">Gender</string>
     <string name="mine_sex_man">man</string>
     <string name="mine_sex_woman">woman</string>
     <string name="mine_sex_unknow">unknow</string>

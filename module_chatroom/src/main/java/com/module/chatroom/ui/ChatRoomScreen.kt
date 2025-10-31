@@ -99,12 +99,14 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
         }
         LaunchedEffect(Unit) {
             viewModel.receiveGiftFlow.collect {
+                if (localNav.currentDestination?.route == AppRoutes.Game.static) {
+                    return@collect
+                }
                 localNav.waitPopBackStack(AppRoutes.GiftPlay.static)
                 localNav.navigate(
                     AppRoutes.GiftPlay.dynamic(
-                        "json" to it
-                    )
-                )
+                        "json" to it, "isShowSvg" to true
+                    ))
             }
         }
         LaunchedEffect(Unit) {
@@ -148,9 +150,9 @@ internal fun ChatRoomScreen(viewModel: ChatRoomViewModel = apiHandlerViewModel()
             message = "System is Failed please retry"
         )
         val localFocus = LocalFocusManager.current
-       val isShowIme =  WindowInsets.ime.getBottom(LocalDensity.current)>0
+        val isShowIme = WindowInsets.ime.getBottom(LocalDensity.current) > 0
         LaunchedEffect(isShowIme) {
-            if(!isShowIme&& viewModel.isInputFocused){
+            if (!isShowIme && viewModel.isInputFocused) {
                 localFocus.clearFocus()
             }
         }
@@ -454,7 +456,20 @@ private fun ChatRoomInfo(viewModel: ChatRoomViewModel, onShowSilencePickerDialog
         }
         SpacerWeight(1f)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            var selectedUid by remember { mutableStateOf<String?>(null) }
+            UserInfoPopup(
+                uid = selectedUid.orEmpty(),
+                viewModel = viewModel,
+                isShow = selectedUid != null,
+                onSilence = {
+                    onShowSilencePickerDialog()
+                },
+                onDismissRequest = {
+                    selectedUid = null
+                }
+            )
             viewModel.chatroomUserInfos.forEach {
+                it.uid
                 Image(
                     painter = rememberAsyncImagePainter(it.avatar),
                     contentDescription = null,
@@ -462,6 +477,9 @@ private fun ChatRoomInfo(viewModel: ChatRoomViewModel, onShowSilencePickerDialog
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
+                        .onClick {
+                            selectedUid = it.uid.toString()
+                        }
                 )
             }
         }

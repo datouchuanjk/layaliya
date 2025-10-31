@@ -35,21 +35,7 @@ data class NobleResponse(
 
     ) {
 
-    val nobleExpireTime: String? =
-        when (AppGlobal.userResponse?.nobleLevel) {
-            0, null -> {
-                null
-            }
-            level -> {
-                Calendar.getInstance()
-                    .apply {
-                        timeInMillis = AppGlobal.userResponse?.nobleExpireTime?.toLong() ?: 0L
-                    }.YMD
-            }
-            else -> {
-                null
-            }
-        }
+
     val textColor
         get() = when (level) {
             1 -> Brush.verticalGradient(colors = listOf(Color(0xffFFAC55), Color(0xff92350E)))

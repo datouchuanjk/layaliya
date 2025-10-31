@@ -1,6 +1,5 @@
 package com.module.room.ui
 
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavGraphBuilder
@@ -22,14 +21,18 @@ fun NavGraphBuilder.roomCreateCheckDialog() = dialog(route = AppRoutes.RoomCreat
 @Composable
 internal fun RoomCreateCheckDialog(viewModel: RoomCheckViewModel = apiHandlerViewModel()) {
     val localNav = LocalNavController.current
-    val localBack = LocalOnBackPressedDispatcherOwner.current
     LaunchedEffect(Unit) {
         viewModel.checkResultfulFlow
             .collect {
-                if(it){
-                    localNav.navigateTo(AppRoutes.CreateOrEditRoom.static)
-                }else{
-                    localBack?.onBackPressedDispatcher?.onBackPressed()
+                if (it == null) {
+                    localNav.popBackStack()
+                } else {
+                    localNav.navigateTo(
+                        AppRoutes.CreateOrEditRoom.dynamic(
+                            "type" to it.type,
+                            "roomInfo" to it.roomInfo
+                        )
+                    )
                 }
             }
     }

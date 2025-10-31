@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.boundsInRoot
@@ -59,6 +60,7 @@ internal fun EmojiDialog(viewModel: EmojiViewModel = apiHandlerViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(color = Color.Transparent)
     ) {
         val rectList = remember {
             mutableStateListOf<Rect>()
@@ -171,6 +173,7 @@ private fun FlyBox(item: Pair<String, Rect>, viewModel: EmojiViewModel) {
             }
             .width(width)
             .height(height)
+            .scale(1.1f)
             .clip(CircleShape)
     )
 }

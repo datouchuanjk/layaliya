@@ -45,6 +45,11 @@ internal class PostCommunityViewModel(
         }
     }
 
+    fun deleteImage(image: String){
+        _images.remove(image)
+        _isShowAddImage = _images.count() < 3
+    }
+
     /**
      * 发布
      */

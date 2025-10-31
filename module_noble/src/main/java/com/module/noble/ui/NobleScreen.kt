@@ -362,19 +362,22 @@ private fun VipBanner(
                                 brush = item.textColor
                             )
                         )
-                        Text(
-                            modifier = Modifier
-                                .padding(start = 14.dp),
-                            text = if (item.nobleExpireTime.isNullOrEmpty()) "" else "Expiration Date: ${
-                                item.nobleExpireTime
-                            }",
-                            style = TextStyle(
-                                fontSize = 10.sp,
-                                color = item.secondTextColor
+                        if (viewModel.selectedNobleResponse?.level == viewModel.nobleLevel) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 14.dp),
+                                text = "Expiration Date: ${
+                                    viewModel.nobleExpireTime
+                                }",
+                                style = TextStyle(
+                                    fontSize = 10.sp,
+                                    color = item.secondTextColor
+                                )
                             )
-                        )
+                        }
                     }
                     Row(
+                        verticalAlignment = Alignment.Bottom,
                         modifier = Modifier
                             .align(alignment = Alignment.BottomStart)
                             .onClick {

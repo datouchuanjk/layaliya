@@ -12,6 +12,7 @@ import androidx.navigation.*
 import com.helper.develop.nav.*
 import com.module.basic.sp.AppGlobal
 import com.module.basic.viewmodel.BaseViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -53,11 +54,12 @@ class EmojiViewModel(
     fun removeAnimationRectList(item: Pair<String, Rect>, localNav: NavHostController) {
         viewModelScope.launch {
             if (animationRectList.contains(item)) {
-                animationRectList.remove(item)
                 val jsonObject = JSONObject()
                 jsonObject.put("emojiId", item.first)
                 jsonObject.put("uid", AppGlobal.userResponse?.id.toString())
                 localNav.emitResult("send_emoji_result", jsonObject.toString())
+                delay(500)
+                animationRectList.remove(item)
             }
         }
     }

@@ -80,21 +80,5 @@ fun File.toProviderUri(
 ): Uri? = FileProvider.getUriForFile(context, authority, this)
 
 
-fun File.setAttr(key: String, value: String) {
-    try {
-        Os.setxattr(absolutePath, key, value.toByteArray(), 0)
-    }catch (e: Exception){
-        e.printStackTrace()
-        Log.e("1234","123 $absolutePath  456 set error ${e.message}")
-    }
-}
 
-fun File.getAttr(key: String): String? {
-    return try {
-        Os.getxattr(path, key)?.toString(Charsets.UTF_8)
-    } catch (e: ErrnoException) {
-        e.printStackTrace()
-        null
-    }
-}
 

@@ -2,6 +2,7 @@ package com.module.room.ui
 
 import android.view.Gravity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -77,9 +78,11 @@ internal fun CreateOrEditRoomScreen(viewModel: CreateOrEditRoomViewModel = apiHa
     LaunchedEffect(Unit) {
         viewModel.roomCreateSuccessful
             .collect {
-                localNav.navigateTo(AppRoutes.ChatroomEnterCheck.dynamic(
-                    "roomId" to it
-                ))
+                localNav.navigateTo(
+                    AppRoutes.ChatroomEnterCheck.dynamic(
+                        "roomId" to it
+                    )
+                )
             }
     }
     LaunchedEffect(Unit) {
@@ -97,7 +100,7 @@ internal fun CreateOrEditRoomScreen(viewModel: CreateOrEditRoomViewModel = apiHa
                 .padding(it.calculateBottomPadding())
         ) {
             AppTitleBar(
-                text = if (viewModel.isEdit) stringResource(R.string.room_chatroom_settings) else stringResource(
+                text = if (viewModel.roomInfo != null) stringResource(R.string.room_chatroom_settings) else stringResource(
                     R.string.room_chatroom_create
                 )
             )
@@ -113,10 +116,8 @@ internal fun CreateOrEditRoomScreen(viewModel: CreateOrEditRoomViewModel = apiHa
                 SpacerHeight(12.dp)
                 NameAndAnnouncement(viewModel)
                 SpacerHeight(12.dp)
-                Country(viewModel)
-                SpacerHeight(12.dp)
-                Language(viewModel)
-                SpacerHeight(12.dp)
+//                Country(viewModel)
+//                Language(viewModel)
                 RoomType(viewModel)
                 SpacerHeight(12.dp)
                 NumberOfMic(viewModel)
@@ -137,37 +138,49 @@ private fun Cover(viewModel: CreateOrEditRoomViewModel) {
     }
     AppBottomPickVisualSelected(
         isShow = isShow,
-        onDismissRequest ={
-            isShow =false
+        onDismissRequest = {
+            isShow = false
         },
         onResult = {
             viewModel.cover(it[0])
         }
     )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(44.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(16.dp))
-            .onClick {
-                isShow = true
-            }
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.room_cover),
-            fontSize = 20.sp,
-            color = Color(0xff333333)
-        )
-        SpacerWeight(1f)
-        Image(
-            painter = painterResource(R.drawable.room_ic_take_pic),
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
-        SpacerWidth(14.dp)
-        AppMoreIcon()
+    Column(modifier = Modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp)
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .padding(horizontal = 12.dp)
+                .onClick {
+                    isShow = true
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.room_cover),
+                fontSize = 20.sp,
+                color = Color(0xff333333)
+            )
+            SpacerWeight(1f)
+            Image(
+                painter = painterResource(R.drawable.room_ic_take_pic),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            SpacerWidth(14.dp)
+            AppMoreIcon()
+        }
+        SpacerHeight(8.dp)
+        AnimatedVisibility(visible = !viewModel.cover.isNullOrEmpty()) {
+            AppImage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .aspectRatio(1.5f)
+                    .clip(RoundedCornerShape(8.dp)),
+                model = viewModel.cover,
+            )
+        }
     }
 }
 
